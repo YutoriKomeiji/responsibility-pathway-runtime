@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "responsibility-pathway-runtime"
+version = "0.1.0a2"
+description = "A responsibility-pathway runtime for AI agent actions"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Akihisa Ono"}]
+keywords = ["ai-agents", "governance", "responsibility", "human-in-the-loop", "runtime"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Typing :: Typed"
+]
+
+[project.scripts]
+rpr = "rpr.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rpr = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
