@@ -6,6 +6,16 @@ RPR is an MIT-licensed responsibility-pathway runtime for AI-agent actions. It t
 
 > AI responsibility is not a slogan, a log, or a proof badge. It is an executable pathway.
 
+## Start here
+
+New to RPR?
+
+- [はじめてのRPR — 日本語スタートガイド](docs/getting-started-ja.md)
+- [Using RPR — technical integration guide](docs/using-rpr.md)
+- [Architecture and trust boundaries](ARCHITECTURE.md)
+
+The Japanese guide explains the purpose, first five minutes, core terms, safe first use case, Human Gates, readback, retry behavior, Lean 4 scope, and deployment checklist without requiring prior knowledge of the codebase.
+
 ## What RPR is
 
 RPR is working Python software for runtime AI assurance and agent governance. It is designed to sit at a pre-execution interception point between an agent plan and an external action.
