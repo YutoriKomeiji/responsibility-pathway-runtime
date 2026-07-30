@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+title: Responsibility Pathway Runtime
+type: software
+message: "If you use RPR in research or engineering work, cite this software and its canonical repository."
+authors:
+  - family-names: Ono
+    given-names: Akihisa
+license: MIT
+version: 0.1.0-alpha.2
+date-released: 2026-07-30
+abstract: "An executable responsibility-pathway runtime for bounded AI-agent actions."
+repository-code: "https://github.com/YutoriKomeiji/responsibility-pathway-runtime"
