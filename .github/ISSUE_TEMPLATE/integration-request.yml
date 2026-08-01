@@ -1,0 +1,53 @@
+name: Integration request / 統合リクエスト
+description: Propose a framework, service, tool, MCP, agent, RPA, batch, or application integration. Framework、service、tool、MCP、agent、RPA、batch、applicationとの統合を提案します。
+title: "[Integration] "
+labels: ["integration", "needs-design"]
+body:
+  - type: input
+    id: target
+    attributes:
+      label: Integration target / 統合対象
+      placeholder: Product, framework, protocol, or service and version / 製品・framework・protocol・serviceとversion
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Consequential action and use case / 重大な外部作用と利用例
+      description: Describe the action RPR would govern and why evidence, readback, repair, or Human Gate is needed. RPRが統治するactionと、証拠、readback、repair、Human Gateが必要な理由を記載してください。
+    validations:
+      required: true
+  - type: textarea
+    id: authority
+    attributes:
+      label: Authority and Human Gate / 権限とHuman Gate
+      description: Who authorizes execution, exception handling, reconciliation, and retirement? 実行、例外処理、reconciliation、retirementを誰が認可しますか。
+    validations:
+      required: true
+  - type: textarea
+    id: readback
+    attributes:
+      label: Independent readback / 独立readback
+      description: Identify the source that can confirm the external effect independently of dispatch. Dispatchとは独立して外部作用を確認できるsourceを記載してください。
+    validations:
+      required: true
+  - type: textarea
+    id: failure
+    attributes:
+      label: Failure and ambiguity cases / 障害・曖昧性ケース
+      description: Include timeout-after-acceptance, duplicate risk, unavailable readback, restart, and credential or identity boundaries where relevant. 必要に応じて受付後timeout、重複risk、readback unavailable、restart、credential・identity境界を含めてください。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Available evidence or prototype / 利用可能な証拠・prototype
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Boundary confirmation / 境界確認
+      options:
+        - label: The host remains responsible for authentication, credentials, network controls, domain authorization, and bypass prevention. / Hostが認証、credential、network control、domain authorization、bypass防止に責任を持ちます。
+          required: true
+        - label: This request does not treat an adapter or passing demo as production authorization. / Adapterまたはpassing demoを本番認可として扱いません。
+          required: true

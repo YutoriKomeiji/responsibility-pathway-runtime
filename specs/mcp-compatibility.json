@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "product": "Responsibility Pathway Runtime",
+  "default_protocol_version": "2025-11-25",
+  "versions": [
+    {
+      "protocol_version": "2025-11-25",
+      "lifecycle": "stable",
+      "enabled_by_default": true,
+      "requires_experimental_flag": false,
+      "accepted_discovery_modes": ["initialize"],
+      "session_model": "stateful_or_transport_defined"
+    },
+    {
+      "protocol_version": "2026-07-28",
+      "lifecycle": "release_candidate",
+      "enabled_by_default": false,
+      "requires_experimental_flag": true,
+      "accepted_discovery_modes": ["server/discover"],
+      "session_model": "stateless_per_request"
+    }
+  ],
+  "admission_bindings": [
+    "protocol_version",
+    "server_identity",
+    "server_capabilities_hash",
+    "tool_name",
+    "tool_schema_hash"
+  ],
+  "retry_contract": {
+    "transport_retry_reuses_business_identity": true,
+    "business_retry_requires_new_attempt_identity": true,
+    "required_business_identity_fields": [
+      "operation_id",
+      "attempt_id",
+      "idempotency_key",
+      "request_fingerprint"
+    ]
+  },
+  "mrtr_contract": {
+    "input_required_is_human_gate": false,
+    "requires_explicit_mapping": true,
+    "allowed_mappings": [
+      "input_missing",
+      "authorization_required",
+      "human_gate",
+      "repair_required",
+      "write_status_unknown"
+    ]
+  },
+  "unknown_version_policy": "reject",
+  "release_boundary": "private_rpp_development_only"
+}

@@ -1,0 +1,64 @@
+name: Bug report / バグ報告
+description: Report a reproducible defect in RPR product behavior. RPR製品動作の再現可能な不具合を報告します。
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for providing reproducible evidence. Do not include secrets or personal data.
+        再現可能な証拠の提供に感謝します。秘密情報や個人情報を含めないでください。
+  - type: input
+    id: version
+    attributes:
+      label: RPR version / RPRバージョン
+      placeholder: 0.1.0a2
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment / 環境
+      description: OS, Python, installation source, container or virtual environment. OS、Python、導入元、containerまたはvirtual environment。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps / 再現手順
+      description: Provide the smallest complete sequence. 最小で完全な手順を記載してください。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior / 期待結果
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and evidence / 実際の結果と証拠
+      description: Include state, reason codes, diagnostics, sanitized logs, and attempt IDs where available. 状態、reason code、diagnostics、匿名化済みlog、利用可能ならattempt IDを含めてください。
+    validations:
+      required: true
+  - type: dropdown
+    id: external_effect
+    attributes:
+      label: External effect status / 外部作用の状態
+      options:
+        - No external effect occurred / 外部作用なし
+        - External effect confirmed once / 外部作用を1回確認
+        - External effect may be ambiguous / 外部作用が曖昧な可能性
+        - Unknown / 不明
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation / 確認
+      options:
+        - label: I removed credentials, secrets, and personal data. / credential、秘密情報、個人情報を除去しました。
+          required: true
+        - label: I did not retry an ambiguous consequential write solely to produce this report. / 報告作成だけを目的に曖昧な重大writeを再試行していません。
+          required: true

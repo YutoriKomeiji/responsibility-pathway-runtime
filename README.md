@@ -9,7 +9,19 @@ Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for appli
 > Tested final rehearsal profile: Linux, Python 3.11  
 > RPR is not a legal-responsibility engine, identity provider, secret manager, production gateway, or guarantee of exactly-once effects across arbitrary remote systems.
 
-[日本語の入口](docs/ja/README.md) · [Product documentation](docs/en/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
+[日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Product documentation](docs/en/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
+
+## Why RPR
+
+AI agents and automation can execute faster than people can reconstruct what happened. RPR provides a bounded runtime layer where an integrating application can:
+
+- declare actors, authority, and the proposed action;
+- evaluate and retain an explicit pathway state;
+- bind operations, attempts, and idempotency identity;
+- require independent readback before completion;
+- stop ambiguous writes as `write_status_unknown` instead of false success;
+- retain Human Gate, repair, resume, reconciliation, and evidence continuity;
+- survive restart without silently repeating unresolved effects.
 
 ## Verified in the frozen alpha candidate
 
@@ -17,17 +29,36 @@ Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for appli
 - persistent pathway and execution-attempt stores;
 - Human Gate, repair, resume, and reconciliation boundaries;
 - local-file, allow-listed HTTP, durable outbound-message, and real MCP subprocess paths;
-- fail-closed ambiguous-write handling;
-- restart, backup, restore, diagnostics, uninstall, and customer-data retention;
+- HTTP and MCP fault injection;
+- crash/restart continuity and duplicate-dispatch prevention;
+- backup, restore, diagnostics, uninstall, package/CLI residue checks, and customer-data retention;
 - clean wheel and source-distribution installation;
-- reproducible release artifacts;
-- English-primary and Japanese-parallel product documentation.
+- two independent byte-for-byte reproducible builds;
+- English-primary and Japanese-parallel product documentation;
+- final RC audit with no retained findings for locally executable scope.
 
-## Field evidence requested
+## We need field-test reports for
 
-Please report reproducible findings for Windows, macOS, additional Linux/container environments, proxy/TLS/identity/credential routes, remote MCP, framework integrations, installation, operations, recovery, and documentation usability. A report is evidence for that environment; it does not imply universal production readiness.
+RPR is being published so real users can report reproducible environment and integration findings. Please open an Issue for:
 
-## Artifact verification
+- Windows, macOS, other Linux distributions, containers, and Python environments beyond the final Linux/Python 3.11 rehearsal;
+- proxy, TLS, enterprise identity, credential handling, remote MCP, and service-specific connectivity;
+- framework, agent, CI/CD, RPA, batch, and application integrations;
+- installation, upgrade, backup/restore, removal, and operational usability;
+- confusing states, missing examples, documentation gaps, and unsupported assumptions.
+
+A user report is field evidence for that environment. It does not imply universal production readiness.
+
+## Quick Start
+
+```bash
+python3.11 -m venv .venv
+. .venv/bin/activate
+python -m pip install responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
+rpr --help
+```
+
+Verify the received artifact before installation:
 
 ```text
 responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
@@ -41,8 +72,18 @@ size 129479 bytes
 
 ## Integration boundary
 
-The host application remains responsible for authentication, credential isolation, network controls, bypass prevention, domain-specific authorization, and independent readback. RPE integration is optional; absent, malformed, or unsupported RPE output must not become implicit permission.
+The host application remains responsible for authentication, credential isolation, network controls, bypass prevention, domain-specific authorization, and the independent readback source. RPE integration is optional; RPE absence, malformed output, or unsupported results must not become implicit permission.
+
+## Documentation
+
+- [Product, scope, and architecture](docs/en/product-scope-architecture.md)
+- [Installation, operations, and recovery](docs/en/install-operations-recovery.md)
+- [Security, limitations, integration, and API](docs/en/security-integration-api.md)
+- [Verification, known issues, release notes, and UAT](docs/en/verification-release-uat.md)
+- [Support and field testing](SUPPORT.md)
+- [Security reporting](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
 
 ## License
 
-Released under the [MIT License](LICENSE). Copyright © 2026 Akihisa Ono.
+RPR is released under the [MIT License](LICENSE). Copyright © 2026 Akihisa Ono.
