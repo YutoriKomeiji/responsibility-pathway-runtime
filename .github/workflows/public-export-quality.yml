@@ -11,6 +11,37 @@ permissions:
   contents: read
 
 jobs:
+  runtime-package-validation:
+    name: Runtime, package, and demo validation / Runtime・Package・Demo検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build and test tools
+        run: python -m pip install --disable-pip-version-check build pytest
+      - name: Install source package
+        run: python -m pip install --disable-pip-version-check -e .
+      - name: Run complete runtime test suite
+        run: python -m pytest -q
+      - name: Build wheel and source distribution
+        run: python -m build
+      - name: Verify clean wheel installation and CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/rpr-wheel-venv"
+          "$RUNNER_TEMP/rpr-wheel-venv/bin/python" -m pip install --disable-pip-version-check dist/*.whl
+          "$RUNNER_TEMP/rpr-wheel-venv/bin/python" -c "import rpr; print('PASS / 合格: clean wheel import')"
+          "$RUNNER_TEMP/rpr-wheel-venv/bin/rpr" --help >/dev/null
+      - name: Run production-grade demo tests
+        env:
+          PYTHONPATH: examples/production-grade-demo
+        run: python -m pytest -q examples/production-grade-demo/tests
+
   structural-validation:
     name: Structural and bilingual validation / 構造・日英検証
     runs-on: ubuntu-latest
@@ -27,9 +58,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          targets=(tools)
-          [[ -d src ]] && targets+=(src)
-          [[ -d examples ]] && targets+=(examples)
+          targets=(tools src examples tests)
           python -m compileall -q "${targets[@]}"
 
   site-validation:
@@ -44,6 +73,8 @@ jobs:
           set -euo pipefail
           test -s site/index.html
           test -s site/ja.html
+          test -s site/styles.css
+          test -s site/app.js
           grep -F 'href="ja.html"' site/index.html
           grep -F 'href="index.html"' site/ja.html
           grep -F 'prefers-reduced-motion' site/styles.css
@@ -57,4 +88,4 @@ jobs:
       - name: Confirm final release remains human-approved
         run: |
           echo 'Preparation checks may pass automatically.'
-          echo 'Final tag, GitHub Release, binary upload, and publication require Master approval.'
+          echo 'Final tag, GitHub Release, binary upload, Pages publication, and release declaration require Master approval.'
