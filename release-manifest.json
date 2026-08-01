@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "product": "Responsibility Pathway Runtime",
+  "package": "responsibility-pathway-runtime",
+  "version": "0.1.0a2",
+  "release_channel": "public-alpha",
+  "freeze_id": "RPR-CF-2026-08-01-02",
+  "license": "MIT",
+  "status": {
+    "locally_executable_scope": "verified",
+    "production_ready": false,
+    "customer_environment_verified": false,
+    "field_reports_requested": true
+  },
+  "artifacts": [
+    {
+      "name": "responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl",
+      "sha256": "33f1f9255ee93b4f8be28abf3d547a038eea463e7d0965dada843d8724af3790",
+      "size_bytes": 107214
+    },
+    {
+      "name": "responsibility_pathway_runtime-0.1.0a2.tar.gz",
+      "sha256": "7a82e586d44954ed3c3ead0b7d89dba27cb3d308f0fe721cbe8b37d55e1541dd",
+      "size_bytes": 129479
+    }
+  ]
+}
