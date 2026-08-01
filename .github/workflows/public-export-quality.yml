@@ -1,0 +1,60 @@
+name: Public export quality / 公開export品質
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - release/**
+
+permissions:
+  contents: read
+
+jobs:
+  structural-validation:
+    name: Structural and bilingual validation / 構造・日英検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate public export
+        run: python tools/validate_public_export.py
+      - name: Compile shipped Python sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          targets=(tools)
+          [[ -d src ]] && targets+=(src)
+          [[ -d examples ]] && targets+=(examples)
+          python -m compileall -q "${targets[@]}"
+
+  site-validation:
+    name: Static site validation / 静的site検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check bilingual entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s site/index.html
+          test -s site/ja.html
+          grep -F 'href="ja.html"' site/index.html
+          grep -F 'href="index.html"' site/ja.html
+          grep -F 'prefers-reduced-motion' site/styles.css
+          grep -F 'lang="en"' site/index.html
+          grep -F 'lang="ja"' site/ja.html
+
+  release-gate-placeholder:
+    name: Release gate declaration / Release Gate宣言
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm final release remains human-approved
+        run: |
+          echo 'Preparation checks may pass automatically.'
+          echo 'Final tag, GitHub Release, binary upload, and publication require Master approval.'
