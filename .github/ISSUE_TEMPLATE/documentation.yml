@@ -1,0 +1,40 @@
+name: Documentation issue / 文書問題
+description: Report missing, incorrect, unclear, or inconsistent English/Japanese documentation. 不足・誤り・不明瞭・日英不整合を報告します。
+title: "[Docs] "
+labels: ["documentation"]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Document and section / 文書と節
+      placeholder: docs/en/quick-start.md — Installation
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Affected language / 対象言語
+      options:
+        - English
+        - Japanese / 日本語
+        - Both or parity issue / 両方または日英整合
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / 問題
+      description: Quote only the minimum text needed and explain the risk or confusion. 必要最小限だけ引用し、riskまたは混乱を説明してください。
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Proposed correction or missing information / 修正案・不足情報
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Claim boundary / 主張境界
+      options:
+        - label: The proposed wording does not expand verified scope or imply production readiness without evidence. / 修正案は証拠なく検証範囲を拡張したりproduction readinessを示唆したりしません。
+          required: true

@@ -1,0 +1,149 @@
+name: Public export quality / 公開export品質
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - release/**
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-package-validation:
+    name: Runtime, package, and demo validation / Runtime・Package・Demo検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build and test tools
+        run: python -m pip install --disable-pip-version-check build pytest
+      - name: Install source package
+        run: python -m pip install --disable-pip-version-check -e .
+      - name: Validate standalone public test scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest_path = Path('tests/public-test-scope.json')
+          data = json.loads(manifest_path.read_text(encoding='utf-8'))
+          excluded = data['portable_suite']['excluded_modules']
+          paths = [item['path'] for item in excluded]
+          expected = data['portable_suite']['expected_passed_tests']
+          assert len(paths) == 8, paths
+          assert len(paths) == len(set(paths)), paths
+          assert all(Path(path).is_file() for path in paths), paths
+          assert isinstance(expected, int) and expected > 0, expected
+          assert data['canonical_pre_export_validation']['workflow_run'] == 30711058400
+          assert data['canonical_pre_export_validation']['result'] == 'success'
+          assert data['boundary']['portable_exclusion_is_not_a_pass_claim'] is True
+          print(f'PASS / 合格: explicit standalone public test scope verified ({expected} tests)')
+          PY
+      - name: Run standalone portable runtime suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t ignored < <(python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('tests/public-test-scope.json').read_text(encoding='utf-8'))
+          for item in data['portable_suite']['excluded_modules']:
+              print(item['path'])
+          PY
+          )
+          args=()
+          for path in "${ignored[@]}"; do
+            args+=(--ignore "$path")
+          done
+          python -m pytest -q --junitxml="$RUNNER_TEMP/portable-junit.xml" "${args[@]}"
+          python - <<'PY'
+          import json
+          import os
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          data = json.loads(Path('tests/public-test-scope.json').read_text(encoding='utf-8'))
+          expected = data['portable_suite']['expected_passed_tests']
+          root = ET.parse(Path(os.environ['RUNNER_TEMP']) / 'portable-junit.xml').getroot()
+          suite = root if root.tag == 'testsuite' else root.find('testsuite')
+          assert suite is not None
+          tests = int(suite.attrib.get('tests', '0'))
+          failures = int(suite.attrib.get('failures', '0'))
+          errors = int(suite.attrib.get('errors', '0'))
+          skipped = int(suite.attrib.get('skipped', '0'))
+          assert tests == expected, (tests, expected)
+          assert failures == 0, failures
+          assert errors == 0, errors
+          assert skipped == 0, skipped
+          print(f'PASS / 合格: {tests} portable tests passed with no failures, errors, or skips')
+          PY
+      - name: Build wheel and source distribution
+        run: python -m build
+      - name: Verify clean wheel installation and CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/rpr-wheel-venv"
+          "$RUNNER_TEMP/rpr-wheel-venv/bin/python" -m pip install --disable-pip-version-check dist/*.whl
+          "$RUNNER_TEMP/rpr-wheel-venv/bin/python" -c "import rpr; print('PASS / 合格: clean wheel import')"
+          "$RUNNER_TEMP/rpr-wheel-venv/bin/rpr" --help >/dev/null
+      - name: Run production-grade demo tests
+        env:
+          PYTHONPATH: examples/production-grade-demo
+        run: python -m pytest -q examples/production-grade-demo/tests
+
+  structural-validation:
+    name: Structural and bilingual validation / 構造・日英検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate public export
+        run: python tools/validate_public_export.py
+      - name: Compile shipped Python sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          targets=(tools src examples tests)
+          python -m compileall -q "${targets[@]}"
+
+  site-validation:
+    name: Static site validation / 静的site検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check bilingual entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s site/index.html
+          test -s site/ja.html
+          test -s site/styles.css
+          test -s site/app.js
+          grep -F 'href="ja.html"' site/index.html
+          grep -F 'href="index.html"' site/ja.html
+          grep -F 'prefers-reduced-motion' site/styles.css
+          grep -F 'lang="en"' site/index.html
+          grep -F 'lang="ja"' site/ja.html
+
+  release-gate-placeholder:
+    name: Release gate declaration / Release Gate宣言
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm final release remains human-approved
+        run: |
+          echo 'Preparation checks may pass automatically.'
+          echo 'Final tag, GitHub Release, binary upload, Pages publication, and release declaration require Master approval.'

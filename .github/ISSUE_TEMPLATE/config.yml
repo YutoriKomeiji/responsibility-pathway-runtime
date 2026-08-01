@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability / セキュリティ脆弱性
+    url: https://github.com/YutoriKomeiji/responsibility-pathway-runtime/security/advisories/new
+    about: Report suspected vulnerabilities privately. 脆弱性の疑いは非公開で報告してください。
+  - name: Support and reporting guide / サポート・報告ガイド
+    url: https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/SUPPORT.md
+    about: Check scope, evidence, and environment information before filing. 報告前に対象範囲・証拠・環境情報を確認してください。

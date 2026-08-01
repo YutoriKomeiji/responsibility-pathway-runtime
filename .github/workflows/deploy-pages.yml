@@ -1,0 +1,61 @@
+name: Deploy product site / 製品site公開
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "site/**"
+      - ".github/workflows/deploy-pages.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate site / site検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate bilingual entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s site/index.html
+          test -s site/ja.html
+          test -s site/styles.css
+          test -s site/app.js
+          grep -F 'href="ja.html"' site/index.html
+          grep -F 'href="index.html"' site/ja.html
+          grep -F 'lang="en"' site/index.html
+          grep -F 'lang="ja"' site/ja.html
+          grep -F 'prefers-reduced-motion' site/styles.css
+
+  deploy:
+    name: Deploy Pages / Pages配置
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

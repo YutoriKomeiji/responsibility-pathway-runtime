@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Responsibility Pathway Runtimeは、外部作用、証跡継続、復旧、人間への判断帰還を扱うMITライセンスのPythonランタイムです。">
+  <title>Responsibility Pathway Runtime | 日本語</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="RPRホーム"><span class="brand-mark" aria-hidden="true">RPR</span><span>Responsibility Pathway Runtime</span></a>
+    <nav aria-label="主要ナビゲーション"><a href="#capabilities">機能</a><a href="#how">仕組み</a><a href="#demo">運用デモ</a><a href="#field-tests">フィールドテスト</a><a href="#start">クイックスタート</a><a href="index.html" hreflang="en" lang="en">English</a></nav>
+  </header>
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-copy"><p class="eyebrow">MITライセンス Public Alpha · 0.1.0a2</p><h1>ソフトウェアが行為するときも、責任経路を切らない。</h1><p class="lede">RPRは、重要な外部作用の前後で、明示的な権限、実行試行の継続、独立readback、曖昧結果のfail-closed処理、修復経路、人間への判断帰還点を保持するPythonランタイムです。</p><div class="actions"><a class="button primary" href="#start">Public Alphaを試す</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues">Issueを報告</a></div><dl class="release-facts" aria-label="リリース情報"><div><dt>Freeze</dt><dd>RPR-CF-2026-08-01-02</dd></div><div><dt>License</dt><dd>MIT</dd></div><div><dt>最終リハーサル</dt><dd>Linux · Python 3.11</dd></div></dl></div>
+      <div class="pathway-card" aria-label="責任経路図"><div class="node">要求</div><span>↓</span><div class="node">行為者 + 権限</div><span>↓</span><div class="node accent">RPR責任経路</div><span>↓</span><div class="node">Executor + Readback</div><span>↓</span><div class="node">証跡 · 修復 · Human Gate</div></div>
+    </section>
+    <section class="section" id="capabilities"><div class="section-heading"><p class="eyebrow">ローカル実行範囲で検証済み</p><h2>楽観的な完了ではなく、不確実性のためのランタイム境界。</h2></div><div class="feature-grid">
+      <article><h3>明示的な権限</h3><p>統治を単一の真偽値に縮約せず、行為者、権限、責任経路状態、許可された遷移を保持します。</p></article>
+      <article><h3>実行試行の継続</h3><p>操作、試行、冪等性identityを、再試行、再起動、修復、reconciliationを通じて結びます。</p></article>
+      <article><h3>独立readback</h3><p>dispatch応答だけを信頼せず、影響を受けた領域からの独立証拠で完了を確認します。</p></article>
+      <article><h3>曖昧結果のfail-closed</h3><p>dispatch後の不確実性は<code>write_status_unknown</code>として残り、未解決の作用を黙って再送しません。</p></article>
+      <article><h3>人間への帰還点</h3><p>hold、repair、resume、Human Gateの所有者を明示し、根拠のない近道で解除させません。</p></article>
+      <article><h3>運用証拠</h3><p>HTTP、MCP subprocess、再起動、backup/restore、diagnostics、削除、顧客データ保持を検証対象に含みます。</p></article>
+    </div></section>
+    <section class="section split" id="how"><div><p class="eyebrow">統合モデル</p><h2>RPRは責任経路を統治し、Hostは配備を統治します。</h2><p>Host applicationは、認証、credential、networkとstorage control、bypass防止、業務固有の認可、独立readback sourceに責任を持ちます。</p><p>RPRは、pathway lifecycle、execution-attempt continuity、証拠保持、曖昧結果のfail-closed処理、認可された人間または修復経路への明示的帰還を担います。</p></div><aside class="boundary-card"><h3>RPRが主張しないもの</h3><ul><li>法的責任を決定するengine</li><li>identity providerまたはsecret manager</li><li>production gatewayまたはnetwork sandbox</li><li>任意のremote systemに対する普遍的exactly-once保証</li><li>未試験の顧客環境に対する検証済み主張</li></ul></aside></section>
+    <section class="section split" id="demo"><div><p class="eyebrow">運用デモ</p><h2>成功画面を見せるモックではなく、実際の失敗と復旧経路。</h2><p>仕入先支払シナリオでは、実RPR runtime、永続化、HTTP executor、独立readback、再起動復旧、reconciliationを通します。外部決済providerだけを、決定論的localhost serviceで置き換えます。</p><div class="actions"><a class="button primary" href="../examples/production-grade-demo/README.ja.md">デモを読む</a><a class="button secondary" href="../docs/ja/README.md">日本語ドキュメント</a></div></div><aside class="boundary-card"><h3>必須結果</h3><ul><li>dispatch前のHuman Gate</li><li>dispatch後の曖昧障害を未解決のまま保持</li><li>実プロセス再起動後も作用を重複させない</li><li>独立readbackで責任経路を解決</li><li>証拠と修復所有者を追跡可能にする</li></ul></aside></section>
+    <section class="section field" id="field-tests"><div class="section-heading"><p class="eyebrow">実環境の証拠を増やす</p><h2>あなたの環境で使い、実際に起きたことを報告してください。</h2><p>Windows、macOS、追加Linux distribution、container、proxy/TLS、enterprise identity、remote MCP、service integration、framework、運用workflowの再現可能なIssueを募集します。</p></div><div class="field-actions"><a class="button primary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues/new/choose">フィールドレポートを開く</a><a class="button secondary" href="../SUPPORT.md">報告項目</a></div></section>
+    <section class="section quick-start" id="start"><div><p class="eyebrow">クイックスタート</p><h2>固定されたAlpha artifactをclean environmentへ導入します。</h2></div><pre><code>python3.11 -m venv .venv
+. .venv/bin/activate
+python -m pip install responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
+rpr --help</code></pre><div class="digest-grid"><article><h3>Wheel SHA-256</h3><code>33f1f9255ee93b4f8be28abf3d547a038eea463e7d0965dada843d8724af3790</code></article><article><h3>Source distribution SHA-256</h3><code>7a82e586d44954ed3c3ead0b7d89dba27cb3d308f0fe721cbe8b37d55e1541dd</code></article></div></section>
+  </main>
+  <footer><p>Responsibility Pathway Runtime · MIT License · Copyright © 2026 Akihisa Ono</p><nav aria-label="フッターナビゲーション"><a href="../README.md">Repository</a><a href="../SECURITY.md">Security</a><a href="../CONTRIBUTING.md">Contributing</a><a href="index.html" hreflang="en" lang="en">English</a></nav></footer>
+</body>
+</html>

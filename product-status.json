@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "product": "Responsibility Pathway Runtime",
+  "version": "0.1.0a2",
+  "release_channel": "public-alpha",
+  "freeze_id": "RPR-CF-2026-08-01-02",
+  "status": "release-preparation",
+  "production_ready": false,
+  "customer_environment_verified": false,
+  "release_approved": false,
+  "human_gate": {
+    "required_for": [
+      "merge to production main",
+      "public visibility change",
+      "release tag creation",
+      "GitHub Release publication",
+      "binary artifact upload",
+      "GitHub Pages publication",
+      "production-ready claim"
+    ],
+    "residual_owner": "human maintainer"
+  },
+  "verified_profile": {
+    "operating_system": "Linux",
+    "python": "3.11",
+    "scope": "frozen locally executable release-candidate rehearsal"
+  },
+  "verified_capabilities": [
+    "authorized pathway lifecycle transitions",
+    "persistent pathway and execution-attempt continuity",
+    "Human Gate, repair, resume, and reconciliation boundaries",
+    "local-file, allow-listed HTTP, durable outbound-message, and MCP subprocess paths",
+    "fail-closed ambiguous-write handling",
+    "restart and duplicate-dispatch prevention",
+    "backup, restore, diagnostics, removal, and customer-data retention",
+    "clean wheel and source-distribution installation",
+    "byte-for-byte reproducible release artifacts"
+  ],
+  "non_claims": [
+    "universal production readiness",
+    "customer-environment verification",
+    "legal compliance or certification",
+    "identity or credential management",
+    "exactly-once effects across arbitrary remote systems",
+    "automatic transfer of final responsibility to the runtime"
+  ],
+  "open_release_gates": [
+    "complete public source, specifications, tests, examples, and package metadata export",
+    "implement and execute production-grade governed action demo",
+    "complete issue and pull-request templates",
+    "complete website integration and accessibility audit",
+    "add export validator and independent CI",
+    "perform secret, internal-link, license, digest, and residue audit",
+    "perform production repository clean-install and readback verification",
+    "obtain final human release approval"
+  ]
+}

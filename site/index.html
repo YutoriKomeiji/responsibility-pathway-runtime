@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Responsibility Pathway Runtime is an MIT-licensed Python runtime for governed external actions, evidence continuity, recovery, and Human Gate decisions.">
+  <title>Responsibility Pathway Runtime</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="RPR home"><span class="brand-mark" aria-hidden="true">RPR</span><span>Responsibility Pathway Runtime</span></a>
+    <nav aria-label="Primary navigation">
+      <a href="#capabilities">Capabilities</a><a href="#how">How it works</a><a href="#demo">Operational demo</a><a href="#field-tests">Field testing</a><a href="#start">Quick Start</a><a href="ja.html" hreflang="ja" lang="ja">日本語</a>
+    </nav>
+  </header>
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow">MIT-licensed public alpha · 0.1.0a2</p>
+        <h1>Keep the responsibility path intact when software acts.</h1>
+        <p class="lede">RPR is a Python runtime for applications that need explicit authority, attempt continuity, independent readback, fail-closed ambiguity handling, repair routes, and a human return point around consequential external actions.</p>
+        <div class="actions"><a class="button primary" href="#start">Start with the alpha</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues">Report an Issue</a></div>
+        <dl class="release-facts" aria-label="Release facts"><div><dt>Freeze</dt><dd>RPR-CF-2026-08-01-02</dd></div><div><dt>License</dt><dd>MIT</dd></div><div><dt>Final rehearsal</dt><dd>Linux · Python 3.11</dd></div></dl>
+      </div>
+      <div class="pathway-card" aria-label="Responsibility pathway diagram"><div class="node">Request</div><span>↓</span><div class="node">Actor + Authority</div><span>↓</span><div class="node accent">RPR Pathway</div><span>↓</span><div class="node">Executor + Readback</div><span>↓</span><div class="node">Evidence · Repair · Human Gate</div></div>
+    </section>
+    <section class="section" id="capabilities"><div class="section-heading"><p class="eyebrow">Verified locally executable scope</p><h2>A runtime boundary built for uncertainty, not optimistic completion.</h2></div><div class="feature-grid">
+      <article><h3>Explicit authority</h3><p>Retain actors, authority, pathway state, and authorized transitions instead of reducing governance to a boolean check.</p></article>
+      <article><h3>Attempt continuity</h3><p>Bind operations, attempts, and idempotency identity across retry, restart, repair, and reconciliation.</p></article>
+      <article><h3>Independent readback</h3><p>Completion requires evidence from the affected domain rather than trusting a dispatch response alone.</p></article>
+      <article><h3>Fail-closed ambiguity</h3><p>Post-dispatch uncertainty remains <code>write_status_unknown</code>; RPR does not silently replay an unresolved effect.</p></article>
+      <article><h3>Human return point</h3><p>Hold, repair, resume, and Human Gate ownership remain explicit and cannot be cleared by an unsupported shortcut.</p></article>
+      <article><h3>Operational evidence</h3><p>Verified paths include HTTP, MCP subprocess, restart, backup/restore, diagnostics, removal, and retained customer data.</p></article>
+    </div></section>
+    <section class="section split" id="how"><div><p class="eyebrow">Integration model</p><h2>RPR governs the pathway. Your host governs the deployment.</h2><p>The host application remains responsible for authentication, credentials, network and storage controls, bypass prevention, domain-specific authorization, and the independent readback source.</p><p>RPR owns pathway lifecycle, execution-attempt continuity, evidence retention, fail-closed ambiguity, and explicit return to an authorized human or repair route.</p></div><aside class="boundary-card"><h3>RPR does not claim to be</h3><ul><li>a legal-responsibility engine;</li><li>an identity provider or secret manager;</li><li>a production gateway or network sandbox;</li><li>a universal exactly-once guarantee;</li><li>customer-environment verified before that environment is tested.</li></ul></aside></section>
+    <section class="section split" id="demo"><div><p class="eyebrow">Operational demonstration</p><h2>A real failure-and-recovery path, not a mocked success screen.</h2><p>The supplier-payment scenario runs the actual RPR runtime, persistence, HTTP executor, independent readback, restart recovery, and reconciliation logic. A deterministic localhost service replaces only the external payment provider.</p><div class="actions"><a class="button primary" href="../examples/production-grade-demo/README.md">Read the demo</a><a class="button secondary" href="../docs/en/verification-release-uat.md">See verification scope</a></div></div><aside class="boundary-card"><h3>Required outcomes</h3><ul><li>Human Gate before dispatch;</li><li>ambiguous post-dispatch failure remains unresolved;</li><li>real process restart does not duplicate the effect;</li><li>independent readback resolves the pathway;</li><li>evidence and repair ownership remain inspectable.</li></ul></aside></section>
+    <section class="section field" id="field-tests"><div class="section-heading"><p class="eyebrow">Help expand real-world evidence</p><h2>Use it in your environment. Report what actually happens.</h2><p>We are looking for reproducible Issues from Windows, macOS, additional Linux distributions, containers, proxy/TLS routes, enterprise identity, remote MCP, service integrations, frameworks, and operational workflows.</p></div><div class="field-actions"><a class="button primary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues/new/choose">Open a field report</a><a class="button secondary" href="../SUPPORT.md">What to include</a></div></section>
+    <section class="section quick-start" id="start"><div><p class="eyebrow">Quick Start</p><h2>Install the fixed alpha artifact in a clean environment.</h2></div><pre><code>python3.11 -m venv .venv
+. .venv/bin/activate
+python -m pip install responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
+rpr --help</code></pre><div class="digest-grid"><article><h3>Wheel SHA-256</h3><code>33f1f9255ee93b4f8be28abf3d547a038eea463e7d0965dada843d8724af3790</code></article><article><h3>Source distribution SHA-256</h3><code>7a82e586d44954ed3c3ead0b7d89dba27cb3d308f0fe721cbe8b37d55e1541dd</code></article></div></section>
+  </main>
+  <footer><p>Responsibility Pathway Runtime · MIT License · Copyright © 2026 Akihisa Ono</p><nav aria-label="Footer navigation"><a href="../README.md">Repository</a><a href="../SECURITY.md">Security</a><a href="../CONTRIBUTING.md">Contributing</a><a href="ja.html" hreflang="ja" lang="ja">日本語</a></nav></footer>
+</body>
+</html>

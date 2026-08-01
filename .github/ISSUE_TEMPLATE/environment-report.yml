@@ -1,0 +1,57 @@
+name: Environment field report / 環境フィールド報告
+description: Share installation and operation evidence from an environment not covered by the final rehearsal. 最終リハーサル外の環境での導入・運用証拠を共有します。
+title: "[Environment] "
+labels: ["field-evidence", "environment"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: RPR version and artifact digest / バージョンとartifact digest
+      placeholder: 0.1.0a2, wheel SHA-256 ...
+    validations:
+      required: true
+  - type: textarea
+    id: platform
+    attributes:
+      label: Platform / 実行環境
+      description: OS and version, architecture, Python, shell, container, installer, filesystem, and relevant runtime constraints. OSとversion、architecture、Python、shell、container、installer、filesystem、関連するruntime制約。
+    validations:
+      required: true
+  - type: textarea
+    id: procedure
+    attributes:
+      label: Procedure executed / 実施手順
+      description: State whether this was clean install, upgrade, demo, backup/restore, restart, removal, or integration testing. clean install、upgrade、demo、backup/restore、restart、removal、integration testの別を記載してください。
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result / 結果
+      options:
+        - Passed as documented / 文書どおり成功
+        - Passed with workarounds / 回避策付きで成功
+        - Failed safely / 安全に失敗
+        - Failed unsafely or ambiguously / 危険または曖昧に失敗
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and observations / 証拠と観測
+      description: Include commands, sanitized logs, diagnostics, durations, and retained state relevant to the result. command、匿名化済みlog、diagnostics、所要時間、結果に関係する保持状態を含めてください。
+    validations:
+      required: true
+  - type: textarea
+    id: usability
+    attributes:
+      label: Documentation and usability findings / 文書・使いやすさの所見
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation / 確認
+      options:
+        - label: This report describes only the tested environment and does not assert universal production readiness. / この報告は試験環境だけを記述し、普遍的production readinessを主張しません。
+          required: true
+        - label: Secrets and personal data were removed. / 秘密情報と個人情報を除去しました。
+          required: true
