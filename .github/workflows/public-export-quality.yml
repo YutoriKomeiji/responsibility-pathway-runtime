@@ -37,14 +37,15 @@ jobs:
           data = json.loads(manifest_path.read_text(encoding='utf-8'))
           excluded = data['portable_suite']['excluded_modules']
           paths = [item['path'] for item in excluded]
+          expected = data['portable_suite']['expected_passed_tests']
           assert len(paths) == 8, paths
           assert len(paths) == len(set(paths)), paths
           assert all(Path(path).is_file() for path in paths), paths
+          assert isinstance(expected, int) and expected > 0, expected
           assert data['canonical_pre_export_validation']['workflow_run'] == 30711058400
           assert data['canonical_pre_export_validation']['result'] == 'success'
-          assert data['portable_suite']['expected_passed_tests'] == 392
           assert data['boundary']['portable_exclusion_is_not_a_pass_claim'] is True
-          print('PASS / 合格: explicit standalone public test scope verified')
+          print(f'PASS / 合格: explicit standalone public test scope verified ({expected} tests)')
           PY
       - name: Run standalone portable runtime suite
         shell: bash
@@ -62,8 +63,28 @@ jobs:
           for path in "${ignored[@]}"; do
             args+=(--ignore "$path")
           done
-          python -m pytest -q "${args[@]}" | tee "$RUNNER_TEMP/portable-pytest.txt"
-          grep -Eq '392 passed' "$RUNNER_TEMP/portable-pytest.txt"
+          python -m pytest -q --junitxml="$RUNNER_TEMP/portable-junit.xml" "${args[@]}"
+          python - <<'PY'
+          import json
+          import os
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          data = json.loads(Path('tests/public-test-scope.json').read_text(encoding='utf-8'))
+          expected = data['portable_suite']['expected_passed_tests']
+          root = ET.parse(Path(os.environ['RUNNER_TEMP']) / 'portable-junit.xml').getroot()
+          suite = root if root.tag == 'testsuite' else root.find('testsuite')
+          assert suite is not None
+          tests = int(suite.attrib.get('tests', '0'))
+          failures = int(suite.attrib.get('failures', '0'))
+          errors = int(suite.attrib.get('errors', '0'))
+          skipped = int(suite.attrib.get('skipped', '0'))
+          assert tests == expected, (tests, expected)
+          assert failures == 0, failures
+          assert errors == 0, errors
+          assert skipped == 0, skipped
+          print(f'PASS / 合格: {tests} portable tests passed with no failures, errors, or skips')
+          PY
       - name: Build wheel and source distribution
         run: python -m build
       - name: Verify clean wheel installation and CLI
