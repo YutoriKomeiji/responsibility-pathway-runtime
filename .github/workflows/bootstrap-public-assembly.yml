@@ -5,14 +5,14 @@ on:
     branches:
       - release/0.1.0a2
     paths:
-      - ".transfer/rpr-public-clean.tar.gz.b64"
+      - ".transfer/**"
 
 permissions:
   contents: write
 
 jobs:
   transfer:
-    if: ${{ hashFiles('.transfer/rpr-public-clean.tar.gz.b64') != '' }}
+    if: ${{ hashFiles('.transfer/part-*') != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout release branch
@@ -24,7 +24,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base64 --decode .transfer/rpr-public-clean.tar.gz.b64 > "$RUNNER_TEMP/rpr-public-clean.tar.gz"
+          test "$(find .transfer -maxdepth 1 -type f -name 'part-*' | wc -l)" -eq 4
+          cat .transfer/part-* | base64 --decode > "$RUNNER_TEMP/rpr-public-clean.tar.gz"
           echo "04b8d573a0ccc054c5e8523b0698e619a58e100d02cf736b32314af2e70b113e  $RUNNER_TEMP/rpr-public-clean.tar.gz" | sha256sum --check --strict
           mkdir -p "$RUNNER_TEMP/rpr-public-clean"
           tar -xzf "$RUNNER_TEMP/rpr-public-clean.tar.gz" -C "$RUNNER_TEMP/rpr-public-clean"
