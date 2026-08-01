@@ -1,0 +1,47 @@
+name: Bootstrap verified public assembly
+
+on:
+  push:
+    branches:
+      - release/0.1.0a2
+    paths:
+      - ".transfer/rpr-public-clean.tar.gz.b64"
+
+permissions:
+  contents: write
+
+jobs:
+  transfer:
+    if: ${{ hashFiles('.transfer/rpr-public-clean.tar.gz.b64') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          ref: release/0.1.0a2
+          fetch-depth: 0
+      - name: Decode and verify canonical transfer archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode .transfer/rpr-public-clean.tar.gz.b64 > "$RUNNER_TEMP/rpr-public-clean.tar.gz"
+          echo "04b8d573a0ccc054c5e8523b0698e619a58e100d02cf736b32314af2e70b113e  $RUNNER_TEMP/rpr-public-clean.tar.gz" | sha256sum --check --strict
+          mkdir -p "$RUNNER_TEMP/rpr-public-clean"
+          tar -xzf "$RUNNER_TEMP/rpr-public-clean.tar.gz" -C "$RUNNER_TEMP/rpr-public-clean"
+          test "$(find "$RUNNER_TEMP/rpr-public-clean" -type f | wc -l)" -eq 180
+          test -s "$RUNNER_TEMP/rpr-public-clean/.github/workflows/public-export-quality.yml"
+          test -s "$RUNNER_TEMP/rpr-public-clean/.github/workflows/deploy-pages.yml"
+          test -s "$RUNNER_TEMP/rpr-public-clean/docs/en/README.md"
+          test -s "$RUNNER_TEMP/rpr-public-clean/docs/ja/README.md"
+      - name: Replace branch contents with verified canonical tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$RUNNER_TEMP/rpr-public-clean/." .
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "No transfer changes detected"; exit 1; }
+          git commit -m "release: transfer verified RPR 0.1.0a2 assembly"
+          git push origin HEAD:release/0.1.0a2
