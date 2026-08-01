@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "product": "Responsibility Pathway Runtime",
+  "version": "0.1.0a2",
+  "scope": "standalone-public-repository",
+  "canonical_pre_export_validation": {
+    "workflow_run": 30711058400,
+    "result": "success",
+    "coverage": "complete frozen runtime test suite in canonical preparation layout"
+  },
+  "portable_suite": {
+    "expected_passed_tests": 392,
+    "excluded_modules": [
+      {
+        "path": "tests/test_assurance_manifest.py",
+        "reason": "requires canonical assurance manifests and anchored preparation documents not shipped as public runtime inputs"
+      },
+      {
+        "path": "tests/test_canonical_transition_spec.py",
+        "reason": "requires the canonical JSON and Lean transition-model source layout used during pre-export verification"
+      },
+      {
+        "path": "tests/test_claim_traceability.py",
+        "reason": "requires the preparation claim registry and source-document anchor corpus"
+      },
+      {
+        "path": "tests/test_customer_handover.py",
+        "reason": "verifies preparation-stage handover evidence paths and internal workflow anchors"
+      },
+      {
+        "path": "tests/test_delivery_acceptance_baseline.py",
+        "reason": "verifies the preparation-stage delivery evidence corpus and workflow anchors"
+      },
+      {
+        "path": "tests/test_formal_consistency.py",
+        "reason": "requires the canonical Lean project used during pre-export formal consistency verification"
+      },
+      {
+        "path": "tests/test_integration_acceptance_inventory.py",
+        "reason": "requires retained preparation-stage integration evidence and its canonical repository layout"
+      },
+      {
+        "path": "tests/test_lifecycle_acceptance.py",
+        "reason": "requires retained upgrade fixtures from the canonical preparation lifecycle rehearsal"
+      }
+    ]
+  },
+  "boundary": {
+    "portable_exclusion_is_not_a_pass_claim": true,
+    "production_package_build_install_cli_and_demo_remain_required": true,
+    "final_release_requires_human_approval": true
+  }
+}
