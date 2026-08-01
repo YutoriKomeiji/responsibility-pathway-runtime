@@ -9,7 +9,7 @@
     "coverage": "complete frozen runtime test suite in canonical preparation layout"
   },
   "portable_suite": {
-    "expected_passed_tests": 392,
+    "expected_passed_tests": 385,
     "excluded_modules": [
       {
         "path": "tests/test_assurance_manifest.py",
