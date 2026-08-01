@@ -23,11 +23,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl --fail --location --retry 3 --output "$RUNNER_TEMP/rpr-public.zip" 'https://sdmntprjapaneast.oaiusercontent.com/files/00000000-08d0-8209-b6ae-024bb35221fc/raw?se=2026-08-01T18:18:04Z&sp=r&sv=2026-02-06&sr=b&scid=d820da3c-436b-5234-a5e4-1646bd630278&skoid=03727f49-62d3-42ac-8350-1c0e6559d238&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-01T03:45:15Z&ske=2026-08-02T03:45:15Z&sks=b&skv=2026-02-06&sig=oy395BSJzSN0VIHndkkJgO5WnvgaKt3E04w0d86aYQs%3D'
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/rpr-public.zip" 'https://sdmntprjapaneast.oaiusercontent.com/files/00000000-1ccc-8209-bb5c-185190b7ae65/raw?se=2026-08-01T18:21:23Z&sp=r&sv=2026-02-06&sr=b&scid=39f0ecd0-a01c-5b74-82ff-b77a8c65e319&skoid=03727f49-62d3-42ac-8350-1c0e6559d238&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-01T01:24:35Z&ske=2026-08-02T01:24:35Z&sks=b&skv=2026-02-06&sig=kCC0iWQvU2VxW79Yv%2B6Le0s8kz1jBELcmrB8X13rZ%2Bw%3D'
           echo "f3e9627f6ed444e3b419a860f68640b070668faa9a4be7f27e0f9b5b4b58895d  $RUNNER_TEMP/rpr-public.zip" | sha256sum --check --strict
           mkdir -p "$RUNNER_TEMP/rpr-public"
           unzip -q "$RUNNER_TEMP/rpr-public.zip" -d "$RUNNER_TEMP/rpr-public"
-      - name: Reduce artifact to canonical repository set
+      - name: Reduce artifact to canonical non-workflow transfer set
         shell: bash
         run: |
           set -euo pipefail
@@ -38,12 +38,16 @@ jobs:
           test -s "$RUNNER_TEMP/rpr-public/docs/en/README.md"
           test -s "$RUNNER_TEMP/rpr-public/docs/ja/README.md"
           python "$RUNNER_TEMP/rpr-public/tools/validate_public_export.py"
-      - name: Replace branch contents with verified canonical tree
+          rm -rf "$RUNNER_TEMP/rpr-public/.github/workflows"
+      - name: Replace branch contents while preserving bootstrap workflow
         shell: bash
         run: |
           set -euo pipefail
+          cp .github/workflows/bootstrap-public-assembly.yml "$RUNNER_TEMP/bootstrap-public-assembly.yml"
           find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -a "$RUNNER_TEMP/rpr-public/." .
+          mkdir -p .github/workflows
+          cp "$RUNNER_TEMP/bootstrap-public-assembly.yml" .github/workflows/bootstrap-public-assembly.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
