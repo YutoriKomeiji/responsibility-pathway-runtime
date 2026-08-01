@@ -5,7 +5,7 @@ on:
     branches:
       - release/0.1.0a2
     paths:
-      - ".github/workflows/bootstrap-public-assembly.yml"
+      - ".transfer/trigger"
 
 permissions:
   contents: write
