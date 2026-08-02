@@ -86,39 +86,82 @@ jobs:
           (async () => {
             const browser = await chromium.launch({ headless: true });
             const page = await browser.newPage();
-            page.on('console', message => console.log(`[browser:${message.type()}] ${message.text()}`));
-            page.on('pageerror', error => console.error(`[browser:error] ${error.message}`));
-            await page.goto('http://127.0.0.1:8000/demo.html', { waitUntil: 'domcontentloaded' });
-            await page.click('#load-runtime');
-            await page.waitForFunction(
-              () => document.querySelector('#package-status')?.textContent === 'RPR 0.1.0a2',
-              null,
-              { timeout: 180000 }
-            );
-            await page.click('#run-all');
-            await page.waitForFunction(
-              () => document.querySelector('#current-state')?.textContent === 'completed',
-              null,
-              { timeout: 60000 }
-            );
-            const result = await page.evaluate(() => ({
-              state: document.querySelector('#current-state')?.textContent,
-              dispatchCount: document.querySelector('#dispatch-count')?.textContent,
-              evidence: document.querySelector('#evidence-status')?.textContent,
-              output: document.querySelector('#output')?.textContent,
-            }));
-            if (result.state !== 'completed') throw new Error(JSON.stringify(result));
-            if (result.dispatchCount !== '1') throw new Error(JSON.stringify(result));
-            if (result.evidence !== '検証済み') throw new Error(JSON.stringify(result));
-            const payload = JSON.parse(result.output);
-            const reconciled = payload.result.reconciled;
-            if (reconciled.state_before !== 'write_status_unknown') throw new Error(result.output);
-            if (reconciled.duplicate_dispatch_prevented !== true) throw new Error(result.output);
-            if (reconciled.evidence_valid !== true) throw new Error(result.output);
-            console.log(JSON.stringify(result));
-            await browser.close();
+            const browserLog = [];
+            page.on('console', message => {
+              const line = `[browser:${message.type()}] ${message.text()}`;
+              browserLog.push(line);
+              console.log(line);
+            });
+            page.on('pageerror', error => {
+              const line = `[browser:error] ${error.stack || error.message}`;
+              browserLog.push(line);
+              console.error(line);
+            });
+
+            try {
+              await page.goto('http://127.0.0.1:8000/demo.html', { waitUntil: 'domcontentloaded' });
+              await page.click('#load-runtime');
+              await page.waitForFunction(
+                () => {
+                  const root = document.documentElement.dataset;
+                  return root.runtimeReady === 'true' || root.runtimeReady === 'false';
+                },
+                null,
+                { timeout: 180000 }
+              );
+
+              const startup = await page.evaluate(() => ({
+                runtimeReady: document.documentElement.dataset.runtimeReady,
+                stage: document.documentElement.dataset.demoStage,
+                error: document.documentElement.dataset.demoError,
+                python: document.querySelector('#python-status')?.textContent,
+                package: document.querySelector('#package-status')?.textContent,
+                output: document.querySelector('#output')?.textContent,
+              }));
+              console.log(`[browser:startup] ${JSON.stringify(startup)}`);
+              if (startup.runtimeReady !== 'true') throw new Error(`runtime startup failed: ${JSON.stringify(startup)}`);
+              if (startup.package !== 'RPR 0.1.0a2') throw new Error(`unexpected package status: ${JSON.stringify(startup)}`);
+
+              await page.click('#run-all');
+              await page.waitForFunction(
+                () => document.documentElement.dataset.demoState === 'completed',
+                null,
+                { timeout: 60000 }
+              );
+              const result = await page.evaluate(() => ({
+                state: document.querySelector('#current-state')?.textContent,
+                dispatchCount: document.querySelector('#dispatch-count')?.textContent,
+                evidence: document.querySelector('#evidence-status')?.textContent,
+                output: document.querySelector('#output')?.textContent,
+                demoOk: document.documentElement.dataset.demoOk,
+              }));
+              if (result.demoOk !== 'true') throw new Error(JSON.stringify(result));
+              if (result.state !== 'completed') throw new Error(JSON.stringify(result));
+              if (result.dispatchCount !== '1') throw new Error(JSON.stringify(result));
+              if (result.evidence !== '検証済み') throw new Error(JSON.stringify(result));
+              const payload = JSON.parse(result.output);
+              const reconciled = payload.result.reconciled;
+              if (reconciled.state_before !== 'write_status_unknown') throw new Error(result.output);
+              if (reconciled.duplicate_dispatch_prevented !== true) throw new Error(result.output);
+              if (reconciled.evidence_valid !== true) throw new Error(result.output);
+              console.log(JSON.stringify(result));
+            } catch (error) {
+              const snapshot = await page.evaluate(() => ({
+                htmlDataset: { ...document.documentElement.dataset },
+                python: document.querySelector('#python-status')?.textContent,
+                package: document.querySelector('#package-status')?.textContent,
+                state: document.querySelector('#current-state')?.textContent,
+                output: document.querySelector('#output')?.textContent,
+                summary: document.querySelector('#summary')?.textContent,
+              })).catch(() => ({ unavailable: true }));
+              console.error(`[browser:snapshot] ${JSON.stringify(snapshot)}`);
+              console.error(`[browser:log] ${JSON.stringify(browserLog)}`);
+              throw error;
+            } finally {
+              await browser.close();
+            }
           })().catch(error => {
-            console.error(error);
+            console.error(error.stack || error);
             process.exit(1);
           });
           JS
