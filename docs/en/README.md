@@ -10,29 +10,39 @@ Body Language: English
 
 # Responsibility Pathway Runtime documentation
 
-RPR is a runtime control and evidence layer for governed external actions. This documentation describes the frozen public-alpha candidate `0.1.0a2` without claiming universal production readiness.
+Responsibility Pathway Runtime (RPR) is an MIT-licensed runtime control and evidence component for governed external actions. The software is provided under the terms of the [MIT License](../../LICENSE), including its warranty and liability disclaimer.
+
+This documentation describes the verified public-alpha candidate `0.1.0a2`. It explains tested behavior and integration responsibilities; it does not create a warranty, certification, service commitment, or guarantee of fitness for a particular deployment.
 
 ## Start here
 
-1. [Quick Start](quick-start.md)
-2. [Product scope and architecture](product-scope-architecture.md)
-3. [Installation, operation, and recovery](install-operations-recovery.md)
-4. [Security, integration, and API boundary](security-integration-api.md)
-5. [Verification, release notes, known issues, and UAT](verification-release-uat.md)
+| Guide | Purpose |
+|---|---|
+| [Quick Start](quick-start.md) | Verify an artifact and run a low-impact local rehearsal |
+| [Product scope and architecture](product-scope-architecture.md) | Understand what RPR does, does not do, and where it sits |
+| [Installation, operation, and recovery](install-operations-recovery.md) | Prepare, operate, stop, restore, and remove an integration |
+| [Security, integration, and API boundary](security-integration-api.md) | Define trust boundaries and host-application obligations |
+| [Verification, release notes, known issues, and UAT](verification-release-uat.md) | Review evidence, limitations, and a minimum acceptance plan |
 
-## Evidence boundary
+## Product and integration boundary
 
-The frozen candidate was rehearsed on Linux with Python 3.11. Other operating systems, Python versions, proxies, TLS arrangements, enterprise identity systems, credential stores, remote MCP services, and host-framework integrations require environment-specific evidence.
+| RPR provides | The integrator or operator provides |
+|---|---|
+| Pathway state and authorized transitions | Authentication and domain-specific authorization |
+| Execution-attempt continuity | Credential isolation and network controls |
+| Evidence attachment and readback workflow | An independent and authoritative readback source |
+| Human Gate, repair, resume, and reconciliation states | Approval policy, bypass prevention, and operational ownership |
+| Tested adapters and failure-state handling | Deployment suitability, monitoring, and final external action |
 
-A successful field report demonstrates only the reported configuration. It does not establish general production readiness, legal compliance, safety certification, or exactly-once behavior across arbitrary remote systems.
+The frozen candidate was rehearsed on Linux with Python 3.11. Results for other operating systems, Python versions, proxies, TLS arrangements, identity systems, credential stores, remote MCP services, and host frameworks require environment-specific testing.
 
-## Responsibility boundary
-
-RPR can retain declarations, pathway state, execution attempts, readback evidence, repair and reconciliation state, and Human Gate decisions. The integrating application and its operators remain responsible for authentication, authorization, credential isolation, network controls, domain-specific policy, bypass prevention, independent readback, deployment approval, and final external action.
+A field report is evidence for the reported configuration only. It is not a general warranty, legal opinion, safety certification, or proof of exactly-once behavior across arbitrary remote systems.
 
 ## Support routes
 
-- Product and integration questions: see [`SUPPORT.md`](../../SUPPORT.md)
-- Security reports: see [`SECURITY.md`](../../SECURITY.md)
-- Contributions: see [`CONTRIBUTING.md`](../../CONTRIBUTING.md)
-- Public issue forms: use the repository Issue tab after production promotion
+| Topic | Route |
+|---|---|
+| Product and integration questions | [`SUPPORT.md`](../../SUPPORT.md) |
+| Security reports | [`SECURITY.md`](../../SECURITY.md) |
+| Contributions | [`CONTRIBUTING.md`](../../CONTRIBUTING.md) |
+| License terms | [`LICENSE`](../../LICENSE) |
