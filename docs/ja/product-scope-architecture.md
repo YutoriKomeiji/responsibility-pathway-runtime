@@ -12,7 +12,7 @@ Body Language: Japanese
 
 ## Product role
 
-Responsibility Pathway Runtime（RPR）は、host applicationのdecision logicと重大なexternal actionの間に置かれます。提案actionから、宣言authority、pathway state、execution attempt、独立readback、repairまたはreconciliation、Human Gateへの返却までを再構成可能な経路として保持します。
+Responsibility Pathway Runtime（RPR）は、host applicationのdecision logicと重大なexternal actionの間に配置するMITライセンスのsoftware componentです。提案actionからauthority、execution attempt、evidence、repairまたはreconciliation、Human Gateへの返却までを再構成可能な経路として保持します。
 
 ```text
 host application
@@ -24,36 +24,38 @@ host application
   -> evidence retained for reconstruction
 ```
 
-## Frozen alpha capability groups
+## Capability map
 
-`RPR-CF-2026-08-01-02`候補には次が含まれます。
-
-- pathway lifecycleとauthorized transition
-- persistent pathwayとexecution-attempt continuity
-- Human Gate、repair、resume、reconciliation境界
-- local-file、allow-listed HTTP、durable outbound-message、MCP subprocess経路
-- fail-closedなambiguous-write処理
-- freeze rehearsalで試験したcrash/restartとduplicate-dispatch protection
-- backup、restore、diagnostics、removal、customer-data retention手順
-- reproducible artifactによるwheel/source-distribution install
+| Capability | RPRが提供するもの | RPRの外に残るもの |
+|---|---|---|
+| Pathway lifecycle | State modelと許可transition | Business policyの作成 |
+| Execution continuity | 永続operationとattempt | Remote systemのtransaction保証 |
+| Evidence | Evidence保持、provenance、readback workflow | 権威ある外部evidence source |
+| Human control | Human Gate、repair、resume、reconciliation state | Authorized decision makerの選定と本人性確認 |
+| Adapter | Local file、HTTP、message、MCPのbounded path | Network trust、credential、service固有semantics |
+| Recovery | Ambiguous write保持とrestart continuity | Incident staffingと運用ownership |
 
 ## Stateとevidenceの原則
 
-- writeを試みたことはcompletionではない。
-- completionにはhost integrationが定義したevidence class、通常は独立readbackが必要。
-- remote result不明は`write_status_unknown`のまま保持し、successへ書き換えない。
-- restartは未解決attemptを保持し、暗黙再送しない。
-- repairとreconciliationは隠れたexception handlingではなく明示pathway stateである。
-- human approvalはdecision evidenceであり、remote effect発生の証明ではない。
+| 原則 | 必要な挙動 |
+|---|---|
+| Attemptはcompletionではない | Dispatch済みwriteだけで完了扱いしない |
+| Evidenceでcompletionを閉じる | Integrationが定義したevidence classを要求する |
+| UnknownはUnknownのまま保持 | Reconciliationなしに`write_status_unknown`をsuccessへ変更しない |
+| Restartはretryではない | 未解決attemptを復元して暗黙再送しない |
+| Recoveryを明示する | Repairとreconciliationをhidden exception handlingにしない |
+| Approvalはeffect証明ではない | Human approvalはdecision evidenceでありremote resultの証明ではない |
 
-## Adapter boundary
+## Integration boundary
 
-adapterはbounded execution pathを提供しますが、business authorization、credential、network trust、service semantics、十分なreadback定義は所有しません。host integrationは、許可action、承認者、credential isolation、bypass prevention、effectを証明する独立source、曖昧stateの停止・repair・human return条件を定義する必要があります。
+Host applicationは、許可action、authorization、credential隔離、bypass防止、独立readback、data handling、deployment承認、運用ownershipを定義します。RPRは宣言された責任経路を保持・強制するmechanismを提供しますが、個別deploymentの法令適合、安全性、特定用途への適合性を判定しません。
 
 ## Optional RPE integration
 
-Responsibility Pathway Engineering（RPE）はexternal gate decisionを提供できます。RPRはRPE不在、malformed output、unsupported version、inapplicable resultを可視化し、integration contractに従ってfail closedに扱います。RPEはactionを実行せず、RPRのexecution evidenceを置き換えません。
+Responsibility Pathway Engineering（RPE）はexternal gate decisionを提供できます。RPEはactionを実行せず、RPRのexecution evidenceを置き換えません。RPE不在、malformed output、unsupported version、inapplicable resultは可視化し、integration contractに従って扱います。
 
-## Non-claims
+## Licenseと非主張
 
-RPRはlegal-responsibility engine、policy author、identity provider、secret manager、production gateway、universal transaction coordinator、certification、任意remote systemでのexactly-once guaranteeではありません。このalpha candidateはuniversal production readyとは宣言されていません。
+RPRは[`MIT License`](../../LICENSE)の条件で提供され、無保証です。
+
+RPRはlegal-responsibility engine、policy author、identity provider、secret manager、production gateway、certification、universal transaction coordinator、任意remote systemに対するexactly-once保証ではありません。Public Alphaは、すべての環境や用途への適合を表明するものではありません。
