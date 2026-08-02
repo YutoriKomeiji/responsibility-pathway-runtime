@@ -67,6 +67,61 @@ jobs:
           cp dist/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl site/assets/
           sha256sum site/assets/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl > site/assets/wheel.sha256
           cp demo-result.json site/assets/cpython-demo-result.json
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Chromium test dependency
+        run: |
+          npm install --no-save playwright@1.54.1
+          npx playwright install --with-deps chromium
+      - name: Verify the real wheel inside Chromium and Pyodide
+        run: |
+          python -m http.server 8000 --directory site > /tmp/rpr-pages-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          node <<'JS'
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage();
+            page.on('console', message => console.log(`[browser:${message.type()}] ${message.text()}`));
+            page.on('pageerror', error => console.error(`[browser:error] ${error.message}`));
+            await page.goto('http://127.0.0.1:8000/demo.html', { waitUntil: 'domcontentloaded' });
+            await page.click('#load-runtime');
+            await page.waitForFunction(
+              () => document.querySelector('#package-status')?.textContent === 'RPR 0.1.0a2',
+              null,
+              { timeout: 180000 }
+            );
+            await page.click('#run-all');
+            await page.waitForFunction(
+              () => document.querySelector('#current-state')?.textContent === 'completed',
+              null,
+              { timeout: 60000 }
+            );
+            const result = await page.evaluate(() => ({
+              state: document.querySelector('#current-state')?.textContent,
+              dispatchCount: document.querySelector('#dispatch-count')?.textContent,
+              evidence: document.querySelector('#evidence-status')?.textContent,
+              output: document.querySelector('#output')?.textContent,
+            }));
+            if (result.state !== 'completed') throw new Error(JSON.stringify(result));
+            if (result.dispatchCount !== '1') throw new Error(JSON.stringify(result));
+            if (result.evidence !== '検証済み') throw new Error(JSON.stringify(result));
+            const payload = JSON.parse(result.output);
+            const reconciled = payload.result.reconciled;
+            if (reconciled.state_before !== 'write_status_unknown') throw new Error(result.output);
+            if (reconciled.duplicate_dispatch_prevented !== true) throw new Error(result.output);
+            if (reconciled.evidence_valid !== true) throw new Error(result.output);
+            console.log(JSON.stringify(result));
+            await browser.close();
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          JS
       - name: Configure Pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
