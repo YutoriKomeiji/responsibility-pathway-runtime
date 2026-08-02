@@ -1,10 +1,32 @@
 /*
 Language: JavaScript
-Purpose: Progressive enhancement for the static RPR public website.
+Purpose: Progressive enhancement and demo navigation for the static RPR public website.
 Boundary: No analytics, network calls, storage, credentials, or runtime control.
 */
 (() => {
   "use strict";
+
+  const isJapanese = document.documentElement.lang === "ja";
+  const nav = document.querySelector(".site-header nav");
+  if (nav && !nav.querySelector('a[href="demo.html"]')) {
+    const demoLink = document.createElement("a");
+    demoLink.href = "demo.html";
+    demoLink.textContent = isJapanese ? "状態遷移デモ" : "State demo";
+    const languageLink = nav.querySelector('[hreflang]');
+    nav.insertBefore(demoLink, languageLink || null);
+  }
+
+  const demoSection = document.getElementById("demo");
+  if (demoSection) {
+    const actions = demoSection.querySelector(".actions");
+    if (actions && !actions.querySelector('a[href="demo.html"]')) {
+      const demoButton = document.createElement("a");
+      demoButton.className = "button primary";
+      demoButton.href = "demo.html";
+      demoButton.textContent = isJapanese ? "ブラウザ内デモを試す" : "Try the browser demo";
+      actions.prepend(demoButton);
+    }
+  }
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const targets = document.querySelectorAll(".reveal");
