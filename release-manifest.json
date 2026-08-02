@@ -4,26 +4,38 @@
   "package": "responsibility-pathway-runtime",
   "version": "0.1.0a2",
   "release_channel": "public-alpha",
-  "freeze_id": "RPR-CF-2026-08-01-02",
-  "canonical_product_commit": "2ed6df0e800709c2ae97b4e4d654b79d7b9b7b54",
+  "freeze_id": "RPR-CF-2026-08-02-01",
+  "supersedes_freeze_id": "RPR-CF-2026-08-01-02",
+  "canonical_repository": "YutoriKomeiji/responsibility-pathway-runtime",
+  "artifact_source_commit": "fcdc9cb8da3d141cd4a47fc1f14d8dbe5ea84cea",
+  "verification_run_id": 30726958037,
+  "artifact_evidence_id": 8826674526,
+  "artifact_evidence_digest": "sha256:4f2f64217a67385e3ad58c9a8460305b08cd7547936bf445e5bfcd24668de472",
+  "source_date_epoch": 1785632400,
+  "independent_build_count": 2,
+  "byte_for_byte_reproducible": true,
   "license": "MIT",
   "status": {
     "locally_executable_scope": "verified",
+    "formal_build": "verified",
+    "json_python_lean_parity": "verified",
+    "standalone_test_suite": "verified",
     "production_ready": false,
     "customer_environment_verified": false,
     "external_environment_scenario": "INT-EXT-001",
-    "field_reports_requested": true
+    "field_reports_requested": true,
+    "public_release_approved": false
   },
   "artifacts": [
     {
       "name": "responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl",
-      "sha256": "33f1f9255ee93b4f8be28abf3d547a038eea463e7d0965dada843d8724af3790",
-      "size_bytes": 107214
+      "sha256": "dde87226c60f6b6e01765e01e793cd2a1a2eb661f5e13d01653cb3739d6aaa89",
+      "size_bytes": 104797
     },
     {
       "name": "responsibility_pathway_runtime-0.1.0a2.tar.gz",
-      "sha256": "7a82e586d44954ed3c3ead0b7d89dba27cb3d308f0fe721cbe8b37d55e1541dd",
-      "size_bytes": 129479
+      "sha256": "9390d8ff6192a8ad7bc21ccbc18159d200662967f1e4e854a4c53bcd79af2719",
+      "size_bytes": 127169
     }
   ],
   "verified_capability_groups": [
@@ -33,15 +45,17 @@
     "local file, HTTP, outbound message, and MCP subprocess paths",
     "fail-closed ambiguous-write handling",
     "restart, backup, restore, diagnostics, removal, and customer-data retention",
+    "complete standalone Python test execution",
     "clean wheel and source-distribution installation",
     "byte-for-byte reproducible release artifacts",
-    "English and Japanese product documentation",
-    "final RC audit for locally executable scope"
+    "canonical JSON, generated Python, and Lean 4 transition parity",
+    "selected Lean 4 invariants built with the pinned toolchain",
+    "English and Japanese product documentation"
   ],
   "field_test_requests": [
     "Windows and macOS",
     "additional Linux distributions and containers",
-    "declared Python environments beyond final Linux/Python 3.11 rehearsal",
+    "declared Python environments beyond Linux/Python 3.11 verification",
     "proxy and TLS routes",
     "enterprise identity and credential integration",
     "remote MCP and service-specific connectivity",
