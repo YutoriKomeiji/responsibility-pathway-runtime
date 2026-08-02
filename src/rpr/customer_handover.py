@@ -9,13 +9,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Mapping, Sequence
 
-
 _REQUIRED_ROLES = ("operations", "audit", "maintenance")
-_REQUIRED_BOUNDARIES = (
-    "no_public_release_authority",
-    "no_production_readiness_claim",
-    "human_gate_required",
-)
+_REQUIRED_BOUNDARIES = ("no_public_release_authority", "no_production_readiness_claim", "human_gate_required")
 
 
 class CustomerHandoverError(RuntimeError):
@@ -37,9 +32,7 @@ class HandoverRole:
             raise CustomerHandoverError(f"{name} evidence is incomplete")
         missing = [reference for reference in self.evidence if not (repository_root / reference).is_file()]
         if missing:
-            raise CustomerHandoverError(
-                f"{name} evidence references do not exist: {', '.join(sorted(missing))}"
-            )
+            raise CustomerHandoverError(f"{name} evidence references do not exist: {', '.join(sorted(missing))}")
 
 
 @dataclass(frozen=True)
@@ -68,13 +61,9 @@ class CustomerHandoverCandidate:
         missing_boundaries = [name for name in _REQUIRED_BOUNDARIES if name not in self.boundaries]
         unknown_boundaries = sorted(set(self.boundaries) - set(_REQUIRED_BOUNDARIES))
         if missing_boundaries:
-            raise CustomerHandoverError(
-                f"missing handover boundaries: {', '.join(missing_boundaries)}"
-            )
+            raise CustomerHandoverError(f"missing handover boundaries: {', '.join(missing_boundaries)}")
         if unknown_boundaries:
-            raise CustomerHandoverError(
-                f"unknown handover boundaries: {', '.join(unknown_boundaries)}"
-            )
+            raise CustomerHandoverError(f"unknown handover boundaries: {', '.join(unknown_boundaries)}")
         if not all(self.boundaries[name] is True for name in _REQUIRED_BOUNDARIES):
             raise CustomerHandoverError("all handover safety boundaries must remain active")
 
@@ -89,29 +78,15 @@ class CustomerHandoverCandidate:
         }
 
     def digest(self, *, repository_root: Path) -> str:
-        canonical = json.dumps(
-            self.to_dict(repository_root=repository_root),
-            sort_keys=True,
-            separators=(",", ":"),
-            ensure_ascii=False,
-        )
+        canonical = json.dumps(self.to_dict(repository_root=repository_root), sort_keys=True, separators=(",", ":"), ensure_ascii=False)
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def _role(
-    *,
-    responsibilities: Sequence[str],
-    review_questions: Sequence[str],
-    evidence: Sequence[str],
-) -> HandoverRole:
+def _role(*, responsibilities: Sequence[str], review_questions: Sequence[str], evidence: Sequence[str]) -> HandoverRole:
     return HandoverRole(tuple(responsibilities), tuple(review_questions), tuple(evidence))
 
 
-def build_customer_handover_candidate(
-    *,
-    source_commit: str,
-    residual_owner: str,
-) -> CustomerHandoverCandidate:
+def build_customer_handover_candidate(*, source_commit: str, residual_owner: str) -> CustomerHandoverCandidate:
     roles = {
         "operations": _role(
             responsibilities=(
@@ -122,15 +97,15 @@ def build_customer_handover_candidate(
             review_questions=(
                 "Are all governed mutations routed through RPR without an ungoverned bypass?",
                 "Can operators diagnose and recover write-status-unknown without automatic replay?",
-                "Can the lifecycle suite be reproduced in the customer environment?",
+                "Can the lifecycle suite be reproduced in the target environment?",
             ),
             evidence=(
-                "incubator/rpr/docs/using-rpr.md",
-                "incubator/rpr/src/rpr/diagnostics.py",
-                "incubator/rpr/src/rpr/lifecycle_acceptance.py",
-                "incubator/rpr/tests/test_operational_diagnostics.py",
-                "incubator/rpr/tests/test_lifecycle_acceptance.py",
-                ".github/workflows/rpr-lifecycle-acceptance.yml",
+                "docs/en/install-operations-recovery.md",
+                "src/rpr/diagnostics.py",
+                "src/rpr/lifecycle_acceptance.py",
+                "tests/test_operational_diagnostics.py",
+                "tests/test_lifecycle_acceptance.py",
+                ".github/workflows/public-export-quality.yml",
             ),
         ),
         "audit": _role(
@@ -141,16 +116,16 @@ def build_customer_handover_candidate(
             ),
             review_questions=(
                 "Does every verified delivery dimension point to retained evidence?",
-                "Are Human Gate, secret scan, and vulnerability review still external decisions?",
+                "Are Human Gate, secret scan, and vulnerability review still explicit decisions?",
                 "Are known limitations visible and consistent with the candidate claims?",
             ),
             evidence=(
-                "incubator/rpr/src/rpr/delivery_acceptance.py",
-                "incubator/rpr/src/rpr/delivery_acceptance_baseline.py",
-                "incubator/rpr/src/rpr/candidate_readiness.py",
-                "incubator/rpr/src/rpr/claim_traceability.py",
-                "incubator/rpr/docs/known-limitations.md",
-                ".github/workflows/rpr-test.yml",
+                "src/rpr/delivery_acceptance.py",
+                "src/rpr/delivery_acceptance_baseline.py",
+                "src/rpr/candidate_readiness.py",
+                "src/rpr/claim_traceability.py",
+                "docs/en/verification-release-uat.md",
+                ".github/workflows/public-export-quality.yml",
             ),
         ),
         "maintenance": _role(
@@ -165,12 +140,12 @@ def build_customer_handover_candidate(
                 "Do changes preserve fail-closed behavior and explicit residual ownership?",
             ),
             evidence=(
-                "incubator/rpr/pyproject.toml",
-                "incubator/rpr/fixtures/lifecycle/previous-candidate-v1.json",
-                "incubator/rpr/tests/test_resume_authorization_restart.py",
-                "incubator/rpr/tests/test_product_e2e_repair_resume_retry.py",
-                "incubator/rpr/tests/test_product_e2e_explicit_compensation.py",
-                "incubator/rpr/src/rpr/release_audit.py",
+                "pyproject.toml",
+                "fixtures/lifecycle/previous-candidate-v1.json",
+                "tests/test_resume_authorization_restart.py",
+                "tests/test_product_e2e_repair_resume_retry.py",
+                "tests/test_product_e2e_explicit_compensation.py",
+                "src/rpr/release_audit.py",
             ),
         ),
     }
@@ -182,26 +157,16 @@ def build_customer_handover_candidate(
     )
 
 
-def write_customer_handover_candidate(
-    *,
-    repository_root: str | Path,
-    output: str | Path,
-    source_commit: str,
-    residual_owner: str,
-) -> dict[str, object]:
+def write_customer_handover_candidate(*, repository_root: str | Path, output: str | Path, source_commit: str, residual_owner: str) -> dict[str, object]:
     root = Path(repository_root).resolve()
-    candidate = build_customer_handover_candidate(
-        source_commit=source_commit,
-        residual_owner=residual_owner,
-    )
+    candidate = build_customer_handover_candidate(source_commit=source_commit, residual_owner=residual_owner)
     document = candidate.to_dict(repository_root=root)
     document["candidate_sha256"] = candidate.digest(repository_root=root)
     serialized = json.dumps(document, indent=2, sort_keys=True) + "\n"
-    normalized = json.loads(serialized)
     target = Path(output)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(serialized, encoding="utf-8")
-    return normalized
+    return json.loads(serialized)
 
 
 def main() -> int:
