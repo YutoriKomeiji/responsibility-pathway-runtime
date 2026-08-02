@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="公開RPR wheelをブラウザ内Pythonで実行し、Human Gate、結果不明、SQLite永続化、再起動後の照合を確認する実動デモです。">
+  <title>RPR Live Runtime Demo | Responsibility Pathway Runtime</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header">
+    <a class="brand" href="ja.html"><span class="brand-mark" aria-hidden="true">RPR</span><span>Responsibility Pathway Runtime</span></a>
+    <nav aria-label="デモナビゲーション"><a href="ja.html">製品ページ</a><a href="index.html" lang="en">English</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime">GitHub</a></nav>
+  </header>
+  <main id="main">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Real wheel · browser-hosted Python · SQLite</p>
+        <h1>外部作用は模擬する。RPR Runtimeは模擬しない。</h1>
+        <p class="lead">このページは、GitHub PagesのCIがRPRソースから生成したwheelをPyodideへインストールし、実際の<code>ResponsibilityPathwayRuntime</code>、SQLite store、execution-attempt ledger、evidence chain、reconciliationをブラウザ内で実行します。</p>
+        <div class="notice"><strong>実行境界:</strong> 決済providerだけを決定論的なin-process adapterで置き換えます。実API、認証情報、利用者データは扱いません。Pyodide本体をCDNから取得し、RPR wheelとデモシナリオを同一Pagesサイトから取得します。</div>
+        <div class="actions"><button class="button primary" id="load-runtime" type="button">実RPRを起動する</button><button class="button secondary" id="run-all" type="button" disabled>全シナリオを実行</button><button class="button secondary" id="reset" type="button" disabled>リセット</button></div>
+      </div>
+      <aside class="status-card" aria-live="polite">
+        <div class="status-row"><span>Python環境</span><strong id="python-status">未起動</strong></div>
+        <div class="status-row"><span>RPR package</span><strong id="package-status">未読込</strong></div>
+        <div class="status-row"><span>現在の状態</span><strong id="current-state">未登録</strong></div>
+        <div class="status-row"><span>dispatch回数</span><strong id="dispatch-count">0</strong></div>
+        <div class="status-row"><span>証拠チェーン</span><strong id="evidence-status">未生成</strong></div>
+      </aside>
+    </section>
+
+    <section aria-labelledby="steps-title">
+      <p class="eyebrow">Live execution</p>
+      <h2 id="steps-title">同じ公開wheelで、停止・結果不明・復旧を通す</h2>
+      <div class="grid">
+        <article class="card"><h3>1. Pathway登録</h3><p>実際のRPR inspectionとRPE evaluatorを通し、SQLiteへpathwayと最初のevidence eventを保存します。</p><button class="button secondary demo-step" data-function="register_demo" type="button" disabled>登録する</button></article>
+        <article class="card"><h3>2. 承認して実行</h3><p>承認後にexecution attemptを作成します。provider側では反映済み、応答だけ失われた結果を返し、<code>write_status_unknown</code>を永続化します。</p><button class="button secondary demo-step" data-function="approve_and_execute" type="button" disabled>曖昧writeを発生</button></article>
+        <article class="card"><h3>3. Runtime再生成と照合</h3><p>新しいRuntime instanceが同じSQLiteを読み直し、再dispatchせずprovider stateを確認して<code>completed</code>へ進めます。</p><button class="button secondary demo-step" data-function="restart_and_reconcile" type="button" disabled>再起動して照合</button></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="result-title">
+      <p class="eyebrow">Inspect the proof</p>
+      <h2 id="result-title">RPRが実際に返した結果</h2>
+      <div id="summary" class="card"><p>Runtimeを起動すると、ここに状態、dispatch回数、証拠検証結果を表示します。</p></div>
+      <pre aria-live="polite"><code id="output">No runtime output yet.</code></pre>
+    </section>
+
+    <section>
+      <p class="eyebrow">What is real</p>
+      <h2>本物と代替物の境界</h2>
+      <div class="grid">
+        <article class="card"><h3>実際に動くもの</h3><p>公開RPR wheel、Python runtime API、canonical transition validation、SQLite pathway store、attempt ledger、hash-linked evidence、runtime restart、reconciliation。</p></article>
+        <article class="card"><h3>代替するもの</h3><p>外部決済providerだけをメモリ上の決定論的adapterへ置き換えます。適用済み状態とdispatch回数を独立に保持します。</p></article>
+        <article class="card"><h3>対象外</h3><p>OS subprocess、実MCP、秘密情報、実決済、外部サービス認証、Lean 4 buildはブラウザ内では実行しません。Lean 4はrepositoryとCIで検査します。</p></article>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><p>Responsibility Pathway Runtime · MIT License · Real runtime / simulated external provider</p></footer>
+</body>
+</html>
