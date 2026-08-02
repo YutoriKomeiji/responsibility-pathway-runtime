@@ -49,15 +49,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up Lean toolchain
-        uses: leanprover/lean-action@v1
-        with:
-          lake-package-directory: formal
-          auto-config: false
-          build: false
-          test: false
-          lint: false
-      - name: Generate Lake manifest and build formal package
+      - name: Install Elan
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build pinned Lean formal package
         working-directory: formal
         run: |
           lake update
@@ -81,15 +80,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Validate public export
+      - name: Validate public export and terminology
         run: python tools/validate_public_export.py
       - name: Compile shipped Python sources
         run: python -m compileall -q tools src examples tests
-      - name: Reject private persona terminology
-        shell: bash
-        run: |
-          set -euo pipefail
-          ! grep -RInE 'Master approval|マスター' --exclude-dir=.git --exclude='*.pyc' .
 
   site-validation:
     name: Static site validation / 静的site検証
