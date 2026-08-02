@@ -58,6 +58,7 @@ jobs:
       - name: Build twice, normalize sdist, and compare bytes
         env:
           SOURCE_DATE_EPOCH: "1785632400"
+          SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -72,7 +73,7 @@ jobs:
             name="$(basename "$first")"
             cmp "$first" "$RUNNER_TEMP/build-b/$name"
           done
-          python - "$RUNNER_TEMP/build-a" "$GITHUB_SHA" > "$RUNNER_TEMP/repair-artifact-manifest.json" <<'PY'
+          python - "$RUNNER_TEMP/build-a" "$SOURCE_COMMIT" > "$RUNNER_TEMP/repair-artifact-manifest.json" <<'PY'
           import hashlib, json, pathlib, sys
           root = pathlib.Path(sys.argv[1])
           files = []
