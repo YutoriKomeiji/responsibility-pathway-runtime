@@ -30,24 +30,13 @@
   "retry_contract": {
     "transport_retry_reuses_business_identity": true,
     "business_retry_requires_new_attempt_identity": true,
-    "required_business_identity_fields": [
-      "operation_id",
-      "attempt_id",
-      "idempotency_key",
-      "request_fingerprint"
-    ]
+    "required_business_identity_fields": ["operation_id", "attempt_id", "idempotency_key", "request_fingerprint"]
   },
   "mrtr_contract": {
     "input_required_is_human_gate": false,
     "requires_explicit_mapping": true,
-    "allowed_mappings": [
-      "input_missing",
-      "authorization_required",
-      "human_gate",
-      "repair_required",
-      "write_status_unknown"
-    ]
+    "allowed_mappings": ["input_missing", "authorization_required", "human_gate", "repair_required", "write_status_unknown"]
   },
   "unknown_version_policy": "reject",
-  "release_boundary": "private_rpp_development_only"
+  "release_boundary": "public_alpha_candidate"
 }
