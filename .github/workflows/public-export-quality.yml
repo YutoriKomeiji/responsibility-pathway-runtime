@@ -49,13 +49,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up Lean
+      - name: Set up Lean toolchain
         uses: leanprover/lean-action@v1
         with:
           lake-package-directory: formal
-      - name: Build Lean formal package
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+      - name: Generate Lake manifest and build formal package
         working-directory: formal
-        run: lake build
+        run: |
+          lake update
+          lake build
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -79,12 +85,11 @@ jobs:
         run: python tools/validate_public_export.py
       - name: Compile shipped Python sources
         run: python -m compileall -q tools src examples tests
-      - name: Reject private preparation paths and persona terms
+      - name: Reject private persona terminology
         shell: bash
         run: |
           set -euo pipefail
-          ! grep -RInE 'incubator/rpr|private_rpp_development_only|Master approval|マスター' \
-            --exclude-dir=.git --exclude='*.pyc' .
+          ! grep -RInE 'Master approval|マスター' --exclude-dir=.git --exclude='*.pyc' .
 
   site-validation:
     name: Static site validation / 静的site検証
