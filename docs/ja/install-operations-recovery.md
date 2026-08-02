@@ -10,50 +10,63 @@ Body Language: Japanese
 
 # 導入・運用・復旧
 
-## Install
+この文書は推奨される統合・運用手順を示します。Hosted service、managed operation、support SLA、保証を提供するものではありません。RPRは[`MIT License`](../../LICENSE)に基づいて提供されます。
 
-manifestと一致するwheelまたはsource distributionだけを隔離環境へinstallしてください。artifact、digest、Python version、dependency解決結果、install logをdeployment evidenceとして保存します。
+## Deployment baseline
 
-## Configuration baseline
+| 分類 | Integration側で決定・保存するもの |
+|---|---|
+| Artifact | 検証済みwheelまたはsource distribution、digest、入手元 |
+| Runtime | Python version、dependency解決結果、隔離環境 |
+| Persistence | State store、access control、backup、retention |
+| Authority | 許可action、authorized actor、Human Gate owner |
+| Execution | Adapter allow-list、timeout、cancellation、retry policy |
+| Credential | 外部Secret sourceとleast-privilege scope |
+| Evidence | 独立readback sourceとmatching rule |
+| Recovery | Repair、reconciliation、resume、incident owner |
 
-adapterを有効化する前に、state store、許可action、endpoint allow-list、subprocess command allow-list、timeout、retry policy、credential source、readback source、backup先、retention policy、責任を持つhuman ownerを記録します。
-
-secretをrepository file、example、log、pathway record、Issueへ含めてはいけません。
+Secretをrepository file、example、log、pathway record、diagnostic bundle、Issueへ含めないでください。
 
 ## Operating sequence
 
-1. 提案action、actor、authority、integration設定を検証する。
-2. pathwayを登録またはloadする。
-3. 現stateが要求transitionを許すことを確認する。
-4. dispatch前にdurable execution attemptを1件作る。
-5. bounded adapterからdispatchする。
-6. 独立readbackを取得する。
-7. 必要evidenceが一致した場合だけcompletedにする。
-8. 一致しない場合は未解決stateを保持し、repair、resume、reconciliation、Human Gateへ進む。
+| 順序 | Operation | 完了条件 |
+|---:|---|---|
+| 1 | Proposed action、actor、authority、設定を検証 | 必須宣言が揃っている |
+| 2 | Pathwayを登録またはload | Persistent stateを利用できる |
+| 3 | Requested transitionを確認 | Current stateとactorが許可されている |
+| 4 | Durable execution attemptを作成 | Dispatch前にattempt identityが保存される |
+| 5 | Bounded adapterからdispatch | Dispatch evidenceが保持される |
+| 6 | Independent readbackを取得 | External sourceをqueryする |
+| 7 | Evidenceを照合 | Expected effectと一致する |
+| 8 | Completeまたは停止 | Completed、repair、resume、reconciliation、Human Gateへ進む |
 
-## Restart
+## Restartとambiguous write
 
-restart時は新規dispatchを許す前にpersistent pathwayとattemptをloadします。未解決attemptを暗黙に再送してはいけません。operation identity、dispatch evidence、最後のstate、readback result、必要な次判断を再構成します。
+| 状況 | 必要な処理 |
+|---|---|
+| Process restart | New dispatch前にpathwayとattemptをloadする |
+| Unresolved attempt | 暗黙に再dispatchしない |
+| Write済みの可能性があるが結果不明 | `write_status_unknown`を保持する |
+| Readback可能 | Stable operation identityでqueryしprovenanceを保持する |
+| Readback不可または不確定 | 停止してreconciliationまたはHuman Gateへ返す |
+
+Retryをreconciliationの代替にしてはいけません。
 
 ## Backupとrestore
 
-persistent stateと関連evidenceを整合性が保たれる方法でbackupします。隔離先へrestoreして試験し、その後diagnosticsと未解決attemptのreconciliationを実施してからexternal actionを再開します。
+Persistent stateと関連evidenceを整合性が保たれる方法でbackupします。隔離環境へrestoreして試験し、diagnosticsと未解決attemptのreconciliationを行ってからexternal actionを再開します。
 
-## Ambiguous write recovery
+## Removalとretained data
 
-adapterがwriteした可能性はあるが結果を確定できない場合：
+Python packageのuninstallとpathway dataの削除は別のoperationです。
 
-- `write_status_unknown`を維持する。
-- automatic redispatchを無効にする。
-- stable operation identityで独立sourceをqueryする。
-- resultとprovenanceをevidenceへ付ける。
-- completed、failed、repair-required、Human Gateのいずれかへreconcileする。
-- 判断とevidence trailを保持する。
-
-## Removalとcustomer data
-
-Python packageのuninstallでcustomer pathway dataを暗黙削除してはいけません。state store、backup location、retention owner、export format、削除承認、検証方法をpackage removalとは別に記録します。
+| 対象 | Removal前の記録 |
+|---|---|
+| Package | Install済みversionとuninstall結果 |
+| State | Storeとbackup location |
+| Retention | Owner、期間、export format |
+| Deletion | Approver、method、verification evidence |
 
 ## Operational stop conditions
 
-configuration、authority、credential、persistence、readback、restore integrity、operation identityを確立できない場合はexternal executionを停止します。retryをreconciliationの代替にしないでください。
+Configuration、authority、credential、persistence、readback、restore integrity、stable operation identityを確立できない場合はexternal executionを停止します。利用環境でRPRを採用・継続利用する判断は、統合する組織と運用者が行います。
