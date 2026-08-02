@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "schema": "lifecycle_events_v1",
+  "rows": [
+    {"event_id": 1, "payload": "configured"},
+    {"event_id": 2, "payload": "previous-candidate-data"},
+    {"event_id": 3, "payload": "ready-for-upgrade"}
+  ]
+}
