@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Responsibility Pathway Runtimeのcanonical state machineを説明する、外部通信なしのブラウザ内デモです。">
+  <title>RPR State Path Demo | Responsibility Pathway Runtime</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header">
+    <a class="brand" href="ja.html"><span class="brand-mark" aria-hidden="true">RPR</span><span>Responsibility Pathway Runtime</span></a>
+    <nav aria-label="デモナビゲーション"><a href="ja.html">製品ページ</a><a href="index.html" lang="en">English</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime">GitHub</a></nav>
+  </header>
+  <main id="main">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Canonical state-machine explainer</p>
+        <h1>成功か分からない操作を、推測で完了させない。</h1>
+        <p class="lead">このデモは、RPRの公開状態機械をブラウザ上で説明する静的シミュレーターです。実際のPython Runtime、外部API、永続化、認証、権限制御は実行しません。</p>
+        <div class="notice"><strong>境界:</strong> データ送信、外部通信、localStorage、cookie、analyticsは使用しません。画面を再読み込みすると初期状態へ戻ります。</div>
+      </div>
+      <aside class="status-card" aria-live="polite">
+        <div class="status-row"><span>現在の状態</span><strong id="current-state">proposed</strong></div>
+        <div class="status-row"><span>外部作用</span><strong id="effect-status">未開始</strong></div>
+        <div class="status-row"><span>完了証拠</span><strong id="evidence-status">なし</strong></div>
+        <div class="status-row"><span>Human Gate</span><strong id="human-status">未要求</strong></div>
+      </aside>
+    </section>
+
+    <section aria-labelledby="scenario-title">
+      <p class="eyebrow">Scenario</p>
+      <h2 id="scenario-title">API書き込み直後に通信が切れた</h2>
+      <p class="section-intro">人間の承認を得て外部APIへ書き込みを送りました。しかし応答前に通信が切れ、外部側で適用されたかどうか分かりません。状態を選びながら、RPRが許可する次の遷移を確認してください。</p>
+      <div id="pathway" class="pathway" aria-label="選択した責任経路"></div>
+    </section>
+
+    <section aria-labelledby="actions-title">
+      <p class="eyebrow">Allowed transitions</p>
+      <h2 id="actions-title">次に進める状態</h2>
+      <div id="transition-buttons" class="grid"></div>
+      <div class="actions"><button class="button secondary" id="reset" type="button">最初からやり直す</button></div>
+    </section>
+
+    <section aria-labelledby="explain-title">
+      <p class="eyebrow">Why it matters</p>
+      <h2 id="explain-title">いまの状態が意味すること</h2>
+      <div id="explanation" class="card"></div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Source boundary</p>
+      <h2>デモと製品本体の違い</h2>
+      <div class="grid">
+        <article class="card"><h3>このページがすること</h3><p>canonical JSONに沿った許可遷移を表示し、各状態の意味を説明します。</p></article>
+        <article class="card"><h3>このページがしないこと</h3><p>Python Runtime、SQLite、executor、readback、reconciliation、Lean 4をブラウザ内で実行しません。</p></article>
+        <article class="card"><h3>実際の製品を確認する</h3><p><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/specs/pathway-state-machine.json">canonical state machine</a>、<a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/tree/main/formal">Lean 4 assets</a>、<a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/tree/main/examples/production-grade-demo">production-grade demo</a>を参照してください。</p></article>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><p>Responsibility Pathway Runtime · MIT License · Static explanatory demo</p></footer>
+</body>
+</html>
