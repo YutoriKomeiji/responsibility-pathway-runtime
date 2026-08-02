@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "binding_levels": ["file_bound", "specified_only"],
+  "tests": [
+    {"test_id":"RPR-AUT-001","binding":"file_bound","source":"tests/test_execution_admission.py"},
+    {"test_id":"RPR-AUT-007","binding":"file_bound","source":"tests/test_execution_admission.py"},
+    {"test_id":"RPR-PRE-001","binding":"file_bound","source":"tests/test_execution_admission.py"},
+    {"test_id":"RPR-ADM-002","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"E2E-01","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-PRE-004","binding":"file_bound","source":"tests/test_execution_admission.py"},
+    {"test_id":"RPR-CRS-001","binding":"file_bound","source":"tests/test_http_and_attempts.py"},
+    {"test_id":"RPR-IDM-001","binding":"file_bound","source":"tests/test_http_and_attempts.py"},
+    {"test_id":"RPR-CRS-004","binding":"file_bound","source":"tests/test_http_and_attempts.py"},
+    {"test_id":"RPR-CRS-010","binding":"file_bound","source":"tests/test_http_and_attempts.py"},
+    {"test_id":"RPR-EXE-001","binding":"file_bound","source":"tests/test_http_and_attempts.py"},
+    {"test_id":"RPR-EXE-004","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-IDM-002","binding":"file_bound","source":"tests/test_runtime_reconciliation.py"},
+    {"test_id":"RPR-REC-001","binding":"file_bound","source":"tests/test_runtime_reconciliation.py"},
+    {"test_id":"RPR-CRS-007","binding":"file_bound","source":"tests/test_runtime_reconciliation.py"},
+    {"test_id":"RPR-PER-001","binding":"file_bound","source":"tests/test_http_and_attempts.py"},
+    {"test_id":"RPR-REC-006","binding":"file_bound","source":"tests/test_runtime_reconciliation.py"},
+    {"test_id":"RPR-RPR-001","binding":"file_bound","source":"tests/test_repair_resume_e2e.py"},
+    {"test_id":"RPR-RPR-007","binding":"file_bound","source":"tests/test_repair_resume_e2e.py"},
+    {"test_id":"E2E-05","binding":"file_bound","source":"tests/test_repair_resume_e2e.py"},
+    {"test_id":"RPR-EVD-001","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-EVD-006","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-PER-004","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-FRM-001","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-FRM-005","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-PKG-001","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-PKG-010","binding":"file_bound","source":"tests/test_product_e2e.py"}
+  ]
+}
