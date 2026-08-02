@@ -4,8 +4,8 @@
   "version": "0.1.0a2",
   "release_channel": "public-alpha",
   "previous_freeze_id": "RPR-CF-2026-08-01-02",
-  "freeze_id": null,
-  "status": "integrity-repair-candidate",
+  "freeze_id": "RPR-CF-2026-08-02-01",
+  "status": "verified-public-alpha-candidate",
   "production_ready": false,
   "customer_environment_verified": false,
   "release_approved": false,
@@ -25,7 +25,8 @@
   "verified_profile": {
     "operating_system": "Linux",
     "python": "3.11",
-    "scope": "standalone locally executable repair-candidate validation"
+    "scope": "standalone locally executable public-alpha candidate validation",
+    "verification_run_id": 30726958037
   },
   "verified_capabilities": [
     "authorized pathway lifecycle transitions",
@@ -37,7 +38,9 @@
     "backup, restore, diagnostics, removal, and customer-data retention",
     "complete standalone Python test execution",
     "clean wheel and source-distribution installation",
-    "canonical JSON, Python, and Lean 4 transition-model parity"
+    "byte-for-byte reproducible wheel and normalized source distribution",
+    "canonical JSON, generated Python, and Lean 4 transition-model parity",
+    "selected Lean 4 invariant verification with the pinned toolchain"
   ],
   "non_claims": [
     "universal production readiness",
@@ -49,12 +52,10 @@
     "automatic transfer of final responsibility to the runtime"
   ],
   "open_release_gates": [
-    "complete Lean 4 build verification in production CI",
-    "rebuild wheel and source distribution twice from the repaired production repository",
-    "record replacement artifact names, sizes, and SHA-256 digests",
-    "issue a replacement freeze identifier and candidate record",
-    "repeat secret, internal-path, link, license, residue, and EN/JA claim audit",
+    "complete final secret, internal-path, link, license, residue, and EN/JA claim audit",
+    "merge the verified repair candidate into production main",
+    "change repository visibility only after explicit approval",
     "verify live English and Japanese Pages after repository publicization",
-    "obtain explicit final release approval"
+    "obtain explicit approval for tag, GitHub Release, and binary publication"
   ]
 }
