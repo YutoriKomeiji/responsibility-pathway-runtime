@@ -12,48 +12,62 @@ Body Language: English
 
 ## Release identity
 
-- Version: `0.1.0a2`
-- Channel: public alpha
-- Freeze ID: `RPR-CF-2026-08-01-02`
-- Canonical product commit recorded in `release-manifest.json`
-- Final rehearsal profile: Linux and Python 3.11
+| Field | Value |
+|---|---|
+| Version | `0.1.0a2` |
+| Channel | Public alpha candidate |
+| Freeze ID | `RPR-CF-2026-08-01-02` |
+| Product commit | Recorded in `release-manifest.json` |
+| Final rehearsal profile | Linux / Python 3.11 |
+| License | [MIT License](../../LICENSE) |
 
-## Verified locally executable scope
+## What the retained evidence supports
 
-The frozen candidate retained evidence for pathway transitions, persistent state, execution-attempt continuity, Human Gate and repair routes, local file, allow-listed HTTP, durable outbound-message, MCP subprocess execution, fault injection, restart behavior, backup and restore, diagnostics, removal, package installation, and reproducible artifacts.
+The frozen evidence set covers pathway transitions, persistent state, execution-attempt continuity, Human Gate and repair routes, supported adapter paths, fault injection, restart behavior, backup and restore, diagnostics, removal, package installation, and reproducible artifacts.
 
-This statement is bounded to the frozen evidence set. It does not claim every environment, remote system, credential arrangement, framework, or operating condition was executed.
+| Evidence statement | It does mean | It does not mean |
+|---|---|---|
+| A test passed | The recorded case passed in the recorded environment | Every environment or integration will pass |
+| A build is reproducible | The tested build process produced matching artifacts | The artifact is free of all defects or vulnerabilities |
+| A pathway completed | Required evidence matched for that case | The remote system provides universal exactly-once semantics |
+| A UAT report passed | The reported configuration met its stated checks | General production fitness or certification |
 
-## Known limitations and non-claims
+Verification documentation records observations and test results. It does not modify the MIT License or create a warranty, support obligation, certification, or legal assurance.
 
-- Customer environments are not pre-verified.
-- Windows, macOS, additional Linux distributions, containers, and Python profiles require field evidence.
-- Enterprise proxy, TLS, identity, credentials, and remote MCP routes require integration-specific tests.
-- Exactly-once effects are not guaranteed across arbitrary remote systems.
-- RPR does not supply legal interpretation, production authorization, security certification, or universal deployment fitness.
-- Alpha interfaces and migration behavior may change before a stable release.
+## Known limitations
+
+| Area | Current boundary |
+|---|---|
+| Environments | Customer environments are not pre-verified |
+| Platforms | Windows, macOS, additional Linux, containers, and other Python profiles need field evidence |
+| Enterprise integration | Proxy, TLS, identity, credentials, and remote MCP require integration-specific tests |
+| Remote effects | Exactly-once behavior is not guaranteed across arbitrary systems |
+| Legal and security | RPR does not provide legal interpretation, authorization, or security certification |
+| Compatibility | Alpha interfaces and migration behavior may change |
 
 ## Minimum UAT plan
 
 Use synthetic or non-consequential actions first.
 
-1. Record environment, artifact digest, configuration, and responsible owner.
-2. Confirm unauthorized transitions fail closed.
-3. Confirm a required Human Gate cannot be bypassed.
-4. Exercise one successful dispatch with independent readback.
-5. Inject or simulate an ambiguous result and confirm no false completion.
-6. Restart with an unresolved attempt and confirm no duplicate dispatch.
-7. Exercise repair or reconciliation to a documented end state.
-8. Back up and restore the state store in isolation.
-9. Run diagnostics and verify secrets are absent from outputs.
-10. Remove the package and confirm retained customer data follows the declared policy.
+| Step | Acceptance check |
+|---:|---|
+| 1 | Record environment, artifact digest, configuration, and responsible owner |
+| 2 | Unauthorized transitions fail closed |
+| 3 | A required Human Gate cannot be bypassed |
+| 4 | One dispatch completes with independent readback |
+| 5 | An ambiguous result does not become false completion |
+| 6 | Restart does not duplicate an unresolved dispatch |
+| 7 | Repair or reconciliation reaches a documented end state |
+| 8 | State backup and restore succeed in isolation |
+| 9 | Diagnostic output contains no secrets |
+| 10 | Package removal preserves or deletes data according to the declared policy |
 
-## Reporting result
+## Reporting results
 
-A report should include expected and actual behavior, reproducible steps, sanitized logs, environment details, RPR version, Freeze ID, artifact digest, adapter type, readback source, and whether any real external effect occurred.
+Report expected and actual behavior, reproduction steps, sanitized logs, environment, RPR version, Freeze ID, artifact digest, adapter, readback source, and whether a real external effect occurred.
 
-Classify the result as pass, fail, blocked, not applicable, or not executed. Do not convert blocked or not-executed scenarios into passing evidence.
+Classify each result as `pass`, `fail`, `blocked`, `not applicable`, or `not executed`. Do not convert blocked or unexecuted cases into passing evidence.
 
 ## Release promotion gate
 
-Public repository creation or update, tag creation, GitHub Release, binary upload, and publication occur only after the prepared export passes secret, internal-file, internal-link, license, manifest, digest, documentation, and claim/evidence audits and receives explicit human approval.
+Repository visibility changes, tags, GitHub Releases, binary publication, and release declarations require the designated human approval after the prepared export passes the applicable secret, internal-reference, license, manifest, digest, documentation, and claim/evidence checks.
