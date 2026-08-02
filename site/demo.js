@@ -87,8 +87,8 @@ Boundary: The external provider is simulated in Python; no credentials or user d
       pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/" });
       const pythonVersion = pyodide.runPython("import sys; sys.version.split()[0]");
       pythonStatus.textContent = `Python ${pythonVersion}`;
-      report("micropip-loading");
-      await pyodide.loadPackage("micropip");
+      report("python-packages-loading", "micropip + sqlite3");
+      await pyodide.loadPackage(["micropip", "sqlite3"]);
 
       packageStatus.textContent = "wheelを取得中";
       report("wheel-fetch", WHEEL_URL);
