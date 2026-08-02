@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0",
+  "source_issue": 7,
+  "decision": "verified_product_candidate_with_external_environment_hold",
+  "execution_classes": ["executable", "locally_substitutable", "external_environment_only"],
+  "statuses": ["verified", "partial", "planned", "blocked"],
+  "scenarios": [
+    {
+      "id": "INT-HTTP-001",
+      "area": "http_transport",
+      "name": "loopback mutation with independent readback and idempotent replay",
+      "execution_class": "executable",
+      "status": "verified",
+      "evidence": ["tests/test_http_and_attempts.py"],
+      "residual_risk": "must be rebound to each released candidate and external service profile",
+      "next_phase": "field_evidence"
+    },
+    {
+      "id": "INT-HTTP-002",
+      "area": "http_transport",
+      "name": "server error timeout malformed and oversized response post-dispatch disconnect and replay prevention",
+      "execution_class": "executable",
+      "status": "verified",
+      "evidence": ["tests/test_http_fault_injection_acceptance.py", ".github/workflows/public-export-quality.yml"],
+      "residual_risk": "transport failures cannot universally reveal whether dispatch occurred; ambiguous outcomes remain fail-closed",
+      "next_phase": "field_evidence"
+    },
+    {
+      "id": "INT-MCP-001",
+      "area": "mcp_stdio",
+      "name": "JSON-RPC initialize tools list tools call fragmented IO and verified readback",
+      "execution_class": "locally_substitutable",
+      "status": "verified",
+      "evidence": ["tests/test_mcp_stdio_stack_e2e.py", "tests/test_mcp_subprocess_fault_injection_acceptance.py"],
+      "residual_risk": "customer-specific MCP implementations and production supervisors remain external-environment inputs",
+      "next_phase": "field_evidence"
+    },
+    {
+      "id": "INT-MCP-002",
+      "area": "mcp_stdio",
+      "name": "real child-process startup timeout malformed JSON-RPC request-ID mismatch termination and restart",
+      "execution_class": "executable",
+      "status": "verified",
+      "evidence": ["tests/test_mcp_subprocess_fault_injection_acceptance.py", ".github/workflows/public-export-quality.yml"],
+      "residual_risk": "customer credentials proxy TLS remote MCP hosts and production supervision remain Human Gate inputs",
+      "next_phase": "field_evidence"
+    },
+    {
+      "id": "INT-STATE-001",
+      "area": "runtime_recovery",
+      "name": "restart repair resume retry reconciliation compensation and Human Gate return",
+      "execution_class": "executable",
+      "status": "verified",
+      "evidence": [
+        "tests/test_product_e2e_repair_resume_retry.py",
+        "tests/test_product_e2e_explicit_compensation.py",
+        "tests/test_product_e2e_human_gate_return.py",
+        "tests/test_resume_authorization_restart.py"
+      ],
+      "residual_risk": "customer operational procedures remain environment-specific",
+      "next_phase": "field_evidence"
+    },
+    {
+      "id": "INT-LIFE-001",
+      "area": "lifecycle",
+      "name": "configuration upgrade backup restore uninstall and customer-data retention",
+      "execution_class": "executable",
+      "status": "verified",
+      "evidence": ["tests/test_lifecycle_acceptance.py", "fixtures/lifecycle/previous-candidate-v1.json"],
+      "residual_risk": "customer storage and retention controls remain environment-specific",
+      "next_phase": "field_evidence"
+    },
+    {
+      "id": "INT-PKG-001",
+      "area": "packaging",
+      "name": "wheel and source distribution build isolated install CLI and release audit",
+      "execution_class": "executable",
+      "status": "verified",
+      "evidence": [".github/workflows/public-export-quality.yml", "src/rpr/release_audit.py"],
+      "residual_risk": "artifact digests must be rebound after every candidate change",
+      "next_phase": "replacement_freeze"
+    },
+    {
+      "id": "INT-SYS-001",
+      "area": "system_integration",
+      "name": "single-candidate cross-component acceptance rehearsal",
+      "execution_class": "executable",
+      "status": "verified",
+      "evidence": [".github/workflows/public-export-quality.yml"],
+      "residual_risk": "customer-specific proxy TLS identity credentials remote MCP and production connectivity remain external-environment inputs",
+      "next_phase": "field_evidence"
+    },
+    {
+      "id": "INT-EXT-001",
+      "area": "external_environment",
+      "name": "customer-specific network proxy TLS identity credential and production-service connectivity",
+      "execution_class": "external_environment_only",
+      "status": "blocked",
+      "evidence": [],
+      "residual_risk": "requires customer infrastructure credentials and an authorized test window; retain as Human Gate input",
+      "next_phase": "external_test"
+    }
+  ],
+  "hold_conditions": [
+    "transport ambiguity can become false success",
+    "automatic replay can duplicate an external effect",
+    "evidence is not bound to the selected candidate lineage",
+    "the candidate is rebuilt or substituted without recorded digests",
+    "an external-only scenario lacks residual-risk and Human Gate routing"
+  ]
+}
