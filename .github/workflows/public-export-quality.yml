@@ -6,13 +6,14 @@ on:
     branches:
       - main
       - release/**
+      - fix/**
 
 permissions:
   contents: read
 
 jobs:
   runtime-package-validation:
-    name: Runtime, package, and demo validation / Runtime・Package・Demo検証
+    name: Complete runtime, package, and demo validation / Runtime・Package・Demo完全検証
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,66 +26,8 @@ jobs:
         run: python -m pip install --disable-pip-version-check build pytest
       - name: Install source package
         run: python -m pip install --disable-pip-version-check -e .
-      - name: Validate standalone public test scope
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          manifest_path = Path('tests/public-test-scope.json')
-          data = json.loads(manifest_path.read_text(encoding='utf-8'))
-          excluded = data['portable_suite']['excluded_modules']
-          paths = [item['path'] for item in excluded]
-          expected = data['portable_suite']['expected_passed_tests']
-          assert len(paths) == 8, paths
-          assert len(paths) == len(set(paths)), paths
-          assert all(Path(path).is_file() for path in paths), paths
-          assert isinstance(expected, int) and expected > 0, expected
-          assert data['canonical_pre_export_validation']['workflow_run'] == 30711058400
-          assert data['canonical_pre_export_validation']['result'] == 'success'
-          assert data['boundary']['portable_exclusion_is_not_a_pass_claim'] is True
-          print(f'PASS / 合格: explicit standalone public test scope verified ({expected} tests)')
-          PY
-      - name: Run standalone portable runtime suite
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t ignored < <(python - <<'PY'
-          import json
-          from pathlib import Path
-          data = json.loads(Path('tests/public-test-scope.json').read_text(encoding='utf-8'))
-          for item in data['portable_suite']['excluded_modules']:
-              print(item['path'])
-          PY
-          )
-          args=()
-          for path in "${ignored[@]}"; do
-            args+=(--ignore "$path")
-          done
-          python -m pytest -q --junitxml="$RUNNER_TEMP/portable-junit.xml" "${args[@]}"
-          python - <<'PY'
-          import json
-          import os
-          import xml.etree.ElementTree as ET
-          from pathlib import Path
-
-          data = json.loads(Path('tests/public-test-scope.json').read_text(encoding='utf-8'))
-          expected = data['portable_suite']['expected_passed_tests']
-          root = ET.parse(Path(os.environ['RUNNER_TEMP']) / 'portable-junit.xml').getroot()
-          suite = root if root.tag == 'testsuite' else root.find('testsuite')
-          assert suite is not None
-          tests = int(suite.attrib.get('tests', '0'))
-          failures = int(suite.attrib.get('failures', '0'))
-          errors = int(suite.attrib.get('errors', '0'))
-          skipped = int(suite.attrib.get('skipped', '0'))
-          assert tests == expected, (tests, expected)
-          assert failures == 0, failures
-          assert errors == 0, errors
-          assert skipped == 0, skipped
-          print(f'PASS / 合格: {tests} portable tests passed with no failures, errors, or skips')
-          PY
+      - name: Run complete standalone test suite
+        run: python -m pytest -q --junitxml="$RUNNER_TEMP/standalone-junit.xml"
       - name: Build wheel and source distribution
         run: python -m build
       - name: Verify clean wheel installation and CLI
@@ -100,6 +43,28 @@ jobs:
           PYTHONPATH: examples/production-grade-demo
         run: python -m pytest -q examples/production-grade-demo/tests
 
+  formal-validation:
+    name: Lean 4 and cross-model validation / Lean 4・モデル整合検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: formal
+      - name: Build Lean formal package
+        working-directory: formal
+        run: lake build
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install source package and pytest
+        run: python -m pip install --disable-pip-version-check -e . pytest
+      - name: Verify JSON, Python, and Lean parity
+        run: python -m pytest -q tests/test_formal_consistency.py tests/test_canonical_transition_spec.py
+
   structural-validation:
     name: Structural and bilingual validation / 構造・日英検証
     runs-on: ubuntu-latest
@@ -113,11 +78,13 @@ jobs:
       - name: Validate public export
         run: python tools/validate_public_export.py
       - name: Compile shipped Python sources
+        run: python -m compileall -q tools src examples tests
+      - name: Reject private preparation paths and persona terms
         shell: bash
         run: |
           set -euo pipefail
-          targets=(tools src examples tests)
-          python -m compileall -q "${targets[@]}"
+          ! grep -RInE 'incubator/rpr|private_rpp_development_only|Master approval|マスター' \
+            --exclude-dir=.git --exclude='*.pyc' .
 
   site-validation:
     name: Static site validation / 静的site検証
