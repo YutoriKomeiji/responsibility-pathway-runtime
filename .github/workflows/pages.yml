@@ -1,12 +1,20 @@
 # Language: YAML
-# Purpose: Publish the static RPR product website and explanatory demo to GitHub Pages.
-# Boundary: Static site deployment only; no package, tag, Release, or runtime publication.
-name: Deploy GitHub Pages
+# Purpose: Build the RPR wheel, verify the shared live-demo scenario, and publish the site to GitHub Pages.
+# Boundary: No package index publication, tag, GitHub Release, or external runtime service is created.
+name: Build and deploy GitHub Pages
 
 on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "pyproject.toml"
+      - "site/**"
+      - ".github/workflows/pages.yml"
   push:
     branches: [main]
     paths:
+      - "src/**"
+      - "pyproject.toml"
       - "site/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -17,25 +25,74 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
-environment:
-  name: github-pages
-  url: ${{ steps.deployment.outputs.page_url }}
-
 jobs:
-  deploy:
+  build-and-verify:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --wheel
+          test -f dist/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
+      - name: Install built wheel
+        run: python -m pip install dist/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
+      - name: Run the shared live-demo scenario under CPython
+        run: |
+          python site/demo_scenario.py > demo-result.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path("demo-result.json").read_text(encoding="utf-8"))
+          assert payload["ok"] is True, payload
+          result = payload["result"]["reconciled"]
+          assert result["state_before"] == "write_status_unknown", result
+          assert result["state"] == "completed", result
+          assert result["dispatch_count"] == 1, result
+          assert result["duplicate_dispatch_prevented"] is True, result
+          assert result["evidence_valid"] is True, result
+          PY
+      - name: Assemble Pages artifact
+        run: |
+          mkdir -p site/assets
+          cp dist/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl site/assets/
+          sha256sum site/assets/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl > site/assets/wheel.sha256
+          cp demo-result.json site/assets/cpython-demo-result.json
       - name: Configure Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
-      - name: Upload static site
+      - name: Upload verification artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpr-pages-preview
+          path: site
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build-and-verify
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
