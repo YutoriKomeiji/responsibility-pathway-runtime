@@ -55,15 +55,19 @@ jobs:
           python-version: "3.11"
       - name: Install build tool
         run: python -m pip install --disable-pip-version-check build
-      - name: Build twice and compare bytes
+      - name: Build twice, normalize sdist, and compare bytes
         env:
           SOURCE_DATE_EPOCH: "1785632400"
         shell: bash
         run: |
           set -euo pipefail
           python -m build --outdir "$RUNNER_TEMP/build-a"
+          python tools/normalize_sdist.py "$RUNNER_TEMP/build-a/responsibility_pathway_runtime-0.1.0a2.tar.gz" \
+            --source-date-epoch "$SOURCE_DATE_EPOCH"
           rm -rf build *.egg-info src/*.egg-info
           python -m build --outdir "$RUNNER_TEMP/build-b"
+          python tools/normalize_sdist.py "$RUNNER_TEMP/build-b/responsibility_pathway_runtime-0.1.0a2.tar.gz" \
+            --source-date-epoch "$SOURCE_DATE_EPOCH"
           for first in "$RUNNER_TEMP/build-a"/*; do
             name="$(basename "$first")"
             cmp "$first" "$RUNNER_TEMP/build-b/$name"
