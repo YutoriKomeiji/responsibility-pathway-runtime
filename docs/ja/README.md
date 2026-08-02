@@ -27,7 +27,7 @@ RPRは、法的責任を自動判定するエンジン、認証基盤、Secret M
 - [セキュリティ・統合・API境界](../en/security-integration-api.md)
 - [検証・Release・既知制約・UAT](../en/verification-release-uat.md)
 
-英語文書が現行のPrimary Product Documentationです。この日本語入口は、マスターおよび日本語利用者が判断できるよう、製品位置づけ・非主張・利用経路を示します。
+英語文書が現行のPrimary Product Documentationです。この日本語入口は、日本語利用者が判断できるよう、製品位置づけ・非主張・利用経路を示します。
 
 ## 検証済み範囲
 
