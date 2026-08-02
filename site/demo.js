@@ -47,7 +47,7 @@ Boundary: The external provider is simulated in Python; no credentials or user d
     output.textContent = JSON.stringify(payload, null, 2);
     document.documentElement.dataset.demoOk = String(payload.ok === true);
     if (!payload.ok) {
-      summary.innerHTML = `<h3>実行失敗</h3><p><code>${payload.error_type}</code>: ${payload.error}</p>`;
+      summary.innerHTML = `<h3>実行できませんでした</h3><p><code>${payload.error_type}</code>: ${payload.error}</p>`;
       return;
     }
     const result = latestResult(payload);
@@ -57,20 +57,20 @@ Boundary: The external provider is simulated in Python; no credentials or user d
     const valid = result.evidence_valid;
     currentState.textContent = state;
     dispatchCount.textContent = String(count);
-    evidenceStatus.textContent = valid === true ? "検証済み" : (valid === false ? "不正" : "未検証");
+    evidenceStatus.textContent = valid === true ? "検証済み" : (valid === false ? "不整合" : "未検証");
     document.documentElement.dataset.demoState = state;
     document.documentElement.dataset.dispatchCount = String(count);
     document.documentElement.dataset.evidenceValid = String(valid === true);
     summary.innerHTML = `
-      <h3><code>${state}</code></h3>
-      <p>実RPR packageが返した状態です。dispatch回数は<strong>${count}</strong>、証拠チェーンは<strong>${valid === true ? "valid" : "未確定"}</strong>です。</p>
-      ${result.duplicate_dispatch_prevented === true ? "<p><strong>再起動後も二重dispatchは発生していません。</strong></p>" : ""}
+      <h3>現在の状態: <code>${state}</code></h3>
+      <p>外部サービスへの実行は<strong>${count}回</strong>です。証拠チェーンは<strong>${valid === true ? "検証済み" : "未確定"}</strong>です。</p>
+      ${result.duplicate_dispatch_prevented === true ? "<p><strong>再起動後も同じ操作を再送していません。</strong></p>" : ""}
     `;
   }
 
   async function invoke(functionName) {
-    if (!ready) throw new Error("RPR runtime is not loaded");
-    report("python-scenario", functionName);
+    if (!ready) throw new Error("RPRがまだ読み込まれていません");
+    report("シナリオを実行中", functionName);
     const quoted = JSON.stringify(functionName);
     const raw = await pyodide.runPythonAsync(`run_json(${quoted})`);
     const payload = JSON.parse(raw);
@@ -80,40 +80,36 @@ Boundary: The external provider is simulated in Python; no credentials or user d
 
   async function loadRuntime() {
     loadButton.disabled = true;
-    pythonStatus.textContent = "Pyodide取得中";
+    pythonStatus.textContent = "Pyodideを取得中";
     packageStatus.textContent = "待機中";
-    report("pyodide-loading", "初回は数十MBを取得する場合があります");
+    report("Python環境を準備中", "初回は数十MBを取得する場合があります");
     try {
       pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/" });
       const pythonVersion = pyodide.runPython("import sys; sys.version.split()[0]");
       pythonStatus.textContent = `Python ${pythonVersion}`;
-      report("python-packages-loading", "micropip + sqlite3");
+      report("Python packageを準備中", "micropip + sqlite3");
       await pyodide.loadPackage(["micropip", "sqlite3"]);
 
-      packageStatus.textContent = "wheelを取得中";
-      report("wheel-fetch", WHEEL_URL);
+      packageStatus.textContent = "RPR wheelを取得中";
+      report("RPR wheelを取得中", WHEEL_URL);
       const wheelResponse = await fetch(WHEEL_URL, { cache: "no-store" });
-      if (!wheelResponse.ok) {
-        throw new Error(`wheel fetch failed: HTTP ${wheelResponse.status}`);
-      }
+      if (!wheelResponse.ok) throw new Error(`wheelの取得に失敗しました: HTTP ${wheelResponse.status}`);
       const wheelBytes = new Uint8Array(await wheelResponse.arrayBuffer());
-      if (wheelBytes.byteLength < 1024) {
-        throw new Error(`wheel response is unexpectedly small: ${wheelBytes.byteLength} bytes`);
-      }
+      if (wheelBytes.byteLength < 1024) throw new Error(`取得したwheelが小さすぎます: ${wheelBytes.byteLength} bytes`);
       pyodide.FS.mkdirTree("/tmp");
       pyodide.FS.writeFile(WHEEL_PATH, wheelBytes);
-      report("wheel-fs-ready", `${wheelBytes.byteLength} bytes`);
+      report("RPR wheelを配置しました", `${wheelBytes.byteLength} bytes`);
 
-      packageStatus.textContent = "wheelをインストール中";
-      report("wheel-install", WHEEL_PATH);
+      packageStatus.textContent = "RPRをインストール中";
+      report("RPRをインストール中", WHEEL_PATH);
       await pyodide.runPythonAsync(`
 import micropip
 await micropip.install("emfs:${WHEEL_PATH}")
 `);
 
-      report("scenario-fetch", "./demo_scenario.py");
+      report("デモシナリオを読み込み中", "./demo_scenario.py");
       const scenarioResponse = await fetch("./demo_scenario.py", { cache: "no-store" });
-      if (!scenarioResponse.ok) throw new Error(`demo_scenario.py fetch failed: HTTP ${scenarioResponse.status}`);
+      if (!scenarioResponse.ok) throw new Error(`デモシナリオの取得に失敗しました: HTTP ${scenarioResponse.status}`);
       const scenarioSource = await scenarioResponse.text();
       await pyodide.runPythonAsync(scenarioSource);
 
@@ -124,16 +120,16 @@ importlib.metadata.version("responsibility-pathway-runtime")
       packageStatus.textContent = `RPR ${version}`;
       ready = true;
       setControls(true);
-      loadButton.textContent = "実RPR起動済み";
+      loadButton.textContent = "RPR読込済み";
       document.documentElement.dataset.runtimeReady = "true";
-      report("runtime-ready", `RPR ${version}`);
+      report("RPRを読み込みました", `RPR ${version}`);
       await invoke("reset_demo");
     } catch (error) {
       console.error("[rpr-demo] startup failed", error);
-      pythonStatus.textContent = "起動失敗";
+      pythonStatus.textContent = "準備失敗";
       packageStatus.textContent = "未読込";
       output.textContent = `${error.name}: ${error.message}\n${error.stack || ""}`;
-      summary.innerHTML = "<h3>起動できませんでした</h3><p>ブラウザのWebAssembly、CDN接続、メモリ制限、Content Security Policyなどを確認してください。</p>";
+      summary.innerHTML = "<h3>RPRを読み込めませんでした</h3><p>WebAssemblyへの対応、CDNへの接続、ブラウザのメモリ制限、Content Security Policyを確認してください。</p>";
       document.documentElement.dataset.runtimeReady = "false";
       document.documentElement.dataset.demoError = `${error.name}: ${error.message}`;
       loadButton.disabled = false;
