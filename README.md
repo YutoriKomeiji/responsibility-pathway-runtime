@@ -4,12 +4,13 @@
 
 Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for applications that need to place an explicit responsibility pathway in front of consequential external actions. It helps a host application preserve actor and authority declarations, execution-attempt continuity, readback evidence, fail-closed ambiguity handling, repair routes, and Human Gate decisions.
 
-> **Public alpha — 0.1.0a2**  
-> Freeze ID: `RPR-CF-2026-08-01-02`  
+> **Public alpha source and live demo — 0.1.0a2**  
+> Freeze ID: `RPR-CF-2026-08-02-01`  
 > Tested final rehearsal profile: Linux, Python 3.11  
+> The repository, product site, and browser demo are public. A final tag, GitHub Release, and package-registry distribution have not yet been published.  
 > RPR is not a legal-responsibility engine, identity provider, secret manager, production gateway, or guarantee of exactly-once effects across arbitrary remote systems.
 
-[日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Product documentation](docs/en/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
+[Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Product documentation](docs/en/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
 
 ## Why RPR
 
@@ -35,11 +36,12 @@ AI agents and automation can execute faster than people can reconstruct what hap
 - clean wheel and source-distribution installation;
 - two independent byte-for-byte reproducible builds;
 - English-primary and Japanese-parallel product documentation;
-- final RC audit with no retained findings for locally executable scope.
+- Lean 4 verification of selected published state-machine invariants;
+- Chromium and Pyodide execution of the CI-built RPR wheel in the public browser demo.
 
 ## We need field-test reports for
 
-RPR is being published so real users can report reproducible environment and integration findings. Please open an Issue for:
+RPR is public so real users can report reproducible environment and integration findings. Please open an Issue for:
 
 - Windows, macOS, other Linux distributions, containers, and Python environments beyond the final Linux/Python 3.11 rehearsal;
 - proxy, TLS, enterprise identity, credential handling, remote MCP, and service-specific connectivity;
@@ -51,24 +53,21 @@ A user report is field evidence for that environment. It does not imply universa
 
 ## Quick Start
 
+Until a package-registry distribution or GitHub Release is published, install from the public repository in a disposable environment:
+
 ```bash
+git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
+cd responsibility-pathway-runtime
 python3.11 -m venv .venv
 . .venv/bin/activate
-python -m pip install responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
+python -m pip install --upgrade pip
+python -m pip install -e .
 rpr --help
 ```
 
-Verify the received artifact before installation:
+To inspect the runtime without installing it locally, use the [live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html). The demo runs the CI-built RPR wheel in Pyodide with SQLite; only the external payment provider is simulated.
 
-```text
-responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
-SHA-256 33f1f9255ee93b4f8be28abf3d547a038eea463e7d0965dada843d8724af3790
-size 107214 bytes
-
-responsibility_pathway_runtime-0.1.0a2.tar.gz
-SHA-256 7a82e586d44954ed3c3ead0b7d89dba27cb3d308f0fe721cbe8b37d55e1541dd
-size 129479 bytes
-```
+The verified candidate artifact hashes are recorded in [`release-evidence/replacement-freeze-2026-08-02.json`](release-evidence/replacement-freeze-2026-08-02.json). Those candidate artifacts are not yet a general package distribution.
 
 ## Integration boundary
 
