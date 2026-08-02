@@ -23,6 +23,7 @@ Responsibility Pathway Runtime（RPR）は、外部作用を伴う処理に責�
 | [導入・運用・復旧](install-operations-recovery.md) | 導入、停止、復旧、削除の運用手順 |
 | [セキュリティ・統合・API境界](security-integration-api.md) | 信頼境界と統合側の責務 |
 | [検証・Release・既知制約・UAT](verification-release-uat.md) | 検証根拠、制約、受入試験 |
+| [日本語ドキュメント執筆基準](writing-standard.md) | 日本語本文、製品ページ、デモUIの表記と審査基準 |
 | [English product documentation](../en/README.md) | 英語版ドキュメント |
 
 ## 製品と統合の役割分担
