@@ -20,14 +20,14 @@ RPRは、法的責任を自動判定するエンジン、認証基盤、Secret M
 
 ## 最初に読むもの
 
+- [クイックスタート](quick-start.md)
+- [製品範囲と構成](product-scope-architecture.md)
+- [導入・運用・復旧](install-operations-recovery.md)
+- [セキュリティ・統合・API境界](security-integration-api.md)
+- [検証・Release・既知制約・UAT](verification-release-uat.md)
 - [English product documentation](../en/README.md)
-- [Quick Start](../en/quick-start.md)
-- [製品範囲と構成](../en/product-scope-architecture.md)
-- [導入・運用・復旧](../en/install-operations-recovery.md)
-- [セキュリティ・統合・API境界](../en/security-integration-api.md)
-- [検証・Release・既知制約・UAT](../en/verification-release-uat.md)
 
-英語文書が現行のPrimary Product Documentationです。この日本語入口は、日本語利用者が判断できるよう、製品位置づけ・非主張・利用経路を示します。
+日本語文書は英語Primary Product Documentationと並行して整備しています。日本語入口からは、まず日本語版の製品位置づけ、導入手順、責任境界、検証範囲を確認できます。英語版は原文確認や英語利用者向けの参照先として利用してください。
 
 ## 検証済み範囲
 
