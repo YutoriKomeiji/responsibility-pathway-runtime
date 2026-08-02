@@ -1,0 +1,36 @@
+{
+  "format_version": 1,
+  "states": [
+    "proposed",
+    "awaiting_approval",
+    "approved",
+    "running",
+    "held",
+    "human_gate",
+    "stopped",
+    "partially_completed",
+    "write_status_unknown",
+    "repair_required",
+    "ready_to_resume",
+    "completed",
+    "denied",
+    "aborted"
+  ],
+  "terminal_states": ["completed", "denied", "aborted"],
+  "transitions": {
+    "proposed": ["awaiting_approval", "approved", "denied"],
+    "awaiting_approval": ["approved", "denied", "human_gate"],
+    "approved": ["running", "held", "aborted"],
+    "running": ["completed", "stopped", "partially_completed", "write_status_unknown", "repair_required"],
+    "held": ["human_gate", "approved", "aborted"],
+    "human_gate": ["approved", "denied", "aborted"],
+    "stopped": ["repair_required", "aborted"],
+    "partially_completed": ["repair_required"],
+    "write_status_unknown": ["completed", "repair_required"],
+    "repair_required": ["ready_to_resume", "aborted"],
+    "ready_to_resume": ["running", "aborted"],
+    "completed": [],
+    "denied": [],
+    "aborted": []
+  }
+}

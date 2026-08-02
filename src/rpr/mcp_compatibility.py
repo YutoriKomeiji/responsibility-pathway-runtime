@@ -53,13 +53,7 @@ def validate_mcp_compatibility(path: str | Path) -> dict[str, Any]:
             if entry.get("enabled_by_default") is not False or entry.get("requires_experimental_flag") is not True:
                 raise McpCompatibilityError(f"{protocol_version}: non-stable versions must be experimental and disabled by default")
 
-    required_bindings = {
-        "protocol_version",
-        "server_identity",
-        "server_capabilities_hash",
-        "tool_name",
-        "tool_schema_hash",
-    }
+    required_bindings = {"protocol_version", "server_identity", "server_capabilities_hash", "tool_name", "tool_schema_hash"}
     if set(_require_unique_strings(data.get("admission_bindings"), "admission_bindings")) != required_bindings:
         raise McpCompatibilityError("admission_bindings must match the required MCP admission identity")
 
@@ -83,8 +77,8 @@ def validate_mcp_compatibility(path: str | Path) -> dict[str, Any]:
 
     if data.get("unknown_version_policy") != "reject":
         raise McpCompatibilityError("unknown MCP versions must fail closed")
-    if data.get("release_boundary") != "private_rpp_development_only":
-        raise McpCompatibilityError("release boundary must remain private development")
+    if data.get("release_boundary") != "public_alpha_candidate":
+        raise McpCompatibilityError("release boundary must remain a public-alpha candidate")
     return data
 
 

@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "product": "Responsibility Pathway Runtime",
+  "release_boundary": "public_alpha_candidate",
+  "allowed_statuses": ["not_implemented", "implemented_unverified", "passing", "failing", "deferred", "out_of_scope"],
+  "allowed_evidence_levels": ["E0", "E1", "E2", "E3", "E4", "E5"],
+  "claims": [
+    {
+      "claim_id": "CLM-01",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/runtime.py", "src/rpr/authority.py", "src/rpr/state_machine.py"],
+      "test_ids": ["RPR-AUT-001", "RPR-AUT-007", "RPR-PRE-001"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-DB"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "Within the configured RPR boundary, declared state and actor authority are enforced before dispatch and replay-result access.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-02",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/runtime.py", "src/rpr/authority.py", "src/rpr/inspection.py"],
+      "test_ids": ["RPR-ADM-002", "RPR-AUT-001", "E2E-01"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-CHAIN"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR enforces an explicit approval transition and prevents configured external dispatch before authorized approval.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-03",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/attempts.py", "src/rpr/runtime.py"],
+      "test_ids": ["RPR-PRE-001", "RPR-PRE-004", "RPR-CRS-001"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-DB"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR distinguishes rejected pre-dispatch calls from persisted possible-dispatch uncertainty within the tested SQLite execution boundary.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-04",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/attempts.py", "src/rpr/runtime.py"],
+      "test_ids": ["RPR-IDM-001", "RPR-CRS-004", "RPR-CRS-010"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-CALL", "EV-DB"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR prevents automatic duplicate dispatch for identical persisted attempts within the tested single-node SQLite runtime boundary.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-05",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/executor.py", "src/rpr/runtime.py"],
+      "test_ids": ["RPR-EXE-001", "RPR-EXE-004", "E2E-01"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-CALL"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR requires configured verified readback before marking the tested external effect completed.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-06",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/models.py", "src/rpr/reconciliation.py", "src/rpr/runtime.py"],
+      "test_ids": ["RPR-IDM-002", "RPR-REC-001", "RPR-CRS-007"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-DB", "EV-CALL"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR preserves possible-dispatch uncertainty until configured reconciliation supplies sufficient evidence.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-07",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/storage.py", "src/rpr/attempts.py", "src/rpr/evidence.py"],
+      "test_ids": ["RPR-PER-001", "RPR-CRS-001", "RPR-CRS-007"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-DB", "EV-CHAIN"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR restores pathway, attempt, and evidence state across runtime recreation in the tested SQLite deployment mode.",
+      "blocked_by": ["OS-level process termination matrix remains incomplete"]
+    },
+    {
+      "claim_id": "CLM-08",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/runtime.py", "src/rpr/reconciliation.py", "src/rpr/attempts.py", "src/rpr/storage.py"],
+      "test_ids": ["RPR-REC-001", "RPR-REC-006", "RPR-CRS-007"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-DB", "EV-CHAIN"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR recovers attempt, pathway, and evidence coherence after the tested cross-store reconciliation crash window; cross-database atomicity is not claimed.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-09",
+      "status": "implemented_unverified",
+      "evidence_level": "E1",
+      "implementation_anchors": ["src/rpr/runtime.py", "src/rpr/authority.py", "src/rpr/models.py"],
+      "test_ids": ["RPR-RPR-001", "RPR-RPR-007", "E2E-05"],
+      "evidence_ids": ["EV-CODE"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "Repair and resume roles are represented in the runtime model; full product-level compensation and residual-closure assurance is not yet established.",
+      "blocked_by": ["repair/resume/compensation product E2E"]
+    },
+    {
+      "claim_id": "CLM-10",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["src/rpr/evidence.py", "src/rpr/storage.py", "src/rpr/redaction.py"],
+      "test_ids": ["RPR-EVD-001", "RPR-EVD-006", "RPR-PER-004"],
+      "evidence_ids": ["EV-CODE", "EV-TEST", "EV-CHAIN"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR produces ordered, hash-linked, inspectable evidence with configured redaction; it does not claim signed non-repudiation.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-11",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["specs/pathway-state-machine.json", "src/rpr/_generated_transitions.py", "formal/rprFormal/State.lean"],
+      "test_ids": ["RPR-FRM-001", "RPR-FRM-005"],
+      "evidence_ids": ["EV-PARITY", "EV-LEAN", "EV-AUDIT"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "RPR cross-checks its selected canonical transition model across JSON, generated Python, and Lean 4, with selected invariants machine-checked in CI.",
+      "blocked_by": []
+    },
+    {
+      "claim_id": "CLM-12",
+      "status": "passing",
+      "evidence_level": "E3",
+      "implementation_anchors": ["pyproject.toml", "src/rpr/cli.py", "src/rpr/rc_execution.py"],
+      "test_ids": ["RPR-PKG-001", "RPR-PKG-010"],
+      "evidence_ids": ["EV-ART", "EV-CLEAN", "EV-AUDIT"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "The tested RPR wheel and source distribution install and execute the documented scenario in a clean supported environment.",
+      "blocked_by": ["production-repository artifact digests require replacement after the integrity repair"]
+    }
+  ]
+}

@@ -21,12 +21,10 @@ _ALLOWED_STATUSES = {
 }
 _EVIDENCE_ORDER = {f"E{level}": level for level in range(6)}
 _REQUIRED_HUMAN_GATES = {
-    "public_repository",
-    "publication",
+    "repository_publicization",
+    "pages_publication",
     "package_release",
     "tag_or_github_release",
-    "independent_rpr_export",
-    "production_promotion",
     "external_or_live_mcp_connection",
     "credential_use",
     "license_change",
@@ -40,7 +38,7 @@ _REQUIRED_NOT_PERMITTED = {
     "distributed correctness",
     "production readiness",
     "signed non-repudiation",
-    "public release authorization",
+    "release-complete declaration without authorization",
 }
 _REQUIRED_CLAIM_FIELDS = {
     "claim_id",
@@ -73,10 +71,10 @@ def validate_assurance_manifest(payload: Any, *, root: str | Path | None = None)
         raise AssuranceManifestError("unsupported_schema_version")
     if payload.get("product") != "Responsibility Pathway Runtime":
         raise AssuranceManifestError("unexpected_product")
-    if payload.get("canonical_source") != "RPP incubator/rpr":
+    if payload.get("canonical_source") != "YutoriKomeiji/responsibility-pathway-runtime":
         raise AssuranceManifestError("unexpected_canonical_source")
-    if payload.get("release_boundary") != "private_rpp_development_only":
-        raise AssuranceManifestError("release_boundary_must_remain_private")
+    if payload.get("release_boundary") != "public_alpha_candidate":
+        raise AssuranceManifestError("release_boundary_must_be_public_alpha_candidate")
 
     human_gates = _string_set(payload.get("human_gate_required_for"), "human_gate_required_for")
     missing_gates = _REQUIRED_HUMAN_GATES - human_gates
@@ -95,7 +93,7 @@ def validate_assurance_manifest(payload: Any, *, root: str | Path | None = None)
     permitted = boundary.get("permitted")
     if not isinstance(permitted, str) or not permitted.strip():
         raise AssuranceManifestError("global_permitted_wording_required")
-    not_permitted = _string_set(boundary.get("not_permitted"), "global_claim_boundary.not_permitted")
+    not_permitted = _string_set(payload.get("global_claim_boundary", {}).get("not_permitted"), "global_claim_boundary.not_permitted")
     missing_prohibitions = _REQUIRED_NOT_PERMITTED - not_permitted
     if missing_prohibitions:
         raise AssuranceManifestError(f"missing_claim_prohibitions: {sorted(missing_prohibitions)!r}")

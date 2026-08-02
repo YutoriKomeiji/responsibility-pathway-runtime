@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "product": "Responsibility Pathway Runtime",
+  "canonical_source": "YutoriKomeiji/responsibility-pathway-runtime",
+  "release_boundary": "public_alpha_candidate",
+  "human_gate_required_for": [
+    "repository_publicization",
+    "pages_publication",
+    "package_release",
+    "tag_or_github_release",
+    "external_or_live_mcp_connection",
+    "credential_use",
+    "license_change",
+    "claim_escalation_to_e4_or_e5"
+  ],
+  "maximum_current_evidence_level": "E3",
+  "global_claim_boundary": {
+    "permitted": "Python runtime with a canonical transition model cross-checked across JSON, generated Python, and Lean 4, selected invariants machine-checked in CI, and bounded local integration behavior tested on supported CI hosts.",
+    "not_permitted": [
+      "full formal verification",
+      "legal or regulatory compliance",
+      "arbitrary third-party MCP compatibility",
+      "live external MCP interoperability",
+      "distributed correctness",
+      "production readiness",
+      "signed non-repudiation",
+      "release-complete declaration without authorization"
+    ]
+  },
+  "source_documents": [
+    "specs/runtime-claim-assurance-case.md",
+    "specs/claim-traceability.json",
+    "formal/README.md"
+  ],
+  "claims": [
+    {
+      "claim_id": "MCP-CLM-01",
+      "status": "passing",
+      "evidence_level": "E3",
+      "statement": "For tested acyclic JSON values, RPR admits stable MCP tools only after protocol, server identity, tool schema, and argument binding pass fail-closed validation.",
+      "implementation_anchors": ["src/rpr/mcp_compatibility.py", "src/rpr/mcp_admission.py"],
+      "test_anchors": ["tests/test_mcp_compatibility.py", "tests/test_mcp_admission.py", "tests/test_mcp_stable_snapshot.py"],
+      "retained_evidence": ["protocol_version", "server_identity_hash", "tool_schema_hash", "argument_hash"],
+      "residual_owner": "Akihisa Ono",
+      "blocked_by": ["cyclic Python containers remain outside the tested admission boundary"],
+      "residual_risks": ["server authentication is outside this claim", "live server behavior is outside this claim"]
+    },
+    {
+      "claim_id": "MCP-CLM-02",
+      "status": "passing",
+      "evidence_level": "E3",
+      "statement": "RPR preserves explicit dispatch classifications and requires configured independent readback before completion.",
+      "implementation_anchors": ["src/rpr/mcp_tool_executor.py", "src/rpr/reconciliation.py"],
+      "test_anchors": ["tests/test_mcp_tool_executor.py", "tests/test_mcp_runtime_integration.py"],
+      "retained_evidence": ["dispatch_state", "execution_status", "readback_verified", "readback_reason"],
+      "residual_owner": "Akihisa Ono",
+      "blocked_by": [],
+      "residual_risks": ["external observers may be insufficient", "provider-side idempotency is not proven"]
+    },
+    {
+      "claim_id": "MCP-CLM-03",
+      "status": "passing",
+      "evidence_level": "E3",
+      "statement": "RPR enforces bounded strict JSON-RPC and line-framed stdio composition for the tested single-process request sequence.",
+      "implementation_anchors": ["src/rpr/mcp_jsonrpc_session.py", "src/rpr/mcp_stdio_framing.py", "src/rpr/mcp_stdio_channel.py"],
+      "test_anchors": ["tests/test_mcp_jsonrpc_session.py", "tests/test_mcp_stdio_framing.py", "tests/test_mcp_stdio_channel.py", "tests/test_mcp_stdio_stack_e2e.py"],
+      "retained_evidence": ["framing_failure_class", "diagnostics_bytes", "diagnostics_truncated"],
+      "residual_owner": "Akihisa Ono",
+      "blocked_by": [],
+      "residual_risks": ["concurrent multiplexing is outside this claim", "network transports are outside this claim"]
+    },
+    {
+      "claim_id": "MCP-CLM-04",
+      "status": "passing",
+      "evidence_level": "E3",
+      "statement": "RPR owns a bounded shell-free local subprocess stdio lifecycle with explicit timeout, termination, kill fallback, and cleanup behavior on supported CI hosts.",
+      "implementation_anchors": ["src/rpr/mcp_subprocess_lifecycle.py", "src/rpr/mcp_local_subprocess_stdio.py"],
+      "test_anchors": ["tests/test_mcp_subprocess_lifecycle.py", "tests/test_mcp_local_subprocess_stdio.py"],
+      "retained_evidence": ["exit_code", "graceful", "terminated", "killed"],
+      "residual_owner": "Akihisa Ono",
+      "blocked_by": [],
+      "residual_risks": ["cross-platform signal equivalence is not established", "arbitrary third-party servers are outside this claim"]
+    },
+    {
+      "claim_id": "MCP-CLM-05",
+      "status": "passing",
+      "evidence_level": "E3",
+      "statement": "RPR constructs and verifies a canonical retained-evidence envelope without retaining selected raw sensitive values.",
+      "implementation_anchors": ["src/rpr/mcp_retained_evidence.py"],
+      "test_anchors": ["tests/test_mcp_retained_evidence.py"],
+      "retained_evidence": ["canonical_sha256", "operation_id", "attempt_id", "admission_binding", "dispatch_state", "readback_state", "process_exit", "residual_boundary"],
+      "residual_owner": "Akihisa Ono",
+      "blocked_by": [],
+      "residual_risks": ["no cryptographic signature or trusted timestamp", "no append-only external evidence store"]
+    },
+    {
+      "claim_id": "RPR-RC-01",
+      "status": "implemented_unverified",
+      "evidence_level": "E1",
+      "statement": "The production repository contains the source, tests, formal assets, documentation, and release tooling required for a standalone public-alpha candidate rehearsal.",
+      "implementation_anchors": ["pyproject.toml", "src/rpr/rc_execution.py", ".github/workflows/public-export-quality.yml"],
+      "test_anchors": [],
+      "retained_evidence": [],
+      "residual_owner": "Akihisa Ono",
+      "blocked_by": ["complete standalone CI, reproducible artifact rebuild, replacement digests, and final integrity audit"],
+      "residual_risks": ["the repair candidate is not yet frozen", "repository publicization and release remain Human Gate actions"]
+    }
+  ]
+}

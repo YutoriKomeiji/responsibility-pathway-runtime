@@ -3,27 +3,30 @@
   "product": "Responsibility Pathway Runtime",
   "version": "0.1.0a2",
   "release_channel": "public-alpha",
-  "freeze_id": "RPR-CF-2026-08-01-02",
-  "status": "release-preparation",
+  "previous_freeze_id": "RPR-CF-2026-08-01-02",
+  "freeze_id": "RPR-CF-2026-08-02-01",
+  "status": "verified-public-alpha-candidate",
   "production_ready": false,
   "customer_environment_verified": false,
   "release_approved": false,
+  "publication_blocked": true,
+  "blocker_issue": 7,
   "human_gate": {
     "required_for": [
-      "merge to production main",
-      "public visibility change",
+      "repository publicization",
+      "GitHub Pages publication",
       "release tag creation",
       "GitHub Release publication",
-      "binary artifact upload",
-      "GitHub Pages publication",
+      "binary artifact publication",
       "production-ready claim"
     ],
-    "residual_owner": "human maintainer"
+    "residual_owner": "authorized release owner"
   },
   "verified_profile": {
     "operating_system": "Linux",
     "python": "3.11",
-    "scope": "frozen locally executable release-candidate rehearsal"
+    "scope": "standalone locally executable public-alpha candidate validation",
+    "verification_run_id": 30726958037
   },
   "verified_capabilities": [
     "authorized pathway lifecycle transitions",
@@ -33,8 +36,11 @@
     "fail-closed ambiguous-write handling",
     "restart and duplicate-dispatch prevention",
     "backup, restore, diagnostics, removal, and customer-data retention",
+    "complete standalone Python test execution",
     "clean wheel and source-distribution installation",
-    "byte-for-byte reproducible release artifacts"
+    "byte-for-byte reproducible wheel and normalized source distribution",
+    "canonical JSON, generated Python, and Lean 4 transition-model parity",
+    "selected Lean 4 invariant verification with the pinned toolchain"
   ],
   "non_claims": [
     "universal production readiness",
@@ -42,16 +48,14 @@
     "legal compliance or certification",
     "identity or credential management",
     "exactly-once effects across arbitrary remote systems",
+    "full formal verification",
     "automatic transfer of final responsibility to the runtime"
   ],
   "open_release_gates": [
-    "complete public source, specifications, tests, examples, and package metadata export",
-    "implement and execute production-grade governed action demo",
-    "complete issue and pull-request templates",
-    "complete website integration and accessibility audit",
-    "add export validator and independent CI",
-    "perform secret, internal-link, license, digest, and residue audit",
-    "perform production repository clean-install and readback verification",
-    "obtain final human release approval"
+    "complete final secret, internal-path, link, license, residue, and EN/JA claim audit",
+    "merge the verified repair candidate into production main",
+    "change repository visibility only after explicit approval",
+    "verify live English and Japanese Pages after repository publicization",
+    "obtain explicit approval for tag, GitHub Release, and binary publication"
   ]
 }

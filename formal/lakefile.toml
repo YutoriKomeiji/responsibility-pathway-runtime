@@ -1,0 +1,6 @@
+name = "rprFormal"
+version = "0.1.0"
+defaultTargets = ["rprFormal"]
+
+[[lean_lib]]
+name = "rprFormal"
