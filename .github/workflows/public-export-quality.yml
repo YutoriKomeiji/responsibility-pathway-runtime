@@ -146,4 +146,4 @@ jobs:
       - name: Confirm final release remains human-approved
         run: |
           echo 'Preparation checks may pass automatically.'
-          echo 'Final tag, GitHub Release, binary upload, Pages publication, and release declaration require Master approval.'
+          echo 'Final tag, GitHub Release, binary upload, Pages publication, and release declaration require approval from the authorized release owner.'
