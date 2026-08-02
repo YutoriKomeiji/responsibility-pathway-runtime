@@ -10,9 +10,20 @@ Body Language: English
 
 # Quick Start
 
-## 1. Verify the release artifact
+RPR is provided under the [MIT License](../../LICENSE), without warranty. Begin with a disposable, non-consequential rehearsal and decide independently whether the software is suitable for your environment.
 
-Compare the file name, byte size, and SHA-256 digest with [`release-manifest.json`](../../release-manifest.json).
+## Rehearsal checklist
+
+| Step | Action | Evidence to retain |
+|---|---|---|
+| 1 | Verify the artifact against [`release-manifest.json`](../../release-manifest.json) | File name, byte size, SHA-256 digest |
+| 2 | Create an isolated Python 3.11 environment | Python and pip versions |
+| 3 | Install the verified wheel | Installation log and dependency resolution |
+| 4 | Confirm the CLI surface | `rpr --help` output |
+| 5 | Run a local synthetic pathway | Pathway, attempt, readback, and final state |
+| 6 | Exercise restart or ambiguity handling | Proof that no unresolved effect was silently repeated |
+
+## 1. Verify the artifact
 
 ```bash
 sha256sum responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
@@ -37,35 +48,31 @@ rpr --help
 python -m responsibility_pathway_runtime --help
 ```
 
-## 4. Start with a non-consequential local rehearsal
+## 4. Run a non-consequential rehearsal
 
-Use a disposable directory and synthetic data. Confirm that the host application can:
+Use a disposable directory and synthetic data. Confirm that the host application can register a pathway and authority, reach a Human Gate, retain an execution attempt, attach independent readback evidence, restore unresolved state after restart, and expose repair or reconciliation when completion cannot be established.
 
-1. register a pathway and declared authority;
-2. reach a Human Gate rather than bypassing it;
-3. create and retain an execution attempt;
-4. attach independent readback evidence;
-5. resume after restart without repeating an unresolved effect;
-6. expose repair or reconciliation when completion cannot be established.
+Do not begin with production credentials, customer data, irreversible actions, or a remote write that cannot be independently read back.
 
-Do not begin with production credentials, customer data, irreversible actions, or a remote service whose write result cannot be independently read back.
+## Environment record
 
-## 5. Record the environment
+| Category | Record |
+|---|---|
+| Runtime | OS, architecture, Python and pip versions |
+| Artifact | Source, version, Freeze ID, digest |
+| Integration | Host framework, adapter, network, proxy, TLS, identity, credentials |
+| Test | Exact command, expected result, actual result |
+| Evidence | Sanitized logs, readback source, final pathway state |
 
-Retain at least:
+## Reporting routes
 
-- operating system and architecture;
-- Python and pip versions;
-- installation source and artifact digest;
-- RPR version and Freeze ID;
-- host framework and adapter path;
-- network, proxy, TLS, identity, and credential arrangement;
-- exact command, expected result, actual result, and relevant logs with secrets removed.
-
-## 6. Report field evidence
-
-Use the environment-report Issue form for successful or failed reproducible tests. Use the bug form for product defects, the integration form for framework or service requests, and the private route in `SECURITY.md` for vulnerabilities.
+| Finding | Route |
+|---|---|
+| Reproducible environment result | Environment-report Issue form |
+| Product defect | Bug Issue form |
+| Framework or service request | Integration Issue form |
+| Potential vulnerability | Private route in [`SECURITY.md`](../../SECURITY.md) |
 
 ## Stop conditions
 
-Stop the rehearsal when authority is absent, the independent readback source is unavailable, a credential may be exposed, an external effect is ambiguous, the pathway cannot be restored, or the next action would be irreversible without explicit human approval.
+Stop the rehearsal when authority is absent, independent readback is unavailable, credentials may be exposed, an external effect is ambiguous, the pathway cannot be restored, or the next action would be irreversible without explicit human approval.

@@ -10,9 +10,20 @@ Body Language: Japanese
 
 # クイックスタート
 
-## 1. Release artifactを検証する
+RPRは[`MIT License`](../../LICENSE)に基づき、無保証で提供されます。まず使い捨て可能で影響のない環境で試験し、利用環境への適合性は利用者自身で判断してください。
 
-ファイル名、byte数、SHA-256 digestを[`release-manifest.json`](../../release-manifest.json)と照合します。
+## 試験の流れ
+
+| 手順 | 実施内容 | 保存するEvidence |
+|---:|---|---|
+| 1 | [`release-manifest.json`](../../release-manifest.json)と配布物を照合 | File名、byte数、SHA-256 |
+| 2 | 隔離したPython 3.11環境を作成 | Python・pip version |
+| 3 | 検証済みwheelをinstall | Install log、dependency解決結果 |
+| 4 | CLIを確認 | `rpr --help`の出力 |
+| 5 | Synthetic dataでlocal pathwayを実行 | Pathway、attempt、readback、最終state |
+| 6 | Restartまたは曖昧結果を試験 | 未解決effectが重複実行されない証拠 |
+
+## 1. Release artifactを検証する
 
 ```bash
 sha256sum responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
@@ -37,27 +48,31 @@ rpr --help
 python -m responsibility_pathway_runtime --help
 ```
 
-## 4. 影響のないlocal rehearsalから始める
+## 4. 影響のないlocal rehearsalを行う
 
-使い捨てdirectoryとsynthetic dataを使用し、host applicationが次を実行できることを確認します。
-
-1. pathwayと宣言済みauthorityを登録する。
-2. Human Gateを迂回せず到達する。
-3. execution attemptを作成し永続化する。
-4. 独立readback evidenceを関連付ける。
-5. 未解決effectを再送せずrestart後に再開する。
-6. completionを確定できない場合にrepairまたはreconciliationを公開する。
+使い捨てdirectoryとsynthetic dataを使用し、pathwayとauthorityの登録、Human Gateへの到達、execution attemptの永続化、独立readback evidenceの関連付け、restart後の未解決state復元、repairまたはreconciliationへの遷移を確認します。
 
 最初からproduction credential、customer data、不可逆action、独立readbackできないremote writeを使用しないでください。
 
-## 5. Environmentを記録する
+## Environment記録
 
-最低限、OSとarchitecture、Python/pip version、install元とartifact digest、RPR versionとFreeze ID、host framework、network/proxy/TLS/identity/credential構成、実行command、期待結果、実結果、secret除去済みlogを保存します。
+| 分類 | 記録項目 |
+|---|---|
+| Runtime | OS、architecture、Python・pip version |
+| Artifact | 入手元、version、Freeze ID、digest |
+| Integration | Host framework、adapter、network、proxy、TLS、identity、credential |
+| Test | 実行command、期待結果、実結果 |
+| Evidence | Secret除去済みlog、readback source、最終pathway state |
 
-## 6. Field evidenceを報告する
+## 報告経路
 
-再現可能な成功・失敗試験はenvironment-report Issue formへ、product defectはbug formへ、framework/service要望はintegration formへ、脆弱性は`SECURITY.md`のprivate routeへ報告します。
+| 内容 | 経路 |
+|---|---|
+| 再現可能な環境試験結果 | Environment-report Issue form |
+| Product defect | Bug Issue form |
+| Framework・Service要望 | Integration Issue form |
+| 脆弱性の可能性 | [`SECURITY.md`](../../SECURITY.md)の非公開経路 |
 
 ## 停止条件
 
-authorityがない、独立readback sourceが使えない、credential露出の可能性がある、external effectが曖昧、pathwayを復元できない、または次のactionが明示的な人間承認なしに不可逆となる場合はrehearsalを停止してください。
+authorityがない、独立readback sourceが利用できない、credential露出の可能性がある、external effectが曖昧、pathwayを復元できない、または次のactionが明示的な人間承認なしに不可逆となる場合は試験を停止してください。

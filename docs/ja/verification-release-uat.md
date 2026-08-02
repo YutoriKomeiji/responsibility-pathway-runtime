@@ -12,48 +12,62 @@ Body Language: Japanese
 
 ## Release identity
 
-- Version: `0.1.0a2`
-- Channel: public alpha
-- Freeze ID: `RPR-CF-2026-08-01-02`
-- Canonical product commit: `release-manifest.json`に記録
-- Final rehearsal profile: Linux / Python 3.11
+| 項目 | 値 |
+|---|---|
+| Version | `0.1.0a2` |
+| Channel | Public Alpha Candidate |
+| Freeze ID | `RPR-CF-2026-08-01-02` |
+| Product commit | `release-manifest.json`に記録 |
+| Final rehearsal profile | Linux / Python 3.11 |
+| License | [`MIT License`](../../LICENSE) |
 
-## Verified locally executable scope
+## Retained evidenceが示す範囲
 
-freeze candidateでは、pathway transition、persistent state、execution-attempt continuity、Human Gate/repair route、local file、allow-listed HTTP、durable outbound-message、MCP subprocess execution、fault injection、restart behavior、backup/restore、diagnostics、removal、package installation、reproducible artifactに関するevidenceを保持しています。
+Frozen evidence setは、pathway transition、persistent state、execution-attempt continuity、Human Gate・repair route、対応adapter path、fault injection、restart、backup/restore、diagnostics、removal、package installation、reproducible artifactを対象とします。
 
-この記述はfreeze evidence setに限定されます。すべてのenvironment、remote system、credential arrangement、framework、operating conditionを実行したという主張ではありません。
+| Evidence statement | 示すこと | 示さないこと |
+|---|---|---|
+| Testがpassした | 記録された環境・条件で対象caseがpassした | すべての環境・integrationでpassすること |
+| Buildがreproducible | 試験したbuild processで一致artifactを生成した | 欠陥や脆弱性が存在しないこと |
+| Pathwayがcompletedになった | そのcaseで必要evidenceが一致した | Remote systemが普遍的なexactly-once semanticsを持つこと |
+| UAT reportがpassした | 報告構成が定義済みcheckを満たした | 一般的な本番適合性、認証、保証 |
 
-## Known limitations and non-claims
+Verification documentationは観測結果と試験結果を記録するものです。MIT Licenseを変更せず、warranty、support obligation、certification、legal assuranceを追加しません。
 
-- customer environmentは事前検証されていません。
-- Windows、macOS、追加Linux distribution、container、別Python profileにはfield evidenceが必要です。
-- enterprise proxy、TLS、identity、credential、remote MCPにはintegration固有testが必要です。
-- 任意remote systemでexactly-once effectを保証しません。
-- legal interpretation、production authorization、security certification、universal deployment fitnessを提供しません。
-- alpha interfaceとmigration behaviorはstable release前に変更される場合があります。
+## Known limitations
+
+| 分類 | 現在の境界 |
+|---|---|
+| Customer environment | 事前検証されていない |
+| Platform | Windows、macOS、追加Linux、container、別Python profileにはfield evidenceが必要 |
+| Enterprise integration | Proxy、TLS、identity、credential、Remote MCPにはintegration固有testが必要 |
+| Remote effect | 任意systemに対するexactly-onceを保証しない |
+| Legal / security | Legal interpretation、production authorization、security certificationを提供しない |
+| Compatibility | Alpha interfaceとmigration behaviorは変更される場合がある |
 
 ## Minimum UAT plan
 
-最初はsyntheticまたはnon-consequential actionを使います。
+最初はsyntheticまたはnon-consequential actionを使用します。
 
-1. environment、artifact digest、configuration、responsible ownerを記録する。
-2. unauthorized transitionがfail closedになることを確認する。
-3. required Human Gateを迂回できないことを確認する。
-4. independent readback付き成功dispatchを実行する。
-5. ambiguous resultを注入またはsimulateし、false completionがないことを確認する。
-6. unresolved attemptを持ったままrestartし、duplicate dispatchがないことを確認する。
-7. repairまたはreconciliationをdocumented end stateまで実行する。
-8. state storeを隔離環境でbackup/restoreする。
-9. diagnosticsを実行し、出力にsecretがないことを確認する。
-10. packageをremoveし、retained customer dataが宣言policyに従うことを確認する。
+| 手順 | Acceptance check |
+|---:|---|
+| 1 | Environment、artifact digest、configuration、responsible ownerを記録する |
+| 2 | Unauthorized transitionがfail closedになる |
+| 3 | Required Human Gateを迂回できない |
+| 4 | Independent readback付きdispatchが1件完了する |
+| 5 | Ambiguous resultがfalse completionにならない |
+| 6 | Restart後にunresolved dispatchが重複しない |
+| 7 | Repairまたはreconciliationがdocumented end stateへ到達する |
+| 8 | State backup/restoreが隔離環境で成功する |
+| 9 | Diagnostic outputにsecretが含まれない |
+| 10 | Package removal後のdataが宣言policyどおり保持または削除される |
 
 ## Reporting result
 
-expected/actual behavior、reproduction steps、sanitized log、environment、RPR version、Freeze ID、artifact digest、adapter type、readback source、real external effectの有無を含めます。
+Expected / actual behavior、reproduction step、sanitized log、environment、RPR version、Freeze ID、artifact digest、adapter、readback source、real external effectの有無を記録します。
 
-結果はpass、fail、blocked、not applicable、not executedのいずれかに分類します。blockedやnot-executedをpassing evidenceへ変換してはいけません。
+各結果は`pass`、`fail`、`blocked`、`not applicable`、`not executed`のいずれかに分類します。Blockedや未実行caseをpassing evidenceへ変換してはいけません。
 
 ## Release promotion gate
 
-public repository更新、tag、GitHub Release、binary upload、publicationは、準備exportがsecret、internal file/link、license、manifest、digest、documentation、claim/evidence auditを通過し、明示的human approvalを受けた後だけ実施します。
+Repository visibility変更、tag、GitHub Release、binary publication、release declarationは、準備exportが対象となるsecret、internal reference、license、manifest、digest、documentation、claim/evidence checkを通過し、指定されたhuman approvalを得た後に実施します。

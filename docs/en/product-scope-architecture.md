@@ -12,7 +12,7 @@ Body Language: English
 
 ## Product role
 
-Responsibility Pathway Runtime (RPR) sits between a host application's decision logic and a consequential external action. It preserves a reconstructable route from proposed action to declared authority, pathway state, execution attempt, independent readback, repair or reconciliation, and Human Gate return.
+Responsibility Pathway Runtime (RPR) is an MIT-licensed software component placed between a host application's decision logic and a consequential external action. It preserves a reconstructable route from proposed action to authority, execution attempt, evidence, repair or reconciliation, and Human Gate return.
 
 ```text
 host application
@@ -24,43 +24,38 @@ host application
   -> evidence retained for reconstruction
 ```
 
-## Frozen alpha capability groups
+## Capability map
 
-The `RPR-CF-2026-08-01-02` candidate includes:
-
-- pathway lifecycle and authorized transitions;
-- persistent pathway and execution-attempt continuity;
-- Human Gate, repair, resume, and reconciliation boundaries;
-- local-file, allow-listed HTTP, durable outbound-message, and MCP subprocess paths;
-- fail-closed ambiguous-write handling;
-- crash/restart and duplicate-dispatch protections exercised in the frozen rehearsal;
-- backup, restore, diagnostics, removal, and customer-data retention procedures;
-- wheel and source-distribution installation with reproducible artifacts.
+| Capability | What RPR supplies | What remains outside RPR |
+|---|---|---|
+| Pathway lifecycle | State model and authorized transitions | Business-policy authorship |
+| Execution continuity | Durable operations and attempts | Remote-system transaction guarantees |
+| Evidence | Attachment, provenance, and readback workflow | The authoritative external evidence source |
+| Human control | Human Gate, repair, resume, reconciliation states | Selection and identity of authorized decision makers |
+| Adapters | Bounded local-file, HTTP, message, and MCP paths | Network trust, credentials, and service-specific semantics |
+| Recovery | Ambiguous-write preservation and restart continuity | Operational staffing and incident ownership |
 
 ## State and evidence principles
 
-- An attempted write is not completion.
-- Completion requires the evidence class defined by the host integration, normally independent readback.
-- An unknown remote result remains `write_status_unknown`; it must not be rewritten as success.
-- Restart must preserve unresolved attempts and must not silently dispatch them again.
-- Repair and reconciliation are explicit pathway states, not hidden exception handling.
-- Human approval is evidence of a decision, not proof that a remote effect occurred.
+| Principle | Required behavior |
+|---|---|
+| Attempt is not completion | A dispatched write is not treated as a completed effect |
+| Evidence closes completion | Completion requires the evidence class defined by the integration |
+| Unknown remains unknown | `write_status_unknown` is not rewritten as success without reconciliation |
+| Restart does not imply retry | Unresolved attempts are restored without silent redispatch |
+| Recovery is explicit | Repair and reconciliation are pathway states, not hidden exception handling |
+| Approval is not effect proof | Human approval proves a decision, not the remote result |
 
-## Adapter boundary
+## Integration boundary
 
-Adapters provide bounded execution paths. They do not own business authorization, credentials, network trust, service semantics, or the definition of sufficient readback. The host integration must define:
-
-- which actions are allowed;
-- who may authorize them;
-- how credentials are isolated;
-- how bypass is prevented;
-- what independent source proves the effect;
-- which ambiguous states require stop, repair, or human return.
+The host application defines permitted actions, authorization, credential isolation, bypass prevention, independent readback, data handling, deployment approval, and operational ownership. RPR provides mechanisms to retain and enforce the declared pathway; it does not determine whether a particular deployment is lawful, safe, or suitable.
 
 ## Optional RPE integration
 
-Responsibility Pathway Engineering (RPE) may supply an external gate decision. RPR must treat RPE absence, malformed output, unsupported versions, and inapplicable results visibly and fail closed according to the integration contract. RPE does not execute the action and does not replace RPR's execution evidence.
+Responsibility Pathway Engineering (RPE) may provide an external gate decision. RPE does not execute the action or replace RPR execution evidence. Missing, malformed, unsupported, or inapplicable RPE output must remain visible and be handled according to the integration contract.
 
-## Non-claims
+## License and non-claims
 
-RPR is not a legal-responsibility engine, policy author, identity provider, secret manager, production gateway, universal transaction coordinator, certification, or guarantee of exactly-once effects. The alpha candidate is not declared universally production ready.
+RPR is provided under the [MIT License](../../LICENSE). The license permits use, modification, and distribution subject to its notice requirements and provides the software without warranty.
+
+RPR is not a legal-responsibility engine, policy author, identity provider, secret manager, production gateway, certification, universal transaction coordinator, or guarantee of exactly-once effects. The public alpha is not represented as fit for every environment or purpose.

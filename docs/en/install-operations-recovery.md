@@ -10,50 +10,63 @@ Body Language: English
 
 # Installation, operation, and recovery
 
-## Installation
+This guide describes recommended integration practices. It is not a hosted service commitment, managed-operations agreement, or warranty. RPR is provided under the [MIT License](../../LICENSE).
 
-Install only a manifest-matching wheel or source distribution in an isolated environment. Retain the artifact, digest, Python version, dependency resolution output, and installation log as deployment evidence.
+## Deployment baseline
 
-## Configuration baseline
+| Area | Integrator decision and evidence |
+|---|---|
+| Artifact | Verified wheel or source distribution, digest, source |
+| Runtime | Python version, dependency resolution, isolated environment |
+| Persistence | State-store location, access control, backup and retention |
+| Authority | Permitted actions, authorized actors, Human Gate owners |
+| Execution | Adapter allow-lists, timeout, cancellation, retry policy |
+| Credentials | External secret source and least-privilege scope |
+| Evidence | Independent readback source and matching rule |
+| Recovery | Repair, reconciliation, resume, and incident owners |
 
-Before enabling an adapter, record the state-store location, permitted action types, endpoint allow-list, subprocess command allow-list, timeouts, retry policy, credential source, readback source, backup destination, retention policy, and responsible human owner.
-
-Secrets must not be committed to repository files, examples, logs, pathway records, or Issue reports.
+Secrets must not be committed to repository files, examples, logs, pathway records, diagnostic bundles, or Issues.
 
 ## Operating sequence
 
-1. Validate the proposed action, actor, authority, and integration configuration.
-2. Register or load the pathway.
-3. Confirm the current state permits the requested transition.
-4. Create one durable execution attempt before dispatch.
-5. Dispatch through the bounded adapter.
-6. Obtain independent readback.
-7. Mark completion only when the required evidence matches.
-8. Otherwise retain the unresolved state and enter repair, resume, reconciliation, or Human Gate.
+| Order | Operation | Completion condition |
+|---:|---|---|
+| 1 | Validate action, actor, authority, and integration configuration | Required declarations are present |
+| 2 | Register or load the pathway | Persistent state is available |
+| 3 | Check the requested transition | Current state and actor permit it |
+| 4 | Create a durable execution attempt | Attempt identity is stored before dispatch |
+| 5 | Dispatch through the bounded adapter | Dispatch evidence is retained |
+| 6 | Obtain independent readback | External source is queried |
+| 7 | Reconcile evidence | Required evidence matches the expected effect |
+| 8 | Complete or stop | Enter completed, repair, resume, reconciliation, or Human Gate |
 
-## Restart
+## Restart and ambiguous writes
 
-On restart, load persistent pathways and attempts before permitting new dispatch. An unresolved attempt must not be silently repeated. Reconstruct its operation identity, dispatch evidence, last known state, readback result, and required next decision.
+| Situation | Required handling |
+|---|---|
+| Process restart | Load persistent pathways and attempts before new dispatch |
+| Unresolved attempt | Do not silently redispatch |
+| Possible write with unknown result | Retain `write_status_unknown` |
+| Readback available | Query using stable operation identity and retain provenance |
+| Readback unavailable or inconclusive | Stop and route to reconciliation or Human Gate |
+
+Retry is not a substitute for reconciliation.
 
 ## Backup and restore
 
-Back up the persistent state and associated evidence using a method that preserves consistency. Test restoration into an isolated location. After restore, run diagnostics and reconcile unresolved attempts before enabling external actions.
+Back up persistent state and associated evidence consistently. Test restoration in an isolated location. After restoration, run diagnostics and reconcile unresolved attempts before enabling external actions.
 
-## Ambiguous write recovery
+## Removal and retained data
 
-When an adapter may have written but the result cannot be established:
+Uninstalling the Python package and deleting pathway data are separate operations.
 
-- retain `write_status_unknown`;
-- disable automatic redispatch;
-- query an independent source using stable operation identity;
-- attach the result and provenance;
-- reconcile to complete, failed, repair-required, or Human Gate;
-- preserve the decision and evidence trail.
-
-## Removal and customer data
-
-Uninstalling the Python package must not silently delete customer pathway data. Document the state-store and backup locations, retention owner, export format, deletion approval, and verification method separately from package removal.
+| Item | Record before removal |
+|---|---|
+| Package | Installed version and uninstall result |
+| State | Store and backup locations |
+| Retention | Owner, period, and export format |
+| Deletion | Approver, method, and verification evidence |
 
 ## Operational stop conditions
 
-Stop external execution when configuration, authority, credentials, persistence, readback, restore integrity, or operation identity cannot be established. Do not use retry as a substitute for reconciliation.
+Stop external execution when configuration, authority, credentials, persistence, readback, restore integrity, or stable operation identity cannot be established. The integrator remains responsible for deciding whether and how the software may be used in its environment.
