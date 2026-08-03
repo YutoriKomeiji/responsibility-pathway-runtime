@@ -14,11 +14,21 @@ authors = [{name = "Akihisa Ono"}]
 keywords = ["ai-agents", "governance", "responsibility", "human-in-the-loop", "runtime"]
 classifiers = [
   "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Quality Assurance",
   "Typing :: Typed"
 ]
+
+[project.urls]
+Homepage = "https://yutorikomeiji.github.io/responsibility-pathway-runtime/"
+Documentation = "https://yutorikomeiji.github.io/responsibility-pathway-runtime/"
+Repository = "https://github.com/YutoriKomeiji/responsibility-pathway-runtime"
+Issues = "https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues"
+Demo = "https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html"
 
 [project.scripts]
 rpr = "rpr.cli:main"
