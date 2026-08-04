@@ -32,6 +32,7 @@ Demo = "https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html
 
 [project.scripts]
 rpr = "rpr.cli:main"
+rpr-mcp = "rpr.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
