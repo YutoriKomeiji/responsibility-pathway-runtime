@@ -4,13 +4,14 @@
 
 Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for applications that need to place an explicit responsibility pathway in front of consequential external actions. It helps a host application preserve actor and authority declarations, execution-attempt continuity, readback evidence, fail-closed ambiguity handling, repair routes, and Human Gate decisions.
 
-> **Public alpha source and live demo — 0.1.0a2**  
+> **Public Alpha — 0.1.0a2**  
+> Tag: `v0.1.0a2`  
 > Freeze ID: `RPR-CF-2026-08-02-01`  
 > Tested final rehearsal profile: Linux, Python 3.11  
-> The repository, product site, and browser demo are public. A final tag, GitHub Release, and package-registry distribution have not yet been published.  
+> The source repository, product site, browser demo, GitHub Prerelease, and PyPI package are public.  
 > RPR is not a legal-responsibility engine, identity provider, secret manager, production gateway, or guarantee of exactly-once effects across arbitrary remote systems.
 
-[Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Product documentation](docs/en/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
+[PyPI](https://pypi.org/project/responsibility-pathway-runtime/) · [GitHub Prerelease](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a2) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Product documentation](docs/en/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
 
 ## Why RPR
 
@@ -24,7 +25,7 @@ AI agents and automation can execute faster than people can reconstruct what hap
 - retain Human Gate, repair, resume, reconciliation, and evidence continuity;
 - survive restart without silently repeating unresolved effects.
 
-## Verified in the frozen alpha candidate
+## Verified in the public alpha
 
 - pathway registration and authorized state transitions;
 - persistent pathway and execution-attempt stores;
@@ -33,8 +34,8 @@ AI agents and automation can execute faster than people can reconstruct what hap
 - HTTP and MCP fault injection;
 - crash/restart continuity and duplicate-dispatch prevention;
 - backup, restore, diagnostics, uninstall, package/CLI residue checks, and customer-data retention;
-- clean wheel and source-distribution installation;
-- two independent byte-for-byte reproducible builds;
+- wheel and source-distribution build and installation checks;
+- GitHub Actions OIDC Trusted Publishing to PyPI;
 - English-primary and Japanese-parallel product documentation;
 - Lean 4 verification of selected published state-machine invariants;
 - Chromium and Pyodide execution of the CI-built RPR wheel in the public browser demo.
@@ -53,21 +54,27 @@ A user report is field evidence for that environment. It does not imply universa
 
 ## Quick Start
 
-Until a package-registry distribution or GitHub Release is published, install from the public repository in a disposable environment:
+Install the Public Alpha from PyPI in an isolated, disposable environment:
+
+```bash
+python3.11 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install responsibility-pathway-runtime==0.1.0a2
+rpr --help
+```
+
+For development or source inspection, clone the public repository and use an editable install:
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
 cd responsibility-pathway-runtime
-python3.11 -m venv .venv
-. .venv/bin/activate
-python -m pip install --upgrade pip
 python -m pip install -e .
-rpr --help
 ```
 
 To inspect the runtime without installing it locally, use the [live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html). The demo runs the CI-built RPR wheel in Pyodide with SQLite; only the external payment provider is simulated.
 
-The verified candidate artifact hashes are recorded in [`release-evidence/replacement-freeze-2026-08-02.json`](release-evidence/replacement-freeze-2026-08-02.json). Those candidate artifacts are not yet a general package distribution.
+The pre-release verification hashes remain recorded in [`release-evidence/replacement-freeze-2026-08-02.json`](release-evidence/replacement-freeze-2026-08-02.json). They are evidence for the frozen candidate that preceded the PyPI publication, not a substitute for reading the published package metadata and release state.
 
 ## Integration boundary
 
