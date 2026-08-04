@@ -27,7 +27,7 @@ AI agents and automation can execute faster than people can reconstruct what hap
 
 ## Current MCP support
 
-RPR `0.1.0a2` can govern outbound MCP tool calls made by a host application. The verified public-alpha path includes local subprocess launch, stdio transport, MCP JSON-RPC framing, admitted server and tool bindings, execution-attempt continuity, fail-closed ambiguous outcomes, and optional independent readback.
+Published PyPI `0.1.0a2` can govern outbound MCP tool calls made by a host application. The verified public-alpha path includes local subprocess launch, stdio transport, MCP JSON-RPC framing, admitted server and tool bindings, execution-attempt continuity, fail-closed ambiguous outcomes, and optional independent readback.
 
 ```text
 host application or agent
@@ -42,7 +42,28 @@ host application or agent
 
 A successful MCP response is not automatically proof of a consequential external effect. When required readback is missing or a transport failure leaves dispatch uncertain, RPR keeps the pathway as `write_status_unknown` rather than silently retrying or reporting success.
 
-> **Boundary:** RPR currently governs calls to an MCP server. It is not yet distributed as an MCP server exposing RPR pathway operations as MCP tools. Remote MCP services and customer-specific transports require environment-specific evaluation.
+### Unreleased read-only server preview
+
+The current source tree also contains a Phase 1 local stdio MCP server that inspects an existing RPR SQLite database through a read-only connection.
+
+```bash
+python -m pip install -e .
+rpr-mcp --database ./rpr.sqlite3
+```
+
+It exposes only:
+
+```text
+rpr.get_status
+rpr.list_pathways
+rpr.get_pathway
+rpr.get_evidence
+rpr.list_unresolved
+```
+
+It has no approval, execution, transition, reconciliation, repair, or resume tool. The database is opened with SQLite `mode=ro`, and status output does not disclose its filesystem path.
+
+> **Release boundary:** This read-only MCP server is an unreleased source preview. It is not included in the published PyPI `0.1.0a2` package. Read-only access can still reveal pathway definitions and retained evidence, so it is intended only for a trusted local MCP client with existing operating-system read permission.
 
 See the [MCP integration guide](docs/en/mcp-integration.md) or the [Japanese guide](docs/ja/mcp-integration.md).
 
@@ -61,6 +82,8 @@ See the [MCP integration guide](docs/en/mcp-integration.md) or the [Japanese gui
 - English-primary and Japanese-parallel product documentation;
 - Lean 4 verification of selected published state-machine invariants;
 - Chromium and Pyodide execution of the CI-built RPR wheel in the public browser demo.
+
+The read-only MCP server preview has additional source-tree tests for read-only database opening, MCP initialization and tools, malformed requests, missing pathways, stdout cleanliness, and rejection of missing or non-RPR databases. Those tests do not promote the preview into the published `0.1.0a2` release.
 
 ## We need field-test reports for
 
@@ -86,7 +109,7 @@ python -m pip install responsibility-pathway-runtime==0.1.0a2
 rpr --help
 ```
 
-For development or source inspection, clone the public repository and use an editable install:
+For development, source inspection, or the unreleased read-only MCP server preview, clone the public repository and use an editable install:
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
@@ -100,7 +123,7 @@ The pre-release verification hashes remain recorded in [`release-evidence/replac
 
 ## Integration boundary
 
-The host application remains responsible for authentication, credential isolation, network controls, bypass prevention, domain-specific authorization, MCP server selection, tool permissions, and the independent readback source. RPE integration is optional; RPE absence, malformed output, or unsupported results must not become implicit permission.
+The host application remains responsible for authentication, credential isolation, network controls, bypass prevention, domain-specific authorization, MCP peer selection, tool permissions, trusted-client access to stored pathway data, and the independent readback source. RPE integration is optional; RPE absence, malformed output, or unsupported results must not become implicit permission.
 
 ## Documentation
 
