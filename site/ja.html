@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Responsibility Pathway Runtime（RPR）は、AIや自動処理による外部操作を、人間の承認、実行記録、結果確認、修復、再開まで含む責任経路として扱うMITライセンスのPython Runtimeです。">
+  <meta name="description" content="Responsibility Pathway Runtime（RPR）は、AIや自動処理による外部操作とMCP Tool Callを、人間の承認、実行記録、結果確認、修復、再開まで含む責任経路として扱うMITライセンスのPython Runtimeです。">
   <title>Responsibility Pathway Runtime | 日本語</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
@@ -12,7 +12,7 @@
   <a class="skip-link" href="#main">本文へ移動</a>
   <header class="site-header">
     <a class="brand" href="#top" aria-label="RPRホーム"><span class="brand-mark" aria-hidden="true">RPR</span><span>Responsibility Pathway Runtime</span></a>
-    <nav aria-label="主要ナビゲーション"><a href="#capabilities">できること</a><a href="#how">役割分担</a><a href="#demo">実動デモ</a><a href="#field-tests">動作報告</a><a href="#start">導入方法</a><a href="index.html" hreflang="en" lang="en">English</a></nav>
+    <nav aria-label="主要ナビゲーション"><a href="#capabilities">できること</a><a href="#how">役割分担</a><a href="#mcp">MCP</a><a href="#demo">実動デモ</a><a href="#field-tests">動作報告</a><a href="#start">導入方法</a><a href="index.html" hreflang="en" lang="en">English</a></nav>
   </header>
   <main id="main">
     <section class="hero" id="top">
@@ -43,6 +43,11 @@
       <aside class="boundary-card"><h3>RPRが行わないこと</h3><ul><li>法的責任の自動判定</li><li>認証基盤や秘密情報の管理</li><li>ネットワーク分離や本番ゲートウェイの代替</li><li>あらゆる外部サービスでの完全な一回実行保証</li><li>未検証環境での安全性や適合性の保証</li></ul></aside>
     </section>
 
+    <section class="section split" id="mcp">
+      <div><p class="eyebrow">現在のMCP対応</p><h2>MCPの応答だけで「外部変更も成功した」と決めない。</h2><p>RPRは、Host ApplicationとLocal MCP Serverの間に置けます。現在のPublic Alphaでは、Subprocess起動、stdio Transport、JSON-RPC framing、ServerとToolのbinding、Execution Attemptの継続、送信済みかもしれないCallのfail-closed処理を実装しています。</p><p>変更を伴うToolでは、MCPの成功応答だけを完了証拠にせず、必要に応じて独立readbackを要求します。結果を確認できない場合は、<code>write_status_unknown</code>として保持します。</p><div class="actions"><a class="button primary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/docs/ja/mcp-integration.md">MCP統合ガイドを読む</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues/new/choose">MCPの動作結果を報告する</a></div></div>
+      <aside class="boundary-card"><h3>現在の境界</h3><ul><li>Local subprocessとstdio経路を実装済み</li><li>Server Identity、Capability、Tool Schemaを実行前にbinding</li><li>結果不明のCallを黙って再送しない</li><li>Remote MCPは環境ごとの評価が必要</li><li>RPR自身をMCP Serverとして公開する機能は未提供</li></ul></aside>
+    </section>
+
     <section class="section split" id="demo">
       <div><p class="eyebrow">ブラウザで動く実RPRデモ</p><h2>状態遷移の見本ではなく、公開wheelをその場で実行します。</h2><p>デモページは、GitHub ActionsでRPRのソースから生成したwheelをPyodideへ読み込み、ブラウザ内で実際のRPR、SQLite、実行試行台帳、証拠チェーン、再起動後の照合を動かします。</p><p>外部の支払い先だけは安全な模擬providerへ置き換えています。RPR本体はモックではありません。</p><div class="actions"><a class="button primary" href="demo.html">実RPRデモを開く</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/docs/ja/README.md">日本語ドキュメント</a></div></div>
       <aside class="boundary-card"><h3>デモで確認できること</h3><ul><li>Human Gateで実行前に停止する</li><li>通信断後を<code>write_status_unknown</code>として保存する</li><li>新しいRuntimeからSQLiteを読み戻す</li><li>再送せずに外部状態を照合する</li><li>dispatch回数が1回のまま完了する</li></ul></aside>
@@ -63,6 +68,6 @@ rpr --help</code></pre>
       <div class="actions"><a class="button primary" href="https://pypi.org/project/responsibility-pathway-runtime/">PyPIを開く</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a2">Prereleaseを見る</a></div>
     </section>
   </main>
-  <footer><p>Responsibility Pathway Runtime · MIT License · Copyright © 2026 Akihisa Ono</p><nav aria-label="フッターナビゲーション"><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime">GitHub</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/SECURITY.md">Security</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/CONTRIBUTING.md">Contributing</a><a href="index.html" hreflang="en" lang="en">English</a></nav></footer>
+  <footer><p>Responsibility Pathway Runtime · MIT License · Copyright © 2026 Akihisa Ono</p><nav aria-label="フッターナビゲーション"><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime">GitHub</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/docs/ja/mcp-integration.md">MCP統合</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/SECURITY.md">Security</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/CONTRIBUTING.md">Contributing</a><a href="index.html" hreflang="en" lang="en">English</a></nav></footer>
 </body>
 </html>
