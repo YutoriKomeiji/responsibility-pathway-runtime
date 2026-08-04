@@ -1,7 +1,7 @@
 <!--
 Document Title: RPR MCP Integration
 Document Type: Public Product Guide
-Status: Public Alpha
+Status: Public Alpha and Unreleased Source Preview
 Version: 0.1.0a2
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
@@ -10,13 +10,13 @@ Body Language: English
 
 # MCP integration
 
-Responsibility Pathway Runtime (RPR) can govern outbound Model Context Protocol (MCP) tool calls made by a host application. In the current Public Alpha, RPR acts as a client-side execution and evidence layer in front of an MCP server.
+Responsibility Pathway Runtime (RPR) can govern outbound Model Context Protocol (MCP) tool calls made by a host application. In the published Public Alpha `0.1.0a2`, RPR acts as a client-side execution and evidence layer in front of an MCP server.
 
-> **Current boundary:** RPR can govern calls to an MCP server. RPR is not yet distributed as an MCP server that exposes its own pathway operations as MCP tools.
+> **Published-release boundary:** PyPI `0.1.0a2` governs calls to an MCP server. It does not expose RPR pathway operations as MCP tools.
 
-## What is implemented
+## What is implemented in `0.1.0a2`
 
-The current MCP path includes:
+The published outbound MCP path includes:
 
 - local subprocess launch and stdio transport;
 - MCP JSON-RPC session and framing;
@@ -28,7 +28,7 @@ The current MCP path includes:
 - optional independent readback before a mutating effect is treated as complete;
 - restart and reconciliation paths that do not silently repeat an unresolved call.
 
-## Responsibility pathway around an MCP call
+## Responsibility pathway around an outbound MCP call
 
 ```text
 host application or agent
@@ -58,33 +58,76 @@ RPR distinguishes between:
 
 An unresolved call must not be retried merely because the client process restarted or the transport timed out.
 
+## Unreleased read-only RPR MCP server preview
+
+The current source tree contains a Phase 1 read-only stdio MCP server for inspecting an existing RPR SQLite pathway store. This source preview is **not included in the published PyPI `0.1.0a2` package** and has not yet been promoted as a new package release.
+
+Start it from an editable source installation:
+
+```bash
+python -m pip install -e .
+rpr-mcp --database ./rpr.sqlite3
+```
+
+The preview exposes only:
+
+- `rpr.get_status`
+- `rpr.list_pathways`
+- `rpr.get_pathway`
+- `rpr.get_evidence`
+- `rpr.list_unresolved`
+
+The server opens the existing SQLite file with `mode=ro`. It has no MCP tool for approval, execution, transition, reconciliation, repair, or resume. Status output does not disclose the database filesystem path.
+
+Example local MCP client configuration:
+
+```json
+{
+  "command": "rpr-mcp",
+  "args": ["--database", "/absolute/path/to/rpr.sqlite3"]
+}
+```
+
+> **Trust boundary:** Read-only does not mean non-sensitive. Pathway definitions and retained evidence may contain operational information. Run the preview only for a trusted local MCP client under operating-system permissions that already allow reading the database. It is not an authentication, authorization, tenant-isolation, or redaction gateway.
+
 ## Verified and unverified scope
 
-The public-alpha verification includes local MCP subprocess and stdio paths, fault injection, restart continuity, and duplicate-dispatch prevention in the tested environment.
+The published public-alpha verification includes local outbound MCP subprocess and stdio paths, fault injection, restart continuity, and duplicate-dispatch prevention in the tested environment.
 
-The following require environment-specific evaluation:
+The read-only server preview adds tests for:
+
+- read-only SQLite opening and rejection of write statements;
+- MCP initialization, `tools/list`, and `tools/call`;
+- empty, listed, individual, evidence, and unresolved-pathway results;
+- malformed JSON-RPC and invalid arguments;
+- structured tool errors and missing pathway IDs;
+- stdout containing JSON-RPC messages only;
+- rejection of missing and non-RPR databases.
+
+The following still require environment-specific evaluation:
 
 - remote MCP transports and hosted MCP services;
 - enterprise proxy, TLS, identity, and credential arrangements;
 - service-specific tool semantics and authoritative readback sources;
-- Windows, macOS, containers, and Python environments outside the final Linux/Python 3.11 rehearsal;
-- production bypass prevention, monitoring, incident ownership, and deployment suitability.
+- Windows, macOS, containers, and Python environments outside the tested profile;
+- production authentication, authorization, tenant isolation, bypass prevention, monitoring, incident ownership, and deployment suitability.
 
 ## Integration responsibilities
 
-RPR does not discover that an arbitrary MCP server is trustworthy. The integrating application remains responsible for:
+RPR does not discover that an arbitrary MCP server or client is trustworthy. The integrating application and operator remain responsible for:
 
-- selecting and authenticating the MCP server;
-- protecting credentials and environment variables;
-- restricting the server process, network, filesystem, and tool permissions;
-- deciding which tools require Human Gate;
+- selecting and authenticating MCP peers;
+- protecting credentials, database files, and environment variables;
+- restricting process, network, filesystem, and tool permissions;
+- deciding which outbound tools require Human Gate;
 - supplying authoritative independent readback for consequential effects;
 - defining repair, reconciliation, resume, and residual ownership;
-- preventing alternate execution paths that bypass RPR.
+- preventing alternate execution paths that bypass RPR;
+- preventing untrusted MCP clients from reading pathway and evidence data.
 
-## Not yet implemented
+## Still not implemented
 
-The current release does not expose RPR itself as an MCP server. Tools such as `rpr.get_pathway`, `rpr.request_human_gate`, or `rpr.reconcile` are a possible future interface, not a capability of `0.1.0a2`.
+The source preview does not expose mutating RPR operations. Tools such as `rpr.request_human_gate`, `rpr.approve`, `rpr.execute`, `rpr.reconcile`, or `rpr.resume` remain future design candidates, not current capabilities.
 
 See also:
 
