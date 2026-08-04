@@ -28,11 +28,16 @@ Public Alpha `0.1.0a2` は、PyPIとGitHub Prereleaseで公開しています。
 |---|---|
 | [クイックスタート](quick-start.md) | PyPIから導入し、影響のないローカル試験を行う |
 | [製品範囲と構成](product-scope-architecture.md) | RPRが提供する機能と製品境界 |
+| [MCP統合](mcp-integration.md) | 現在のMCP Tool Call経路、証拠要件、対応境界を確認する |
 | [導入・運用・復旧](install-operations-recovery.md) | 導入、停止、復旧、削除の運用手順 |
 | [セキュリティ・統合・API境界](security-integration-api.md) | 信頼境界と統合側の責務 |
 | [検証・Release・既知制約・UAT](verification-release-uat.md) | 検証根拠、制約、受入試験 |
 | [日本語ドキュメント執筆基準](writing-standard.md) | 日本語本文、製品ページ、デモUIの表記と審査基準 |
 | [English product documentation](../en/README.md) | 英語版ドキュメント |
+
+## 現在のMCP対応境界
+
+RPR `0.1.0a2`は、統合ApplicationからMCP Serverへ送るTool Callを責任経路で管理できます。Local subprocess / stdio transport、ServerとToolのbinding、結果不明のfail-closed処理、独立readbackを扱います。ただし、RPR自身のPathway操作をMCP Toolとして公開する「RPR MCP Server」は、まだ提供していません。
 
 ## 製品と統合の役割分担
 
