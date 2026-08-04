@@ -10,7 +10,7 @@ import pytest
 
 from rpr.evidence import build_event
 from rpr.mcp_read_model import ReadOnlyDatabaseError, SQLiteReadModel
-from rpr.mcp_server import ReadOnlyRprMcpServer, run_stdio
+from rpr.mcp_server import JsonRpcError, ReadOnlyRprMcpServer, run_stdio
 from rpr.mcp_stable_snapshot import STABLE_PROTOCOL_VERSION
 from rpr.models import ActionClass, EnvironmentTrust, PathwayDefinition, PathwayState
 from rpr.storage import SQLiteStore
@@ -115,6 +115,19 @@ def test_read_model_lists_pathways_unresolved_and_evidence(tmp_path):
         read_model.close()
 
 
+def test_server_requires_initialize_before_initialized_notification(tmp_path):
+    read_model, server = _server(tmp_path)
+    try:
+        with pytest.raises(JsonRpcError) as captured:
+            server.handle(
+                {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}}
+            )
+        assert captured.value.code == -32002
+        assert server.initialized is False
+    finally:
+        read_model.close()
+
+
 def test_server_exposes_only_read_only_tools(tmp_path):
     read_model, server = _server(tmp_path)
     try:
@@ -186,10 +199,14 @@ def test_server_returns_structured_results_and_tool_errors(tmp_path):
         read_model.close()
 
 
-def test_stdio_emits_only_json_rpc_messages_on_stdout(tmp_path):
+def test_stdio_emits_only_json_rpc_messages_and_suppresses_notification_errors(tmp_path):
     read_model, server = _server(tmp_path)
     stdin = io.StringIO(
         "not-json\n"
+        + json.dumps(
+            {"jsonrpc": "2.0", "method": "notifications/unknown", "params": {}}
+        )
+        + "\n"
         + json.dumps(
             {
                 "jsonrpc": "2.0",
