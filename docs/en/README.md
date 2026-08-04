@@ -24,9 +24,14 @@ This documentation describes the verified Public Alpha `0.1.0a2`. It explains te
 |---|---|
 | [Quick Start](quick-start.md) | Install from PyPI and run a low-impact local rehearsal |
 | [Product scope and architecture](product-scope-architecture.md) | Understand what RPR does, does not do, and where it sits |
+| [MCP integration](mcp-integration.md) | Understand the current outbound MCP tool-call path, evidence requirements, and limits |
 | [Installation, operation, and recovery](install-operations-recovery.md) | Prepare, operate, stop, restore, and remove an integration |
 | [Security, integration, and API boundary](security-integration-api.md) | Define trust boundaries and host-application obligations |
 | [Verification, release notes, known issues, and UAT](verification-release-uat.md) | Review evidence, limitations, and a minimum acceptance plan |
+
+## Current MCP boundary
+
+RPR `0.1.0a2` can govern outbound calls from a host application to an MCP server, including local subprocess/stdio transport, admitted server and tool bindings, fail-closed ambiguous outcomes, and optional independent readback. RPR is not yet exposed as an MCP server that offers its own pathway operations as MCP tools.
 
 ## Product and integration boundary
 
