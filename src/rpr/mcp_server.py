@@ -13,7 +13,7 @@ from .mcp_read_model import ReadOnlyDatabaseError, SQLiteReadModel
 from .mcp_stable_snapshot import STABLE_PROTOCOL_VERSION
 
 _SERVER_NAME = "responsibility-pathway-runtime"
-_SERVER_VERSION = "0.1.0a3"
+_SERVER_VERSION = "0.1.0a4"
 
 @dataclass(frozen=True)
 class JsonRpcError(Exception):
