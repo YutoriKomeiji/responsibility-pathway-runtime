@@ -18,8 +18,8 @@ Boundary: The external provider is simulated in Python; no credentials or user d
   const summary = document.getElementById("summary");
   const output = document.getElementById("output");
 
-  const WHEEL_URL = "./assets/responsibility_pathway_runtime-0.1.0a3-py3-none-any.whl";
-  const WHEEL_PATH = "/tmp/responsibility_pathway_runtime-0.1.0a3-py3-none-any.whl";
+  const WHEEL_URL = "./assets/responsibility_pathway_runtime-0.1.0a4-py3-none-any.whl";
+  const WHEEL_PATH = "/tmp/responsibility_pathway_runtime-0.1.0a4-py3-none-any.whl";
 
   let pyodide = null;
   let ready = false;
