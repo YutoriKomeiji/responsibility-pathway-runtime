@@ -29,7 +29,7 @@ class SQLiteReadModel:
     def __init__(self, database: str | Path) -> None:
         path = Path(database).expanduser().resolve()
         if not path.is_file():
-            raise ReadOnlyDatabaseError(f"database file does not exist: {path}")
+            raise ReadOnlyDatabaseError("database file does not exist")
         uri = f"file:{path.as_posix()}?mode=ro"
         try:
             self._connection = sqlite3.connect(uri, uri=True, timeout=5.0)
@@ -37,7 +37,6 @@ class SQLiteReadModel:
             self._validate_schema()
         except (sqlite3.Error, ValueError) as exc:
             raise ReadOnlyDatabaseError(f"cannot open RPR database read-only: {exc}") from exc
-        self.database = str(path)
 
     def close(self) -> None:
         self._connection.close()
@@ -71,7 +70,6 @@ class SQLiteReadModel:
         )
         return {
             "mode": "read_only",
-            "database": self.database,
             "schema_version": int(schema_row["value"]),
             "pathway_count": pathway_count,
             "unresolved_count": unresolved_count,
