@@ -2,16 +2,14 @@
 
 **Govern external actions without losing evidence, recovery, or the human decision point.**
 
-Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for applications that need to place an explicit responsibility pathway in front of consequential external actions. It helps a host application preserve actor and authority declarations, execution-attempt continuity, readback evidence, fail-closed ambiguity handling, repair routes, and Human Gate decisions.
+Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for applications that need to place an explicit responsibility pathway in front of consequential external actions. It preserves actor and authority declarations, execution-attempt continuity, readback evidence, fail-closed ambiguity handling, repair routes, and Human Gate decisions.
 
-> **Public Alpha — 0.1.0a2**  
-> Tag: `v0.1.0a2`  
-> Freeze ID: `RPR-CF-2026-08-02-01`  
-> Tested final rehearsal profile: Linux, Python 3.11  
-> The source repository, product site, browser demo, GitHub Prerelease, and PyPI package are public.  
+> **Public Alpha — 0.1.0a4**  
+> Tag: `v0.1.0a4`  
+> Correction scope: package-description and release-metadata alignment after `0.1.0a3`  
 > RPR is not a legal-responsibility engine, identity provider, secret manager, production gateway, or guarantee of exactly-once effects across arbitrary remote systems.
 
-[PyPI](https://pypi.org/project/responsibility-pathway-runtime/) · [GitHub Prerelease](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a2) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [MCP integration](docs/en/mcp-integration.md) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Product documentation](docs/en/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
+[PyPI](https://pypi.org/project/responsibility-pathway-runtime/) · [GitHub Prerelease](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a4) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [MCP integration](docs/en/mcp-integration.md) · [Article 50 profile](docs/eu-ai-act-article-50.md) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
 
 ## Why RPR
 
@@ -27,27 +25,19 @@ AI agents and automation can execute faster than people can reconstruct what hap
 
 ## Current MCP support
 
-Published PyPI `0.1.0a2` can govern outbound MCP tool calls made by a host application. The verified public-alpha path includes local subprocess launch, stdio transport, MCP JSON-RPC framing, admitted server and tool bindings, execution-attempt continuity, fail-closed ambiguous outcomes, and optional independent readback.
+The published package includes two distinct MCP-related boundaries.
 
-```text
-host application or agent
-  -> proposed MCP tool call
-  -> actor, authority, Human Gate, and pathway state
-  -> admitted MCP server and tool binding
-  -> tools/call
-  -> tool result
-  -> independent readback when required
-  -> completed | write_status_unknown | repair | reconcile | human gate
-```
+### Governed outbound MCP calls
 
-A successful MCP response is not automatically proof of a consequential external effect. When required readback is missing or a transport failure leaves dispatch uncertain, RPR keeps the pathway as `write_status_unknown` rather than silently retrying or reporting success.
+A host application can route consequential outbound MCP tool calls through an RPR responsibility pathway. The verified path includes local subprocess launch, stdio transport, MCP JSON-RPC framing, admitted server and tool bindings, execution-attempt continuity, fail-closed ambiguous outcomes, and optional independent readback.
 
-### Unreleased read-only server preview
+A successful MCP response is not automatically proof of a consequential external effect. When required readback is missing or transport failure leaves dispatch uncertain, RPR retains `write_status_unknown` rather than silently retrying or reporting success.
 
-The current source tree also contains a Phase 1 local stdio MCP server that inspects an existing RPR SQLite database through a read-only connection.
+### Published read-only MCP inspection server
+
+The package includes `rpr-mcp`, a local stdio read-only inspection server targeting stable MCP protocol version `2025-11-25`.
 
 ```bash
-python -m pip install -e .
 rpr-mcp --database ./rpr.sqlite3
 ```
 
@@ -61,55 +51,49 @@ rpr.get_evidence
 rpr.list_unresolved
 ```
 
-It has no approval, execution, transition, reconciliation, repair, or resume tool. The database is opened with SQLite `mode=ro`, and status output does not disclose its filesystem path.
+It has no approval, execution, transition, reconciliation, repair, or resume tool. The SQLite database is opened in read-only mode. Access is intended only for a trusted local MCP client that already has operating-system permission to read the database.
 
-> **Release boundary:** This read-only MCP server is an unreleased source preview. It is not included in the published PyPI `0.1.0a2` package. Read-only access can still reveal pathway definitions and retained evidence, so it is intended only for a trusted local MCP client with existing operating-system read permission.
+Support for mutating MCP tools, remote MCP transport, and later draft or release-candidate MCP protocol versions is not claimed.
 
-See the [MCP integration guide](docs/en/mcp-integration.md) or the [Japanese guide](docs/ja/mcp-integration.md).
+## EU AI Act Article 50 transparency profile
 
-## Verified in the public alpha
+RPR includes an optional Article 50 profile that records and evaluates integrator-declared disclosure, marking, labelling, editorial-review, and Human Gate evidence through structured fail-closed outcomes.
+
+This profile does not provide legal classification, legal advice, certification, or a declaration of compliance with the EU AI Act. Jurisdiction-specific interpretation and deployment decisions remain with the responsible operator and legal advisers.
+
+## Verified public-alpha scope
 
 - pathway registration and authorized state transitions;
 - persistent pathway and execution-attempt stores;
 - Human Gate, repair, resume, and reconciliation boundaries;
 - local-file, allow-listed HTTP, durable outbound-message, and real MCP subprocess paths;
-- MCP server/tool admission binding, stdio execution, fault injection, and ambiguous-call handling;
-- HTTP fault injection;
+- published read-only MCP inspection server and `rpr-mcp` CLI;
+- MCP protocol-abuse, malformed-input, notification, subprocess, and database-byte-invariance tests;
+- Article 50 profile, executable sample, public API exports, and focused tests;
 - crash/restart continuity and duplicate-dispatch prevention;
-- backup, restore, diagnostics, uninstall, package/CLI residue checks, and customer-data retention;
-- wheel and source-distribution build and installation checks;
-- GitHub Actions OIDC Trusted Publishing to PyPI;
-- English-primary and Japanese-parallel product documentation;
-- Lean 4 verification of selected published state-machine invariants;
-- Chromium and Pyodide execution of the CI-built RPR wheel in the public browser demo.
+- wheel and source-distribution build and clean-install checks;
+- English-primary and Japanese-parallel documentation;
+- selected Lean 4 state-machine invariants;
+- Chromium and Pyodide execution of the CI-built wheel.
 
-The read-only MCP server preview has additional source-tree tests for read-only database opening, MCP initialization and tools, malformed requests, missing pathways, stdout cleanliness, and rejection of missing or non-RPR databases. Those tests do not promote the preview into the published `0.1.0a2` release.
+ER-1 hardening has started but is not complete. Customer proxy, TLS, identity, credentials, independent MCP clients, operating-system permission profiles, long-duration operation, production supervisors, and customer-equivalent connectivity remain external-environment validation items.
 
-## We need field-test reports for
-
-RPR is public so real users can report reproducible environment and integration findings. Please open an Issue for:
-
-- Windows, macOS, other Linux distributions, containers, and Python environments beyond the final Linux/Python 3.11 rehearsal;
-- proxy, TLS, enterprise identity, credential handling, remote MCP, and service-specific connectivity;
-- framework, agent, CI/CD, RPA, batch, and application integrations;
-- installation, upgrade, backup/restore, removal, and operational usability;
-- confusing states, missing examples, documentation gaps, and unsupported assumptions.
-
-A user report is field evidence for that environment. It does not imply universal production readiness.
+The evidence ledger is tamper-evident, but it is not independently signed, externally immutable, or independently timestamped. No production-ready or enterprise-ready claim is made.
 
 ## Quick Start
 
-Install the Public Alpha from PyPI in an isolated, disposable environment:
+Install the public alpha in an isolated environment:
 
 ```bash
 python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a2
+python -m pip install responsibility-pathway-runtime==0.1.0a4
 rpr --help
+rpr-mcp --help
 ```
 
-For development, source inspection, or the unreleased read-only MCP server preview, clone the public repository and use an editable install:
+For development or source inspection:
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
@@ -117,18 +101,19 @@ cd responsibility-pathway-runtime
 python -m pip install -e .
 ```
 
-To inspect the runtime without installing it locally, use the [live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html). The demo runs the CI-built RPR wheel in Pyodide with SQLite; only the external payment provider is simulated.
-
-The pre-release verification hashes remain recorded in [`release-evidence/replacement-freeze-2026-08-02.json`](release-evidence/replacement-freeze-2026-08-02.json). They are evidence for the frozen candidate that preceded the PyPI publication, not a substitute for reading the published package metadata and release state.
-
 ## Integration boundary
 
-The host application remains responsible for authentication, credential isolation, network controls, bypass prevention, domain-specific authorization, MCP peer selection, tool permissions, trusted-client access to stored pathway data, and the independent readback source. RPE integration is optional; RPE absence, malformed output, or unsupported results must not become implicit permission.
+The host application remains responsible for authentication, credential isolation, network controls, bypass prevention, domain-specific authorization, MCP peer selection, tool permissions, trusted-client access to stored pathway data, and independent readback sources. RPE integration is optional; RPE absence, malformed output, or unsupported results must not become implicit permission.
+
+## Field-test reports
+
+Please report reproducible findings for operating systems, containers, Python environments, proxy/TLS/identity boundaries, independent MCP clients, framework integrations, installation and removal, backup and restore, and documentation gaps. A user report is evidence for that environment; it does not imply universal production readiness.
 
 ## Documentation
 
 - [Product, scope, and architecture](docs/en/product-scope-architecture.md)
 - [MCP integration](docs/en/mcp-integration.md)
+- [Article 50 profile](docs/eu-ai-act-article-50.md)
 - [Installation, operations, and recovery](docs/en/install-operations-recovery.md)
 - [Security, limitations, integration, and API](docs/en/security-integration-api.md)
 - [Verification, known issues, release notes, and UAT](docs/en/verification-release-uat.md)
