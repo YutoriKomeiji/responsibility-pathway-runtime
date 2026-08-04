@@ -12,8 +12,10 @@ Body Language: English
 
 RPR is provided under the [MIT License](../../LICENSE), without warranty. Begin with a disposable, non-consequential rehearsal and decide independently whether the software is suitable for your environment.
 
-The public repository and live browser demo are available now. A final tag, GitHub Release, and package-registry distribution have not yet been published.
+Version `0.1.0a2` is available on PyPI and as a GitHub Prerelease.
 
+- [PyPI package](https://pypi.org/project/responsibility-pathway-runtime/)
+- [GitHub Prerelease](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a2)
 - [Live RPR browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html)
 - [Public repository](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
 
@@ -21,40 +23,40 @@ The public repository and live browser demo are available now. A final tag, GitH
 
 | Step | Action | Evidence to retain |
 |---:|---|---|
-| 1 | Record the public source and commit | Repository URL and commit SHA |
+| 1 | Record the package version and source | PyPI URL, version, repository URL, and tag |
 | 2 | Create an isolated Python 3.11 environment | Python and pip versions |
-| 3 | Install the public source in editable mode | Installation log and dependency resolution |
+| 3 | Install the pinned Public Alpha from PyPI | Installation log and resolved package version |
 | 4 | Confirm the CLI surface | `rpr --help` output |
 | 5 | Run a local synthetic pathway | Pathway, attempt, readback, and final state |
 | 6 | Exercise restart or ambiguity handling | Proof that no unresolved effect was silently repeated |
 
-## 1. Obtain the public source
-
-```bash
-git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
-cd responsibility-pathway-runtime
-git rev-parse HEAD
-```
-
-For the verified candidate evidence, review [`release-evidence/replacement-freeze-2026-08-02.json`](../../release-evidence/replacement-freeze-2026-08-02.json). The recorded wheel and source distribution are candidate artifacts, not a general package distribution at this stage.
-
-## 2. Create an isolated environment
+## 1. Create an isolated environment and install
 
 ```bash
 python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
+python -m pip install responsibility-pathway-runtime==0.1.0a2
+```
+
+Confirm the installed version and command surface:
+
+```bash
+python -m pip show responsibility-pathway-runtime
+rpr --help
+```
+
+For source inspection or development, clone the repository separately and use an editable install:
+
+```bash
+git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
+cd responsibility-pathway-runtime
 python -m pip install -e .
 ```
 
-## 3. Confirm the command surface
+The pre-release candidate evidence remains in [`release-evidence/replacement-freeze-2026-08-02.json`](../../release-evidence/replacement-freeze-2026-08-02.json). Use it to inspect the frozen candidate that preceded publication; use PyPI and the GitHub Prerelease as the current distribution readback surfaces.
 
-```bash
-rpr --help
-python -m responsibility_pathway_runtime --help
-```
-
-## 4. Run a non-consequential rehearsal
+## 2. Run a non-consequential rehearsal
 
 Use a disposable directory and synthetic data. Confirm that the host application can register a pathway and authority, reach a Human Gate, retain an execution attempt, attach independent readback evidence, restore unresolved state after restart, and expose repair or reconciliation when completion cannot be established.
 
@@ -65,7 +67,7 @@ Do not begin with production credentials, customer data, irreversible actions, o
 | Category | Record |
 |---|---|
 | Runtime | OS, architecture, Python and pip versions |
-| Source | Repository URL, commit SHA, Freeze ID |
+| Distribution | PyPI URL, installed version, GitHub tag or commit |
 | Integration | Host framework, adapter, network, proxy, TLS, identity, credentials |
 | Test | Exact command, expected result, actual result |
 | Evidence | Sanitized logs, readback source, final pathway state |
