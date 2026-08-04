@@ -78,6 +78,7 @@ class ReadOnlyRprMcpServer:
 
     def __init__(self, read_model: SQLiteReadModel) -> None:
         self.read_model = read_model
+        self.initialize_seen = False
         self.initialized = False
 
     def handle(self, request: object) -> dict[str, Any] | None:
@@ -92,10 +93,14 @@ class ReadOnlyRprMcpServer:
 
         if method == "notifications/initialized":
             _empty_params(request.get("params"))
+            if not self.initialize_seen:
+                raise JsonRpcError(-32002, "initialize request has not completed")
             self.initialized = True
             return None
         if method == "initialize":
-            return self._response(request_id, self._initialize(request.get("params")))
+            result = self._initialize(request.get("params"))
+            self.initialize_seen = True
+            return self._response(request_id, result)
         if not self.initialized:
             raise JsonRpcError(-32002, "server has not received notifications/initialized")
         if method == "ping":
@@ -234,17 +239,19 @@ def run_stdio(
         if not raw_line.strip():
             continue
         request_id: object = None
+        is_notification = False
         try:
             request = json.loads(raw_line)
             if isinstance(request, Mapping):
                 request_id = request.get("id")
+                is_notification = "id" not in request
             response = server.handle(request)
         except json.JSONDecodeError as exc:
             response = _error_response(None, JsonRpcError(-32700, "parse error", {"detail": str(exc)}))
         except JsonRpcError as exc:
-            response = _error_response(request_id, exc)
+            response = None if is_notification else _error_response(request_id, exc)
         except Exception as exc:  # fail closed at the protocol boundary
-            response = _error_response(
+            response = None if is_notification else _error_response(
                 request_id,
                 JsonRpcError(-32603, "internal error", {"type": type(exc).__name__}),
             )
