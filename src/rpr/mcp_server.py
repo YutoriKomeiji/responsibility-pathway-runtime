@@ -91,6 +91,7 @@ class ReadOnlyRprMcpServer:
         request_id = request.get("id")
 
         if method == "notifications/initialized":
+            _empty_params(request.get("params"))
             self.initialized = True
             return None
         if method == "initialize":
@@ -98,8 +99,10 @@ class ReadOnlyRprMcpServer:
         if not self.initialized:
             raise JsonRpcError(-32002, "server has not received notifications/initialized")
         if method == "ping":
+            _empty_params(request.get("params"))
             return self._response(request_id, {})
         if method == "tools/list":
+            _empty_params(request.get("params"))
             return self._response(request_id, {"tools": list(_TOOLS)})
         if method == "tools/call":
             return self._response(request_id, self._call_tool(request.get("params")))
@@ -120,18 +123,19 @@ class ReadOnlyRprMcpServer:
             "capabilities": {"tools": {"listChanged": False}},
             "serverInfo": {"name": _SERVER_NAME, "version": _SERVER_VERSION},
             "instructions": (
-                "Read-only RPR inspection server. It cannot approve, execute, reconcile, "
-                "resume, or mutate responsibility pathways."
+                "Read-only RPR inspection server for a trusted local MCP client. It cannot "
+                "approve, execute, reconcile, resume, or mutate responsibility pathways."
             ),
         }
 
     def _call_tool(self, params: object) -> dict[str, Any]:
         if not isinstance(params, Mapping):
             raise JsonRpcError(-32602, "tools/call params must be an object")
-        if set(params) != {"name", "arguments"}:
-            raise JsonRpcError(-32602, "tools/call params must contain only name and arguments")
+        keys = set(params)
+        if "name" not in keys or not keys <= {"name", "arguments"}:
+            raise JsonRpcError(-32602, "tools/call params require name and may contain arguments")
         name = params.get("name")
-        arguments = params.get("arguments")
+        arguments = params.get("arguments", {})
         if not isinstance(name, str) or not name:
             raise JsonRpcError(-32602, "tool name must be a non-empty string")
         if not isinstance(arguments, Mapping):
@@ -192,6 +196,13 @@ class ReadOnlyRprMcpServer:
     @staticmethod
     def _response(request_id: object, result: Mapping[str, Any]) -> dict[str, Any]:
         return {"jsonrpc": "2.0", "id": request_id, "result": dict(result)}
+
+
+def _empty_params(value: object) -> None:
+    if value is None:
+        return
+    if not isinstance(value, Mapping) or value:
+        raise JsonRpcError(-32602, "params must be an empty object when provided")
 
 
 def _require_keys(
