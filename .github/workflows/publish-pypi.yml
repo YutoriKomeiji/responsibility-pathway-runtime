@@ -28,6 +28,9 @@ jobs:
       - name: Validate package metadata
         run: python -m twine check dist/*
 
+      - name: Validate rendered long description
+        run: python tools/check_distribution_long_description.py --root . --dist dist
+
       - name: Install built wheel
         run: python -m pip install dist/*.whl
 
