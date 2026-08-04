@@ -38,13 +38,27 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Record package identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          data = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
+          print(data['project']['version'])
+          PY
+          )
+          wheel="responsibility_pathway_runtime-${version}-py3-none-any.whl"
+          echo "RPR_VERSION=$version" >> "$GITHUB_ENV"
+          echo "RPR_WHEEL=$wheel" >> "$GITHUB_ENV"
       - name: Build wheel
         run: |
           python -m pip install --upgrade pip build
           python -m build --wheel
-          test -f dist/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
+          test -f "dist/$RPR_WHEEL"
       - name: Install built wheel
-        run: python -m pip install dist/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl
+        run: python -m pip install "dist/$RPR_WHEEL"
       - name: Run the shared live-demo scenario under CPython
         run: |
           python site/demo_scenario.py > demo-result.json
@@ -64,8 +78,8 @@ jobs:
       - name: Assemble Pages artifact
         run: |
           mkdir -p site/assets
-          cp dist/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl site/assets/
-          sha256sum site/assets/responsibility_pathway_runtime-0.1.0a2-py3-none-any.whl > site/assets/wheel.sha256
+          cp "dist/$RPR_WHEEL" site/assets/
+          sha256sum "site/assets/$RPR_WHEEL" > site/assets/wheel.sha256
           cp demo-result.json site/assets/cpython-demo-result.json
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -76,6 +90,8 @@ jobs:
           npm install --no-save playwright@1.54.1
           npx playwright install --with-deps chromium
       - name: Verify the real wheel inside Chromium and Pyodide
+        env:
+          EXPECTED_PACKAGE_STATUS: RPR ${{ env.RPR_VERSION }}
         run: |
           python -m http.server 8000 --directory site > /tmp/rpr-pages-server.log 2>&1 &
           SERVER_PID=$!
@@ -120,7 +136,7 @@ jobs:
               }));
               console.log(`[browser:startup] ${JSON.stringify(startup)}`);
               if (startup.runtimeReady !== 'true') throw new Error(`runtime startup failed: ${JSON.stringify(startup)}`);
-              if (startup.package !== 'RPR 0.1.0a2') throw new Error(`unexpected package status: ${JSON.stringify(startup)}`);
+              if (startup.package !== process.env.EXPECTED_PACKAGE_STATUS) throw new Error(`unexpected package status: ${JSON.stringify(startup)}`);
 
               await page.click('#run-all');
               await page.waitForFunction(
