@@ -31,10 +31,11 @@ jobs:
       - name: Install built wheel
         run: python -m pip install dist/*.whl
 
-      - name: Verify package and CLI
+      - name: Verify package and CLIs
         run: |
           python -c "import rpr; print(rpr.__file__)"
           rpr --help
+          rpr-mcp --help
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
