@@ -53,7 +53,7 @@ See the [MCP integration guide](docs/en/mcp-integration.md) or the [Japanese gui
 - Human Gate, repair, resume, and reconciliation boundaries;
 - local-file, allow-listed HTTP, durable outbound-message, and real MCP subprocess paths;
 - MCP server/tool admission binding, stdio execution, fault injection, and ambiguous-call handling;
-- HTTP and MCP fault injection;
+- HTTP fault injection;
 - crash/restart continuity and duplicate-dispatch prevention;
 - backup, restore, diagnostics, uninstall, package/CLI residue checks, and customer-data retention;
 - wheel and source-distribution build and installation checks;
