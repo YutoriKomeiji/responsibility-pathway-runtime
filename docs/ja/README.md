@@ -12,8 +12,10 @@ Body Language: Japanese
 
 Responsibility Pathway Runtime（RPR）は、外部操作を伴う処理に、責任経路、実行履歴、外部状態の独立確認、修復、再開、照合、Human Gateを組み込むための、MITライセンスのPythonランタイムです。
 
-現在、公開リポジトリ、製品ページ、ブラウザ内で実際のRPRを動かすデモを利用できます。最終tag、GitHub Release、package registryへの配布はまだ行っていません。
+Public Alpha `0.1.0a2` は、PyPIとGitHub Prereleaseで公開しています。公開リポジトリ、製品ページ、ブラウザ内で実際のRPRを動かすデモも利用できます。
 
+- [PyPIパッケージ](https://pypi.org/project/responsibility-pathway-runtime/)
+- [GitHub Prerelease](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a2)
 - [日本語製品ページ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/ja.html)
 - [実RPRブラウザデモ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html)
 - [公開リポジトリ](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
@@ -24,7 +26,7 @@ Responsibility Pathway Runtime（RPR）は、外部操作を伴う処理に、�
 
 | 文書 | 内容 |
 |---|---|
-| [クイックスタート](quick-start.md) | 公開ソースからの導入と、影響のないローカル試験 |
+| [クイックスタート](quick-start.md) | PyPIから導入し、影響のないローカル試験を行う |
 | [製品範囲と構成](product-scope-architecture.md) | RPRが提供する機能と製品境界 |
 | [導入・運用・復旧](install-operations-recovery.md) | 導入、停止、復旧、削除の運用手順 |
 | [セキュリティ・統合・API境界](security-integration-api.md) | 信頼境界と統合側の責務 |
