@@ -6,6 +6,7 @@ import json
 import sqlite3
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 from .models import PathwayState
 
@@ -30,7 +31,8 @@ class SQLiteReadModel:
         path = Path(database).expanduser().resolve()
         if not path.is_file():
             raise ReadOnlyDatabaseError("database file does not exist")
-        uri = f"file:{path.as_posix()}?mode=ro"
+        encoded_path = quote(path.as_posix(), safe="/:")
+        uri = f"file:{encoded_path}?mode=ro"
         try:
             self._connection = sqlite3.connect(uri, uri=True, timeout=5.0)
             self._connection.row_factory = sqlite3.Row
