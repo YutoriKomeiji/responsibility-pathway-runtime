@@ -17,11 +17,11 @@
   <main id="main">
     <section class="hero" id="top">
       <div class="hero-copy">
-        <p class="eyebrow">MIT License · Public Alpha 0.1.0a2</p>
+        <p class="eyebrow">MIT License · Public Alpha 0.1.0a4</p>
         <h1>AIの外部操作を、止める。確かめる。失敗しても戻れるようにする。</h1>
         <p class="lede">RPRは、AIエージェントや自動処理がファイル、API、メッセージ、業務システムを変更するときに、誰の権限で実行したか、何が起きたか、結果をどう確かめたか、失敗後に誰が修復し、どこから再開するかを一つの経路として残すPython Runtimeです。</p>
         <div class="actions"><a class="button primary" href="https://pypi.org/project/responsibility-pathway-runtime/">PyPIから導入する</a><a class="button secondary" href="demo.html">実RPRデモを動かす</a></div>
-        <dl class="release-facts" aria-label="公開情報"><div><dt>Version</dt><dd>0.1.0a2</dd></div><div><dt>Tag</dt><dd>v0.1.0a2</dd></div><div><dt>確認環境</dt><dd>Linux · Python 3.11</dd></div></dl>
+        <dl class="release-facts" aria-label="公開情報"><div><dt>Version</dt><dd>0.1.0a4</dd></div><div><dt>Tag</dt><dd>v0.1.0a4</dd></div><div><dt>確認環境</dt><dd>Linux · Python 3.11</dd></div></dl>
       </div>
       <div class="pathway-card" aria-label="責任経路図"><div class="node">操作の提案</div><span>↓</span><div class="node">権限と承認</div><span>↓</span><div class="node accent">RPR</div><span>↓</span><div class="node">実行と結果確認</div><span>↓</span><div class="node">修復 · 再開 · 人間へ返す</div></div>
     </section>
@@ -45,7 +45,7 @@
 
     <section class="section split" id="mcp">
       <div><p class="eyebrow">現在のMCP対応</p><h2>MCPの応答だけで「外部変更も成功した」と決めない。</h2><p>RPRは、Host ApplicationとLocal MCP Serverの間に置けます。現在のPublic Alphaでは、Subprocess起動、stdio Transport、JSON-RPC framing、ServerとToolのbinding、Execution Attemptの継続、送信済みかもしれないCallのfail-closed処理を実装しています。</p><p>変更を伴うToolでは、MCPの成功応答だけを完了証拠にせず、必要に応じて独立readbackを要求します。結果を確認できない場合は、<code>write_status_unknown</code>として保持します。</p><div class="actions"><a class="button primary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/docs/ja/mcp-integration.md">MCP統合ガイドを読む</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues/new/choose">MCPの動作結果を報告する</a></div></div>
-      <aside class="boundary-card"><h3>現在の境界</h3><ul><li>Local subprocessとstdio経路を実装済み</li><li>Server Identity、Capability、Tool Schemaを実行前にbinding</li><li>結果不明のCallを黙って再送しない</li><li>Remote MCPは環境ごとの評価が必要</li><li>RPR自身をMCP Serverとして公開する機能は未提供</li></ul></aside>
+      <aside class="boundary-card"><h3>現在の境界</h3><ul><li>Local subprocessとstdioのOutbound経路を実装済み</li><li>Server Identity、Capability、Tool Schemaを実行前にbinding</li><li>結果不明のCallを黙って再送しない</li><li><code>rpr-mcp</code>としてLocal stdioのread-only inspection serverを公開済み</li><li>Mutating MCP Server ToolとRemote MCP Transportは未主張</li></ul></aside>
     </section>
 
     <section class="section split" id="demo">
@@ -63,9 +63,10 @@
       <pre><code>python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a2
-rpr --help</code></pre>
-      <div class="actions"><a class="button primary" href="https://pypi.org/project/responsibility-pathway-runtime/">PyPIを開く</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a2">Prereleaseを見る</a></div>
+python -m pip install responsibility-pathway-runtime==0.1.0a4
+rpr --help
+rpr-mcp --help</code></pre>
+      <div class="actions"><a class="button primary" href="https://pypi.org/project/responsibility-pathway-runtime/">PyPIを開く</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a4">Prereleaseを見る</a></div>
     </section>
   </main>
   <footer><p>Responsibility Pathway Runtime · MIT License · Copyright © 2026 Akihisa Ono</p><nav aria-label="フッターナビゲーション"><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime">GitHub</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/docs/ja/mcp-integration.md">MCP統合</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/SECURITY.md">Security</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/CONTRIBUTING.md">Contributing</a><a href="index.html" hreflang="en" lang="en">English</a></nav></footer>
