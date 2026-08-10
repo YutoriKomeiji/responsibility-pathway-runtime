@@ -1,23 +1,21 @@
 {
   "schema_version": "1.0",
   "product": "Responsibility Pathway Runtime",
-  "version": "0.1.0a2",
+  "version": "0.1.0a4",
   "release_channel": "public-alpha",
   "previous_freeze_id": "RPR-CF-2026-08-01-02",
   "freeze_id": "RPR-CF-2026-08-02-01",
-  "status": "verified-public-alpha-candidate",
+  "status": "published-public-alpha",
   "production_ready": false,
   "customer_environment_verified": false,
-  "release_approved": false,
-  "publication_blocked": true,
-  "blocker_issue": 7,
+  "release_approved": true,
+  "publication_blocked": false,
+  "blocker_issue": null,
   "human_gate": {
     "required_for": [
-      "repository publicization",
-      "GitHub Pages publication",
-      "release tag creation",
-      "GitHub Release publication",
-      "binary artifact publication",
+      "future release tag creation",
+      "future GitHub Release publication",
+      "future binary artifact publication",
       "production-ready claim"
     ],
     "residual_owner": "authorized release owner"
@@ -52,10 +50,8 @@
     "automatic transfer of final responsibility to the runtime"
   ],
   "open_release_gates": [
-    "complete final secret, internal-path, link, license, residue, and EN/JA claim audit",
-    "merge the verified repair candidate into production main",
-    "change repository visibility only after explicit approval",
-    "verify live English and Japanese Pages after repository publicization",
-    "obtain explicit approval for tag, GitHub Release, and binary publication"
+    "retain Human Gate for any future tag, GitHub Release, or binary publication",
+    "retain Human Gate for any production-ready or enterprise-ready claim",
+    "retain customer-equivalent external-environment validation as incomplete"
   ]
 }
