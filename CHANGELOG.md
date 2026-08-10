@@ -8,7 +8,7 @@ Status: Candidate
 
 All notable changes to Responsibility Pathway Runtime are recorded here.
 
-## [0.1.0a4] - Unreleased
+## [0.1.0a4] - 2026-08-04
 
 ### Corrected
 
@@ -20,7 +20,7 @@ All notable changes to Responsibility Pathway Runtime are recorded here.
 ### Boundaries
 
 - this correction does not add mutating MCP tools, remote MCP transport, production authorization, legal certification, EU-compliance claims, or enterprise-ready claims;
-- no Git tag, GitHub Release, or PyPI publication is authorized by this entry.
+- publication of this alpha release does not imply production authorization, legal certification, EU-compliance, or enterprise readiness.
 
 ## [0.1.0a3] - 2026-08-04
 
