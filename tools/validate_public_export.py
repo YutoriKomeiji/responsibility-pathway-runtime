@@ -9,11 +9,11 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SELF = Path(__file__).resolve()
-EXPECTED_VERSION = "0.1.0a2"
 PREVIOUS_FREEZE = "RPR-CF-2026-08-01-02"
 
 REQUIRED_PATHS = (
@@ -81,10 +81,35 @@ def validate_status_files() -> int:
     errors = 0
     release = json.loads((ROOT / "release-manifest.json").read_text(encoding="utf-8"))
     status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
-    for name, data in (("release-manifest.json", release), ("product-status.json", status)):
-        if data.get("version") != EXPECTED_VERSION:
-            fail(f"unexpected version / version不一致: {name}")
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+    current_version = project.get("project", {}).get("version")
+    status_version = status.get("version")
+    release_version = release.get("version")
+
+    if not isinstance(current_version, str) or not current_version:
+        fail("pyproject project version is missing / pyprojectのproject versionがありません")
+        errors += 1
+    elif status_version != current_version:
+        fail("product status version differs from current package version / product-statusと現行package versionが不一致")
+        errors += 1
+
+    if not isinstance(release_version, str) or not release_version:
+        fail("release manifest version is missing / release-manifestのversionがありません")
+        errors += 1
+    else:
+        artifacts = release.get("artifacts")
+        if not isinstance(artifacts, list) or not artifacts:
+            fail("release manifest artifact evidence is missing / release-manifestのartifact evidenceがありません")
             errors += 1
+        else:
+            for artifact in artifacts:
+                name = artifact.get("name") if isinstance(artifact, dict) else None
+                if not isinstance(name, str) or release_version not in name:
+                    fail("release artifact version differs from frozen manifest / release artifactと凍結manifestのversionが不一致")
+                    errors += 1
+                    break
+
     if status.get("status") == "integrity-repair-candidate":
         if status.get("freeze_id") is not None or status.get("previous_freeze_id") != PREVIOUS_FREEZE:
             fail("repair candidate must invalidate the previous freeze / 修復候補は旧freezeを無効化する必要があります")
@@ -107,8 +132,8 @@ def main() -> int:
     if not errors:
         try:
             errors += validate_status_files()
-        except (OSError, json.JSONDecodeError) as exc:
-            fail(f"invalid status JSON / status JSON不正: {exc}")
+        except (OSError, json.JSONDecodeError, tomllib.TOMLDecodeError) as exc:
+            fail(f"invalid status metadata / status metadata不正: {exc}")
             errors += 1
 
     for path in ROOT.rglob("*"):
