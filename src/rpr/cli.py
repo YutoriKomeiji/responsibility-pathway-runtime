@@ -16,7 +16,9 @@ def main(argv: list[str] | None = None) -> int:
     check = subparsers.add_parser("check", help="Inspect a responsibility pathway JSON file")
     check.add_argument("path", type=Path)
     args = parser.parse_args(argv)
-    value = json.loads(args.path.read_text(encoding="utf-8"))
+    # utf-8-sig accepts both plain UTF-8 and UTF-8 files with a BOM, which are
+    # commonly produced by Windows tooling such as PowerShell.
+    value = json.loads(args.path.read_text(encoding="utf-8-sig"))
     result = inspect_pathway(PathwayDefinition.from_dict(value))
     print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
     return 0 if result.valid else 2
