@@ -80,6 +80,18 @@ ER-1 hardening has started but is not complete. Customer proxy, TLS, identity, c
 
 The evidence ledger is tamper-evident, but it is not independently signed, externally immutable, or independently timestamped. No production-ready or enterprise-ready claim is made.
 
+## Claim boundary and promotion path
+
+RPR does not treat every current non-claim as a permanent disclaimer. Public boundaries are separated into **evidence-limited boundaries that can move** and **permanent responsibility boundaries that RPR should not cross by itself**. See [Claim Boundary Promotion](docs/en/claim-boundary-promotion.md).
+
+Current evidence-limited boundaries include production/enterprise readiness, customer-environment validation, broad exactly-once claims, independently anchored ledger integrity, and implementation-wide formal conformance. Each has an explicit evidence route: sustained workload and deployment evidence; reproducible customer-profile field evidence; target-side transaction/idempotency plus authoritative readback; signing/attestation or external immutability where claimed; and model-to-runtime conformance evidence, respectively.
+
+These claims move only after scoped evidence is reviewed and explicitly admitted. Version age alone does not promote them.
+
+Permanent responsibility boundaries remain even as RPR matures: the runtime does not create legal or organizational authority, make credentials/networks/external systems correct, treat a transport or MCP response as automatic proof of external effect, transfer final responsibility to software, promise universal exactly-once behavior for arbitrary remote systems without the required contract, or turn an abstract formal proof into automatic proof of the complete runtime/deployment.
+
+Where practical, evidence-limited boundaries are tracked as `evidence_collecting`, `review_ready`, or `promoted`; permanent boundaries are `permanently_out_of_scope`.
+
 ## Quick Start
 
 Install the public alpha in an isolated environment:
@@ -112,6 +124,7 @@ Please report reproducible findings for operating systems, containers, Python en
 ## Documentation
 
 - [Product, scope, and architecture](docs/en/product-scope-architecture.md)
+- [Claim boundary promotion](docs/en/claim-boundary-promotion.md)
 - [MCP integration](docs/en/mcp-integration.md)
 - [Article 50 profile](docs/eu-ai-act-article-50.md)
 - [Installation, operations, and recovery](docs/en/install-operations-recovery.md)
