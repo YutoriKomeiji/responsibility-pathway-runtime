@@ -2,7 +2,7 @@
 Document Title: RPR クイックスタート
 Document Type: Public Product Guide
 Status: Public Alpha
-Version: split-state: GitHub 0.1.0a5 / PyPI 0.1.0a4
+Version: 0.1.0a5
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: Japanese
 Body Language: Japanese
@@ -12,9 +12,9 @@ Body Language: Japanese
 
 RPRは[`MIT License`](../../LICENSE)に基づき、無保証で提供されます。まず使い捨て可能で影響のない環境で試験し、利用環境への適合性は利用者自身で判断してください。
 
-現在の配布状態は一時的に分かれています。GitHub Prerelease / sourceは `0.1.0a5`、独立readback済みのPyPI packageは `0.1.0a4` です。PyPI `0.1.0a5` の直接readbackが成功するまでは、PyPIからは `0.1.0a4` を導入してください。
+GitHub Prerelease / sourceとPyPI packageは、Public Alpha `0.1.0a5` で揃っています。
 
-- [PyPI 0.1.0a4（現在のreadback済みpackage）](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a4/)
+- [PyPI 0.1.0a5](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/)
 - [GitHub Prerelease v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5)
 - [実RPRブラウザデモ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html)
 - [公開リポジトリ](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
@@ -36,7 +36,7 @@ RPRは[`MIT License`](../../LICENSE)に基づき、無保証で提供されま�
 python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a4
+python -m pip install responsibility-pathway-runtime==0.1.0a5
 ```
 
 導入されたversionとCLIを確認します。
@@ -47,7 +47,7 @@ rpr --help
 rpr-mcp --help
 ```
 
-GitHub `v0.1.0a5` prereleaseのsource確認や開発を行う場合は、公開リポジトリを別途取得します。
+対応するGitHub `v0.1.0a5` prereleaseのsource確認や開発を行う場合は、公開リポジトリを別途取得します。
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
@@ -56,7 +56,7 @@ git checkout v0.1.0a5
 python -m pip install -e .
 ```
 
-Windows UTF-8 BOM修復は、再現された環境・入力経路について `v0.1.0a5` source/release evidenceで検証済みです。ただしPyPI `0.1.0a5` の配布結果として扱うのは公開readback後です。
+Windows UTF-8 BOM修復は `0.1.0a5` に含まれ、再現された環境・入力経路について検証済みです。このevidenceは、すべてのWindows環境やcustomer environmentの一般保証を意味しません。
 
 ## 2. 影響のないローカル試験を行う
 

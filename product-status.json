@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1",
   "product": "Responsibility Pathway Runtime",
-  "version": "0.1.0a4",
+  "version": "0.1.0a5",
   "release_channel": "public-alpha",
   "previous_freeze_id": "RPR-CF-2026-08-01-02",
   "freeze_id": "RPR-CF-2026-08-02-01",
@@ -11,17 +11,7 @@
   "release_approved": true,
   "publication_blocked": false,
   "blocker_issue": null,
-  "candidate": {
-    "version": "0.1.0a5",
-    "state": "release-approved",
-    "source_base": "v0.1.0a4",
-    "source_head_at_audit": "f231ed2813c73380949865e4aa01448da8b863ad",
-    "reason": "field-reproduced Windows UTF-8 BOM CLI compatibility repair plus accumulated public-surface and validation updates",
-    "release_approved": true,
-    "publication_blocked": false,
-    "exact_head_validation": "pending-final-promotion-head",
-    "artifact_evidence": "pending-final-promotion-head"
-  },
+  "candidate": null,
   "human_gate": {
     "required_for": [
       "release tags after 0.1.0a5",
@@ -61,8 +51,6 @@
     "automatic transfer of final responsibility to the runtime"
   ],
   "open_release_gates": [
-    "complete final promotion-head validation before merge",
-    "verify GitHub Release and PyPI publication after merge",
     "retain Human Gate for any later tag, GitHub Release, or binary publication",
     "retain Human Gate for any production-ready or enterprise-ready claim",
     "retain customer-equivalent external-environment validation as incomplete"
