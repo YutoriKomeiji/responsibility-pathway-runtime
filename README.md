@@ -4,12 +4,12 @@
 
 Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for applications that need to place an explicit responsibility pathway in front of consequential external actions. It preserves actor and authority declarations, execution-attempt continuity, readback evidence, fail-closed ambiguity handling, repair routes, and Human Gate decisions.
 
-> **Public Alpha — 0.1.0a4**  
-> Tag: `v0.1.0a4`  
-> Correction scope: package-description and release-metadata alignment after `0.1.0a3`  
+> **Release Candidate — 0.1.0a5**  
+> **Unpublished candidate.** The currently published PyPI/GitHub release remains `0.1.0a4`.  
+> Candidate scope: field-reproduced Windows UTF-8 BOM CLI compatibility repair plus accumulated validation, public-surface, and evidence-boundary updates.  
 > RPR is not a legal-responsibility engine, identity provider, secret manager, production gateway, or guarantee of exactly-once effects across arbitrary remote systems.
 
-[PyPI](https://pypi.org/project/responsibility-pathway-runtime/) · [GitHub Prerelease](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a4) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [MCP integration](docs/en/mcp-integration.md) · [Article 50 profile](docs/eu-ai-act-article-50.md) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
+[PyPI — current 0.1.0a4](https://pypi.org/project/responsibility-pathway-runtime/) · [Current GitHub Prerelease — v0.1.0a4](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a4) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [MCP integration](docs/en/mcp-integration.md) · [Article 50 profile](docs/eu-ai-act-article-50.md) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
 
 ## Why RPR
 
@@ -35,7 +35,7 @@ A successful MCP response is not automatically proof of a consequential external
 
 ### Published read-only MCP inspection server
 
-The package includes `rpr-mcp`, a local stdio read-only inspection server targeting stable MCP protocol version `2025-11-25`.
+The published `0.1.0a4` package includes `rpr-mcp`, a local stdio read-only inspection server targeting stable MCP protocol version `2025-11-25`.
 
 ```bash
 rpr-mcp --database ./rpr.sqlite3
@@ -63,6 +63,8 @@ This profile does not provide legal classification, legal advice, certification,
 
 ## Verified public-alpha scope
 
+The following capabilities are established by the current public line and source-level verification. Candidate-only changes remain bounded until candidate validation is complete.
+
 - pathway registration and authorized state transitions;
 - persistent pathway and execution-attempt stores;
 - Human Gate, repair, resume, and reconciliation boundaries;
@@ -75,6 +77,8 @@ This profile does not provide legal classification, legal advice, certification,
 - English-primary and Japanese-parallel documentation;
 - selected Lean 4 state-machine invariants;
 - Chromium and Pyodide execution of the CI-built wheel.
+
+The `0.1.0a5` candidate additionally carries the Windows UTF-8 BOM CLI repair and regression coverage. The original `0.1.0a4` failure was reproduced on Windows and the repaired source path was rerun successfully; this candidate still requires its own exact-head release-candidate validation before publication.
 
 ER-1 hardening has started but is not complete. Customer proxy, TLS, identity, credentials, independent MCP clients, operating-system permission profiles, long-duration operation, production supervisors, and customer-equivalent connectivity remain external-environment validation items.
 
@@ -94,7 +98,7 @@ Where practical, evidence-limited boundaries are tracked as `evidence_collecting
 
 ## Quick Start
 
-Install the public alpha in an isolated environment:
+Install the **currently published** public alpha in an isolated environment:
 
 ```bash
 python3.11 -m venv .venv
@@ -104,6 +108,8 @@ python -m pip install responsibility-pathway-runtime==0.1.0a4
 rpr --help
 rpr-mcp --help
 ```
+
+The `0.1.0a5` source on this release-candidate branch is not advertised as a PyPI install until the release Human Gate is passed and public publication is verified.
 
 For development or source inspection:
 
