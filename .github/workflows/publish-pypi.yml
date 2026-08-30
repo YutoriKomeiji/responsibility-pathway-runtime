@@ -3,11 +3,31 @@ name: Build and publish Python package
 on:
   workflow_dispatch:
   release:
-    types: [published]
+    types: [published, edited]
 
 jobs:
+  release-gate:
+    name: Verify bounded release event
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v0.1.0a5'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact release boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            test "${{ github.event.release.tag_name }}" = "v0.1.0a5"
+            case "${{ github.event.action }}" in
+              published|edited) ;;
+              *) echo "Unsupported release action"; exit 1 ;;
+            esac
+          else
+            echo "workflow_dispatch remains build-only."
+          fi
+
   build:
     name: Build and validate distributions
+    needs: release-gate
     runs-on: ubuntu-latest
 
     steps:
@@ -49,7 +69,7 @@ jobs:
 
   publish:
     name: Publish distributions to PyPI
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && github.event.release.tag_name == 'v0.1.0a5'
     needs: build
     runs-on: ubuntu-latest
 
