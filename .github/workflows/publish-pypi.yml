@@ -4,10 +4,53 @@ on:
   workflow_dispatch:
   release:
     types: [published]
+  push:
+    branches: [main]
+    paths:
+      - "release/0.1.0a5.pypi-approved"
+      - ".github/workflows/publish-pypi.yml"
 
 jobs:
+  approval-gate:
+    name: Verify release publication gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Verify release event or one-shot a5 approval
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            test "${{ github.event.release.tag_name }}" = "v0.1.0a5" || {
+              echo "Unexpected release tag for this bounded publication path."
+              exit 1
+            }
+          elif [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            test "$(cat release/0.1.0a5.pypi-approved)" = "RPR_0.1.0a5_PYPI_APPROVED" || {
+              echo "Missing exact one-shot PyPI approval marker."
+              exit 1
+            }
+            python - <<'PY'
+          import json, tomllib
+          from pathlib import Path
+          project = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
+          status = json.loads(Path('product-status.json').read_text(encoding='utf-8'))
+          assert project['project']['version'] == '0.1.0a5'
+          candidate = status.get('candidate')
+          assert isinstance(candidate, dict)
+          assert candidate.get('version') == '0.1.0a5'
+          assert candidate.get('state') == 'release-approved'
+          assert candidate.get('release_approved') is True
+          assert candidate.get('publication_blocked') is False
+          PY
+          else
+            echo "workflow_dispatch is build-only and does not authorize publication."
+          fi
+
   build:
     name: Build and validate distributions
+    needs: approval-gate
     runs-on: ubuntu-latest
 
     steps:
@@ -49,7 +92,7 @@ jobs:
 
   publish:
     name: Publish distributions to PyPI
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || github.event_name == 'push'
     needs: build
     runs-on: ubuntu-latest
 
