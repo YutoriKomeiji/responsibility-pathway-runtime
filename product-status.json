@@ -24,7 +24,7 @@
   "verified_profile": {
     "operating_system": "Linux",
     "python": "3.11",
-    "scope": "standalone locally executable public-alpha candidate validation",
+    "scope": "standalone locally executable public-alpha validation",
     "verification_run_id": 30726958037
   },
   "verified_capabilities": [
