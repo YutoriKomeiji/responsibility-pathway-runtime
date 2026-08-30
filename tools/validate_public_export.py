@@ -100,15 +100,21 @@ def validate_status_files() -> int:
         errors += 1
     else:
         candidate_version = candidate.get("version")
-        if candidate.get("state") != "release-candidate":
-            fail("candidate state must be release-candidate / candidate stateはrelease-candidateである必要があります")
+        candidate_state = candidate.get("state")
+        if candidate_state not in {"release-candidate", "release-approved"}:
+            fail("candidate state must be release-candidate or release-approved / candidate stateが不正です")
             errors += 1
         if candidate_version != current_version:
             fail("candidate version differs from current package version / candidateと現行package versionが不一致")
             errors += 1
-        if candidate.get("release_approved") is not False or candidate.get("publication_blocked") is not True:
-            fail("unreleased candidate must be unapproved and publication-blocked / 未公開candidateは未承認かつ公開停止である必要があります")
-            errors += 1
+        if candidate_state == "release-candidate":
+            if candidate.get("release_approved") is not False or candidate.get("publication_blocked") is not True:
+                fail("unapproved candidate must be unapproved and publication-blocked / 未承認candidateは未承認かつ公開停止である必要があります")
+                errors += 1
+        elif candidate_state == "release-approved":
+            if candidate.get("release_approved") is not True or candidate.get("publication_blocked") is not False:
+                fail("approved candidate must be approved and publication-enabled / 承認済candidateは承認済かつ公開可能である必要があります")
+                errors += 1
         if not isinstance(published_version, str) or not published_version:
             fail("published product version is missing / 公開中product versionがありません")
             errors += 1
