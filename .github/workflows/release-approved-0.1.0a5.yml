@@ -1,0 +1,90 @@
+name: Publish approved RPR 0.1.0a5 prerelease
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "release/0.1.0a5.approved"
+      - ".github/workflows/release-approved-0.1.0a5.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  publish-github-release:
+    name: Create approved GitHub prerelease
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact merge head
+        uses: actions/checkout@v4
+
+      - name: Verify bounded release approval
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, tomllib
+          from pathlib import Path
+
+          marker = Path("release/0.1.0a5.approved").read_text(encoding="utf-8").strip()
+          assert marker == "RPR_0.1.0a5_RELEASE_APPROVED", marker
+
+          project = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+          status = json.loads(Path("product-status.json").read_text(encoding="utf-8"))
+          version = project["project"]["version"]
+          candidate = status.get("candidate")
+
+          assert version == "0.1.0a5", version
+          assert isinstance(candidate, dict), candidate
+          assert candidate.get("version") == version, candidate
+          assert candidate.get("state") == "release-approved", candidate
+          assert candidate.get("release_approved") is True, candidate
+          assert candidate.get("publication_blocked") is False, candidate
+          PY
+
+      - name: Recheck public structure before release creation
+        run: python tools/validate_public_export.py
+
+      - name: Create GitHub prerelease and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v0.1.0a5 >/dev/null 2>&1; then
+            echo "v0.1.0a5 already exists; refusing duplicate release creation."
+            exit 0
+          fi
+          cat > "$RUNNER_TEMP/release-notes.md" <<'EOF'
+          ## RPR 0.1.0a5
+
+          Public Alpha maintenance release based on field evidence collected after `0.1.0a4`.
+
+          ### Corrected
+
+          - `rpr check` now accepts both plain UTF-8 and UTF-8 BOM JSON through `utf-8-sig` decoding.
+          - The defect was reproduced on Windows with a PowerShell-generated BOM-bearing pathway file.
+          - Regression tests cover both plain UTF-8 and BOM-bearing JSON.
+          - The originally failing Windows input path was rerun successfully after the repair.
+
+          ### Release engineering
+
+          - separates currently published product state, next-candidate state, and historical frozen artifact evidence during preparation;
+          - keeps release metadata and public-surface validation fail-closed;
+          - improves browser-demo wheel resolution so candidate previews execute the CI-built wheel rather than a hard-coded release filename;
+          - retains evidence-driven claim-boundary documentation.
+
+          ### Boundaries
+
+          This alpha does not establish universal production readiness, customer-environment verification, legal/compliance certification, universal exactly-once external effects, full formal verification, or transfer of final responsibility to software.
+          EOF
+          gh release create v0.1.0a5 \
+            --target "$GITHUB_SHA" \
+            --title "RPR v0.1.0a5" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            --prerelease
+
+      - name: Confirm GitHub release is readable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release view v0.1.0a5 --json tagName,isPrerelease,url
