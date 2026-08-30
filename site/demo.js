@@ -18,8 +18,7 @@ Boundary: The external provider is simulated in Python; no credentials or user d
   const summary = document.getElementById("summary");
   const output = document.getElementById("output");
 
-  const WHEEL_URL = "./assets/responsibility_pathway_runtime-0.1.0a4-py3-none-any.whl";
-  const WHEEL_PATH = "/tmp/responsibility_pathway_runtime-0.1.0a4-py3-none-any.whl";
+  const WHEEL_MANIFEST_URL = "./assets/wheel.sha256";
 
   let pyodide = null;
   let ready = false;
@@ -68,6 +67,19 @@ Boundary: The external provider is simulated in Python; no credentials or user d
     `;
   }
 
+  async function resolveWheelLocation() {
+    const response = await fetch(WHEEL_MANIFEST_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`wheel manifestの取得に失敗しました: HTTP ${response.status}`);
+    const manifest = (await response.text()).trim();
+    const match = manifest.match(/\b(responsibility_pathway_runtime-[0-9A-Za-z.+-]+-py3-none-any\.whl)\b/);
+    if (!match) throw new Error(`wheel manifestを解析できません: ${manifest}`);
+    const filename = match[1];
+    return {
+      url: `./assets/${filename}`,
+      path: `/tmp/${filename}`,
+    };
+  }
+
   async function invoke(functionName) {
     if (!ready) throw new Error("RPRがまだ読み込まれていません");
     report("シナリオを実行中", functionName);
@@ -90,21 +102,22 @@ Boundary: The external provider is simulated in Python; no credentials or user d
       report("Python packageを準備中", "micropip + sqlite3");
       await pyodide.loadPackage(["micropip", "sqlite3"]);
 
+      const wheel = await resolveWheelLocation();
       packageStatus.textContent = "RPR wheelを取得中";
-      report("RPR wheelを取得中", WHEEL_URL);
-      const wheelResponse = await fetch(WHEEL_URL, { cache: "no-store" });
+      report("RPR wheelを取得中", wheel.url);
+      const wheelResponse = await fetch(wheel.url, { cache: "no-store" });
       if (!wheelResponse.ok) throw new Error(`wheelの取得に失敗しました: HTTP ${wheelResponse.status}`);
       const wheelBytes = new Uint8Array(await wheelResponse.arrayBuffer());
       if (wheelBytes.byteLength < 1024) throw new Error(`取得したwheelが小さすぎます: ${wheelBytes.byteLength} bytes`);
       pyodide.FS.mkdirTree("/tmp");
-      pyodide.FS.writeFile(WHEEL_PATH, wheelBytes);
+      pyodide.FS.writeFile(wheel.path, wheelBytes);
       report("RPR wheelを配置しました", `${wheelBytes.byteLength} bytes`);
 
       packageStatus.textContent = "RPRをインストール中";
-      report("RPRをインストール中", WHEEL_PATH);
+      report("RPRをインストール中", wheel.path);
       await pyodide.runPythonAsync(`
 import micropip
-await micropip.install("emfs:${WHEEL_PATH}")
+await micropip.install("emfs:${wheel.path}")
 `);
 
       report("デモシナリオを読み込み中", "./demo_scenario.py");
