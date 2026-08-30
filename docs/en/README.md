@@ -2,7 +2,7 @@
 Document Title: RPR Product Documentation
 Document Type: Public Product Documentation Index
 Status: Public Alpha
-Version: split-state: GitHub 0.1.0a5 / PyPI 0.1.0a4
+Version: 0.1.0a5
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
@@ -12,17 +12,17 @@ Body Language: English
 
 Responsibility Pathway Runtime (RPR) is an MIT-licensed runtime control and evidence component for governed external actions. The software is provided under the terms of the [MIT License](../../LICENSE), including its warranty and liability disclaimer.
 
-Current distribution state is temporarily split: GitHub prerelease/source is `0.1.0a5`, while the independently read-back PyPI package remains `0.1.0a4`. Do not treat PyPI `0.1.0a5` as public until its publication is directly verified.
+GitHub prerelease/source and the PyPI package are aligned at public-alpha `0.1.0a5`.
 
-[PyPI — 0.1.0a4 current](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a4/) · [GitHub Prerelease — v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [Public repository](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
+[PyPI — 0.1.0a5](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/) · [GitHub Prerelease — v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [Public repository](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
 
-The documentation tracks the current public source and verified distribution state separately. It explains tested behavior and integration responsibilities; it does not create a warranty, certification, service commitment, or guarantee of fitness for a particular deployment.
+The documentation explains tested behavior and integration responsibilities; it does not create a warranty, certification, service commitment, or guarantee of fitness for a particular deployment.
 
 ## Start here
 
 | Guide | Purpose |
 |---|---|
-| [Quick Start](quick-start.md) | Install the currently verified PyPI version and run a low-impact local rehearsal |
+| [Quick Start](quick-start.md) | Install the current PyPI public alpha and run a low-impact local rehearsal |
 | [Product scope and architecture](product-scope-architecture.md) | Understand what RPR does, does not do, and where it sits |
 | [Claim Boundary Promotion](claim-boundary-promotion.md) | Review evidence-limited and permanent responsibility boundaries |
 | [MCP integration](mcp-integration.md) | Understand the current outbound MCP tool-call and read-only inspection boundaries |
@@ -32,7 +32,7 @@ The documentation tracks the current public source and verified distribution sta
 
 ## Current MCP boundary
 
-The current RPR public line can govern outbound calls from a host application to an MCP server, including local subprocess/stdio transport, admitted server and tool bindings, fail-closed ambiguous outcomes, and optional independent readback. The published PyPI `0.1.0a4` package also includes `rpr-mcp`, a local stdio read-only inspection server. The GitHub `v0.1.0a5` prerelease retains these boundaries and adds the field-reproduced Windows UTF-8 BOM CLI compatibility repair; that repair is not yet a PyPI `0.1.0a5` distribution claim until PyPI readback succeeds.
+The current RPR public line can govern outbound calls from a host application to an MCP server, including local subprocess/stdio transport, admitted server and tool bindings, fail-closed ambiguous outcomes, and optional independent readback. The published PyPI `0.1.0a5` package includes `rpr-mcp`, a local stdio read-only inspection server, and includes the field-reproduced Windows UTF-8 BOM CLI compatibility repair.
 
 ## Product and integration boundary
 
