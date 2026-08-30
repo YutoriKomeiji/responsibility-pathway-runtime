@@ -84,15 +84,40 @@ def validate_status_files() -> int:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
 
     current_version = project.get("project", {}).get("version")
-    status_version = status.get("version")
+    published_version = status.get("version")
     release_version = release.get("version")
+    candidate = status.get("candidate")
 
     if not isinstance(current_version, str) or not current_version:
         fail("pyproject project version is missing / pyprojectのproject versionがありません")
         errors += 1
-    elif status_version != current_version:
-        fail("product status version differs from current package version / product-statusと現行package versionが不一致")
+    elif candidate is None:
+        if published_version != current_version:
+            fail("product status version differs from current package version / product-statusと現行package versionが不一致")
+            errors += 1
+    elif not isinstance(candidate, dict):
+        fail("candidate release state must be an object / candidate release stateはobjectである必要があります")
         errors += 1
+    else:
+        candidate_version = candidate.get("version")
+        candidate_state = candidate.get("state")
+        if candidate_state not in {"release-candidate", "release-approved"}:
+            fail("candidate state must be release-candidate or release-approved / candidate stateが不正です")
+            errors += 1
+        if candidate_version != current_version:
+            fail("candidate version differs from current package version / candidateと現行package versionが不一致")
+            errors += 1
+        if candidate_state == "release-candidate":
+            if candidate.get("release_approved") is not False or candidate.get("publication_blocked") is not True:
+                fail("unapproved candidate must be unapproved and publication-blocked / 未承認candidateは未承認かつ公開停止である必要があります")
+                errors += 1
+        elif candidate_state == "release-approved":
+            if candidate.get("release_approved") is not True or candidate.get("publication_blocked") is not False:
+                fail("approved candidate must be approved and publication-enabled / 承認済candidateは承認済かつ公開可能である必要があります")
+                errors += 1
+        if not isinstance(published_version, str) or not published_version:
+            fail("published product version is missing / 公開中product versionがありません")
+            errors += 1
 
     if not isinstance(release_version, str) or not release_version:
         fail("release manifest version is missing / release-manifestのversionがありません")

@@ -1,21 +1,24 @@
 # Language: Python
-# Purpose: Prevent public GitHub Pages release labels and demo wheel references from drifting from pyproject.toml.
+# Purpose: Prevent public GitHub Pages release labels and demo wheel selection from drifting from the published product state.
 # Boundary: Static consistency test only; it does not publish, tag, or alter runtime behavior.
 
+import json
 from pathlib import Path
-import tomllib
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def current_version() -> str:
-    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    return data["project"]["version"]
+def published_version() -> str:
+    data = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
+    return str(data["version"])
 
 
-def test_public_pages_release_version_matches_package() -> None:
-    version = current_version()
+def test_public_pages_release_version_matches_published_product() -> None:
+    # During release-candidate preparation pyproject may already carry the next
+    # package version. Public Pages labels and install links stay pinned to the
+    # actually published version until release publication/readback completes.
+    version = published_version()
     expected_tag = f"v{version}"
 
     english = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
@@ -34,4 +37,5 @@ def test_public_pages_release_version_matches_package() -> None:
     assert f"responsibility-pathway-runtime=={version}" in japanese
 
     assert f"Public Alpha {version}" in demo
-    assert f"responsibility_pathway_runtime-{version}-py3-none-any.whl" in demo_js
+    assert 'const WHEEL_MANIFEST_URL = "./assets/wheel.sha256";' in demo_js
+    assert "resolveWheelLocation" in demo_js
