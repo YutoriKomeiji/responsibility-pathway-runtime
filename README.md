@@ -4,12 +4,12 @@
 
 Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for applications that need to place an explicit responsibility pathway in front of consequential external actions. It preserves actor and authority declarations, execution-attempt continuity, readback evidence, fail-closed ambiguity handling, repair routes, and Human Gate decisions.
 
-> **Current distribution state — split pending PyPI readback**  
-> GitHub prerelease/source: `0.1.0a5`. PyPI package: `0.1.0a4` until `0.1.0a5` publication is independently read back.  
+> **Current distribution state — Public Alpha `0.1.0a5`**  
+> GitHub prerelease/source and the PyPI package are aligned at `0.1.0a5`.  
 > `0.1.0a5` carries the field-reproduced Windows UTF-8 BOM CLI compatibility repair plus accumulated validation, public-surface, and evidence-boundary updates after `0.1.0a4`.  
 > RPR is not a legal-responsibility engine, identity provider, secret manager, production gateway, or guarantee of exactly-once effects across arbitrary remote systems.
 
-[PyPI — 0.1.0a4 current](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a4/) · [GitHub Prerelease — v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [MCP integration](docs/en/mcp-integration.md) · [Article 50 profile](docs/eu-ai-act-article-50.md) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
+[PyPI — 0.1.0a5](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/) · [GitHub Prerelease — v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [MCP integration](docs/en/mcp-integration.md) · [Article 50 profile](docs/eu-ai-act-article-50.md) · [日本語の入口](docs/ja/README.md) · [Quick Start](docs/en/quick-start.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
 
 ## Why RPR
 
@@ -35,7 +35,7 @@ A successful MCP response is not automatically proof of a consequential external
 
 ### Published read-only MCP inspection server
 
-The currently published PyPI `0.1.0a4` package includes `rpr-mcp`, a local stdio read-only inspection server targeting stable MCP protocol version `2025-11-25`. The GitHub `v0.1.0a5` prerelease retains this boundary while adding the Windows BOM compatibility repair described below.
+The published PyPI `0.1.0a5` package includes `rpr-mcp`, a local stdio read-only inspection server targeting stable MCP protocol version `2025-11-25`.
 
 ```bash
 rpr-mcp --database ./rpr.sqlite3
@@ -75,9 +75,9 @@ This profile does not provide legal classification, legal advice, certification,
 - English-primary and Japanese-parallel documentation;
 - selected Lean 4 state-machine invariants;
 - Chromium and Pyodide execution of the CI-built wheel;
-- in GitHub `v0.1.0a5` source/release evidence: Windows UTF-8 BOM compatibility for `rpr check`, with regression coverage for plain UTF-8 and BOM-bearing JSON and an exact Windows rerun of the originally failing input path.
+- in published `0.1.0a5`: Windows UTF-8 BOM compatibility for `rpr check`, with regression coverage for plain UTF-8 and BOM-bearing JSON and an exact Windows rerun of the originally failing input path.
 
-The Windows field result establishes compatibility for the reproduced environment and input path; it does not by itself establish universal Windows or customer-environment verification. That repair must not be described as a PyPI `0.1.0a5` distribution result until the PyPI publication is independently read back.
+The Windows field result establishes compatibility for the reproduced environment and input path; it does not by itself establish universal Windows or customer-environment verification.
 
 ER-1 hardening has started but is not complete. Customer proxy, TLS, identity, credentials, independent MCP clients, operating-system permission profiles, long-duration operation, production supervisors, and customer-equivalent connectivity remain external-environment validation items.
 
@@ -97,18 +97,18 @@ Where practical, evidence-limited boundaries are tracked as `evidence_collecting
 
 ## Quick Start
 
-Install the current PyPI public alpha in an isolated environment. Until direct PyPI `0.1.0a5` readback succeeds, the installable PyPI version remains `0.1.0a4`:
+Install the current PyPI Public Alpha in an isolated environment:
 
 ```bash
 python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a4
+python -m pip install responsibility-pathway-runtime==0.1.0a5
 rpr --help
 rpr-mcp --help
 ```
 
-For inspection of the GitHub `v0.1.0a5` source/release or for development:
+For source inspection or development against the matching GitHub release:
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
