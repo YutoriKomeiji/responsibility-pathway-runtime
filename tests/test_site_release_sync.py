@@ -1,5 +1,5 @@
 # Language: Python
-# Purpose: Prevent public GitHub Pages release labels and demo wheel references from drifting from the published product state.
+# Purpose: Prevent public GitHub Pages release labels and demo wheel selection from drifting from the published product state.
 # Boundary: Static consistency test only; it does not publish, tag, or alter runtime behavior.
 
 import json
@@ -16,8 +16,8 @@ def published_version() -> str:
 
 def test_public_pages_release_version_matches_published_product() -> None:
     # During release-candidate preparation pyproject may already carry the next
-    # package version. Public Pages must remain pinned to the actually published
-    # version until the release Human Gate and publication/readback complete.
+    # package version. Public Pages labels and install links stay pinned to the
+    # actually published version until release publication/readback completes.
     version = published_version()
     expected_tag = f"v{version}"
 
@@ -37,4 +37,5 @@ def test_public_pages_release_version_matches_published_product() -> None:
     assert f"responsibility-pathway-runtime=={version}" in japanese
 
     assert f"Public Alpha {version}" in demo
-    assert f"responsibility_pathway_runtime-{version}-py3-none-any.whl" in demo_js
+    assert 'const WHEEL_MANIFEST_URL = "./assets/wheel.sha256";' in demo_js
+    assert "resolveWheelLocation" in demo_js
