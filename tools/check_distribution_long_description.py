@@ -35,7 +35,9 @@ def validate(root: Path, dist: Path) -> dict[str, str]:
     version = _project_version(root)
     status = _product_status(root)
     candidate = status.get("candidate")
-    is_candidate = isinstance(candidate, dict) and candidate.get("version") == version
+    candidate_state = candidate.get("state") if isinstance(candidate, dict) and candidate.get("version") == version else None
+    is_unapproved_candidate = candidate_state == "release-candidate"
+    is_approved_candidate = candidate_state == "release-approved"
 
     wheels = sorted(dist.glob("*.whl"))
     if len(wheels) != 1:
@@ -49,7 +51,7 @@ def validate(root: Path, dist: Path) -> dict[str, str]:
     if f"Version: {version}\n" not in header + "\n":
         raise MetadataValidationError(f"METADATA Version does not match pyproject version {version}")
 
-    if is_candidate:
+    if is_unapproved_candidate:
         expected_markers = (
             f"Release Candidate — {version}",
             "Unpublished candidate",
@@ -87,7 +89,7 @@ def validate(root: Path, dist: Path) -> dict[str, str]:
 
     public_alphas = set(re.findall(r"Public Alpha — ([0-9]+\.[0-9]+\.[0-9]+a[0-9]+)", description))
     release_candidates = set(re.findall(r"Release Candidate — ([0-9]+\.[0-9]+\.[0-9]+a[0-9]+)", description))
-    if is_candidate:
+    if is_unapproved_candidate:
         if release_candidates != {version}:
             raise MetadataValidationError(
                 f"candidate long description advertises unexpected candidate versions: {sorted(release_candidates)}; expected {version}"
@@ -97,11 +99,8 @@ def validate(root: Path, dist: Path) -> dict[str, str]:
             f"long description advertises unexpected alpha versions: {sorted(public_alphas)}; expected {version}"
         )
 
-    return {
-        "version": version,
-        "wheel": wheels[0].name,
-        "status": "candidate-validated" if is_candidate else "validated",
-    }
+    status_label = "approved-release-candidate-validated" if is_approved_candidate else ("candidate-validated" if is_unapproved_candidate else "validated")
+    return {"version": version, "wheel": wheels[0].name, "status": status_label}
 
 
 def main() -> int:
