@@ -1,21 +1,24 @@
 # Language: Python
-# Purpose: Prevent public GitHub Pages release labels and demo wheel references from drifting from pyproject.toml.
+# Purpose: Prevent public GitHub Pages release labels and demo wheel references from drifting from the published product state.
 # Boundary: Static consistency test only; it does not publish, tag, or alter runtime behavior.
 
+import json
 from pathlib import Path
-import tomllib
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def current_version() -> str:
-    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    return data["project"]["version"]
+def published_version() -> str:
+    data = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
+    return str(data["version"])
 
 
-def test_public_pages_release_version_matches_package() -> None:
-    version = current_version()
+def test_public_pages_release_version_matches_published_product() -> None:
+    # During release-candidate preparation pyproject may already carry the next
+    # package version. Public Pages must remain pinned to the actually published
+    # version until the release Human Gate and publication/readback complete.
+    version = published_version()
     expected_tag = f"v{version}"
 
     english = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
