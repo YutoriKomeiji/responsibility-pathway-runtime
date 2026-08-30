@@ -2,7 +2,7 @@
 Document Title: RPR Quick Start
 Document Type: Public Product Guide
 Status: Public Alpha
-Version: 0.1.0a2
+Version: split-state: GitHub 0.1.0a5 / PyPI 0.1.0a4
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
@@ -12,10 +12,10 @@ Body Language: English
 
 RPR is provided under the [MIT License](../../LICENSE), without warranty. Begin with a disposable, non-consequential rehearsal and decide independently whether the software is suitable for your environment.
 
-Version `0.1.0a2` is available on PyPI and as a GitHub Prerelease.
+Current distribution state is split: GitHub prerelease/source is `0.1.0a5`, while the independently read-back PyPI package remains `0.1.0a4`. Until direct PyPI `0.1.0a5` readback succeeds, install `0.1.0a4` from PyPI.
 
-- [PyPI package](https://pypi.org/project/responsibility-pathway-runtime/)
-- [GitHub Prerelease](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a2)
+- [PyPI package — 0.1.0a4 current](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a4/)
+- [GitHub Prerelease — v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5)
 - [Live RPR browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html)
 - [Public repository](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
 
@@ -36,7 +36,7 @@ Version `0.1.0a2` is available on PyPI and as a GitHub Prerelease.
 python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a2
+python -m pip install responsibility-pathway-runtime==0.1.0a4
 ```
 
 Confirm the installed version and command surface:
@@ -44,17 +44,19 @@ Confirm the installed version and command surface:
 ```bash
 python -m pip show responsibility-pathway-runtime
 rpr --help
+rpr-mcp --help
 ```
 
-For source inspection or development, clone the repository separately and use an editable install:
+For source inspection of the GitHub `v0.1.0a5` prerelease or for development, clone the repository separately:
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
 cd responsibility-pathway-runtime
+git checkout v0.1.0a5
 python -m pip install -e .
 ```
 
-The pre-release candidate evidence remains in [`release-evidence/replacement-freeze-2026-08-02.json`](../../release-evidence/replacement-freeze-2026-08-02.json). Use it to inspect the frozen candidate that preceded publication; use PyPI and the GitHub Prerelease as the current distribution readback surfaces.
+The Windows UTF-8 BOM repair is verified in the `v0.1.0a5` source/release evidence for the reproduced environment and input path. It is not yet a PyPI `0.1.0a5` distribution claim until publication readback succeeds.
 
 ## 2. Run a non-consequential rehearsal
 

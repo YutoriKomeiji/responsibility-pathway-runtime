@@ -2,7 +2,7 @@
 Document Title: RPR クイックスタート
 Document Type: Public Product Guide
 Status: Public Alpha
-Version: 0.1.0a2
+Version: split-state: GitHub 0.1.0a5 / PyPI 0.1.0a4
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: Japanese
 Body Language: Japanese
@@ -12,10 +12,10 @@ Body Language: Japanese
 
 RPRは[`MIT License`](../../LICENSE)に基づき、無保証で提供されます。まず使い捨て可能で影響のない環境で試験し、利用環境への適合性は利用者自身で判断してください。
 
-Public Alpha `0.1.0a2` は、PyPIとGitHub Prereleaseで公開しています。
+現在の配布状態は一時的に分かれています。GitHub Prerelease / sourceは `0.1.0a5`、独立readback済みのPyPI packageは `0.1.0a4` です。PyPI `0.1.0a5` の直接readbackが成功するまでは、PyPIからは `0.1.0a4` を導入してください。
 
-- [PyPIパッケージ](https://pypi.org/project/responsibility-pathway-runtime/)
-- [GitHub Prerelease](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a2)
+- [PyPI 0.1.0a4（現在のreadback済みpackage）](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a4/)
+- [GitHub Prerelease v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5)
 - [実RPRブラウザデモ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html)
 - [公開リポジトリ](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
 
@@ -26,7 +26,7 @@ Public Alpha `0.1.0a2` は、PyPIとGitHub Prereleaseで公開しています。
 | 1 | 公開版と取得元を記録 | PyPI URL、version、Repository URL、tag |
 | 2 | 隔離したPython 3.11環境を作成 | Python・pip version |
 | 3 | PyPIからversion固定で導入 | Install log、導入されたpackage version |
-| 4 | CLIを確認 | `rpr --help`の出力 |
+| 4 | CLIを確認 | `rpr --help` / `rpr-mcp --help` の出力 |
 | 5 | Synthetic dataでlocal pathwayを実行 | Pathway、attempt、readback、最終state |
 | 6 | Restartまたは曖昧結果を試験 | 未解決effectが重複実行されない証拠 |
 
@@ -36,7 +36,7 @@ Public Alpha `0.1.0a2` は、PyPIとGitHub Prereleaseで公開しています。
 python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a2
+python -m pip install responsibility-pathway-runtime==0.1.0a4
 ```
 
 導入されたversionとCLIを確認します。
@@ -44,17 +44,19 @@ python -m pip install responsibility-pathway-runtime==0.1.0a2
 ```bash
 python -m pip show responsibility-pathway-runtime
 rpr --help
+rpr-mcp --help
 ```
 
-ソース確認や開発を行う場合は、公開リポジトリを別途取得し、editable installを使用できます。
+GitHub `v0.1.0a5` prereleaseのsource確認や開発を行う場合は、公開リポジトリを別途取得します。
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
 cd responsibility-pathway-runtime
+git checkout v0.1.0a5
 python -m pip install -e .
 ```
 
-公開前候補の検証記録は[`release-evidence/replacement-freeze-2026-08-02.json`](../../release-evidence/replacement-freeze-2026-08-02.json)に残しています。これは公開前に固定した候補のEvidenceです。現在の配布状態はPyPIとGitHub Prereleaseで読み戻してください。
+Windows UTF-8 BOM修復は、再現された環境・入力経路について `v0.1.0a5` source/release evidenceで検証済みです。ただしPyPI `0.1.0a5` の配布結果として扱うのは公開readback後です。
 
 ## 2. 影響のないローカル試験を行う
 
