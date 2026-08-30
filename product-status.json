@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "product": "Responsibility Pathway Runtime",
   "version": "0.1.0a4",
   "release_channel": "public-alpha",
@@ -11,6 +11,17 @@
   "release_approved": true,
   "publication_blocked": false,
   "blocker_issue": null,
+  "candidate": {
+    "version": "0.1.0a5",
+    "state": "release-candidate",
+    "source_base": "v0.1.0a4",
+    "source_head_at_audit": "f231ed2813c73380949865e4aa01448da8b863ad",
+    "reason": "field-reproduced Windows UTF-8 BOM CLI compatibility repair plus accumulated public-surface and validation updates",
+    "release_approved": false,
+    "publication_blocked": true,
+    "exact_head_validation": "pending",
+    "artifact_evidence": "pending"
+  },
   "human_gate": {
     "required_for": [
       "future release tag creation",
@@ -50,6 +61,7 @@
     "automatic transfer of final responsibility to the runtime"
   ],
   "open_release_gates": [
+    "complete exact-head validation for the 0.1.0a5 candidate",
     "retain Human Gate for any future tag, GitHub Release, or binary publication",
     "retain Human Gate for any production-ready or enterprise-ready claim",
     "retain customer-equivalent external-environment validation as incomplete"
