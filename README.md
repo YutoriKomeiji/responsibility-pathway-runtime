@@ -1,5 +1,7 @@
 # Responsibility Pathway Runtime
 
+[![Public Export Quality](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/actions/workflows/public-export-quality.yml/badge.svg?branch=main)](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/actions/workflows/public-export-quality.yml)
+
 **Govern external actions without losing evidence, recovery, or the human decision point.**
 
 Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for applications that need to place an explicit responsibility pathway in front of consequential external actions. It preserves actor and authority declarations, execution-attempt continuity, readback evidence, fail-closed ambiguity handling, repair routes, and Human Gate decisions.
