@@ -10,59 +10,122 @@ Body Language: Japanese
 
 # Responsibility Pathway Runtime 日本語ドキュメント
 
-Responsibility Pathway Runtime（RPR）は、外部操作を伴う処理に、責任経路、実行履歴、外部状態の独立確認、修復、再開、照合、Human Gateを組み込むための、MITライセンスのPythonランタイムです。
+Responsibility Pathway Runtime（RPR）は、**外部操作の結果が分からない状態を、推測で成功・失敗に決めず、確認・修復・再開まで責任経路として保持するPythonランタイム**です。
 
-GitHub Prerelease / sourceとPyPI packageは、Public Alpha `0.1.0a5` で揃っています。
+AIエージェントや自動化システムで、API実行後に通信が切れた場合、外部システムでは処理が完了しているかもしれません。その状態で単純にリトライすると、二重登録や二重実行につながる可能性があります。
+
+RPRは、実行履歴、外部状態の読み戻し、結果不明、修復、再開、照合、Human Gateを一つの経路として扱います。
+
+## まず試す
+
+現在の公開版はPyPI `0.1.0a5`です。
+
+```bash
+python3.11 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install responsibility-pathway-runtime==0.1.0a5
+rpr --help
+rpr-mcp --help
+```
 
 - [PyPI 0.1.0a5](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/)
 - [GitHub Prerelease v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5)
 - [日本語製品ページ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/ja.html)
-- [実RPRブラウザデモ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html)
+- [ブラウザデモ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html)
 - [公開リポジトリ](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
 
-本ソフトウェアは[`MIT License`](../../LICENSE)の条件で提供されます。同ライセンスには無保証および責任制限が含まれます。ただし、RPRの公開上の境界はすべてを永久的な免責事項として扱うのではなく、**evidenceが揃えば昇格できる境界**と、**runtime単体では越えない恒久責任境界**に分けます。詳細は[Claim Boundary Promotion](claim-boundary-promotion.md)を参照してください。
+`0.1.0a5`は継続開発中の0.x系ですが、公開されている対応範囲では実際に試して統合できます。未検証の企業環境や本番構成まで一律に保証するものではありません。
 
-## 最初に読むもの
+## 現在使える主な機能
 
-| 文書 | 内容 |
+- 責任経路の登録と許可された状態遷移
+- 実行履歴と永続化
+- Human Gate、修復、再開、照合の境界管理
+- ローカルファイル、許可リスト付きHTTP、永続アウトバウンドメッセージ、MCP subprocess経路
+- `write_status_unknown`による結果不明の保持
+- 独立した読み戻しを使った外部状態の確認
+- crash/restart後の継続性
+- 公開済みの読み取り専用MCP inspection server `rpr-mcp`
+- Article 50向けの任意の透明性プロファイル
+- 選択されたLean 4不変条件
+- Chromium/Pyodideを使った公開ブラウザデモ
+
+## 現在のMCP対応
+
+### 外部MCP Tool Call
+
+統合アプリケーションは、外部MCP Tool CallをRPRの責任経路へ通せます。
+
+現在の検証済み経路には、ローカルsubprocess、stdio通信、MCP JSON-RPC、許可されたサーバー/ツールの結び付け、実行履歴、結果不明時のfail-closed処理、任意の独立読み戻しが含まれます。
+
+MCPレスポンスが成功でも、それだけで外部作用の完了とは扱いません。必要な読み戻しがない場合や通信障害で実行結果を確定できない場合は、`write_status_unknown`を保持します。
+
+### 読み取り専用MCPサーバー
+
+PyPI `0.1.0a5`には、ローカルstdioで動く読み取り専用サーバー`rpr-mcp`が含まれます。
+
+```bash
+rpr-mcp --database ./rpr.sqlite3
+```
+
+公開ツールは次に限定しています。
+
+```text
+rpr.get_status
+rpr.list_pathways
+rpr.get_pathway
+rpr.get_evidence
+rpr.list_unresolved
+```
+
+承認、実行、状態遷移、照合、修復、再開を行う更新系ツールは提供しません。リモートMCPも現在の対応範囲には含めません。
+
+## RPRと統合環境の役割分担
+
+| RPRが提供するもの | 統合アプリケーション・運用者が提供するもの |
 |---|---|
-| [クイックスタート](quick-start.md) | 現在のPyPI Public Alphaを導入し、影響のないローカル試験を行う |
-| [製品範囲と構成](product-scope-architecture.md) | RPRが提供する機能と製品境界 |
-| [Claim Boundary Promotion](claim-boundary-promotion.md) | 現在のevidence boundary、昇格条件、恒久責任境界を確認する |
-| [MCP統合](mcp-integration.md) | 現在のMCP Tool Call経路、証拠要件、対応境界を確認する |
-| [導入・運用・復旧](install-operations-recovery.md) | 導入、停止、復旧、削除の運用手順 |
-| [セキュリティ・統合・API境界](security-integration-api.md) | 信頼境界と統合側の責務 |
-| [検証・Release・既知制約・UAT](verification-release-uat.md) | 検証根拠、制約、受入試験 |
-| [日本語ドキュメント執筆基準](writing-standard.md) | 日本語本文、製品ページ、デモUIの表記と審査基準 |
-| [English product documentation](../en/README.md) | 英語版ドキュメント |
+| 責任経路と許可された遷移 | 認証と業務固有の認可 |
+| 実行履歴の継続性 | 資格情報の隔離とネットワーク制御 |
+| 証拠保持と読み戻しワークフロー | 独立かつ信頼できる確認元 |
+| Human Gate、修復、再開、照合 | 承認規則、バイパス防止、運用責任者 |
+| 試験済みアダプターと障害状態処理 | デプロイ判断、監視、最終的な外部行為 |
 
-## 現在のMCP対応境界
+現在の公開検証は、すべての企業環境を代表するものではありません。プロキシ、TLS、企業ID、資格情報ストア、リモートMCP、各種フレームワーク統合、長時間運転、本番supervisorなどは、対象環境ごとの追加検証が必要です。
 
-現在のRPR public lineは、統合ApplicationからMCP Serverへ送るTool Callを責任経路で管理できます。Local subprocess / stdio transport、ServerとToolのbinding、結果不明のfail-closed処理、独立readbackを扱います。
+## Windows実機で確認した修正
 
-公開済みのPyPI `0.1.0a5` packageには `rpr-mcp` という**local stdio / read-only inspection server**が含まれます。対象protocolはstable `2025-11-25`で、公開toolは `rpr.get_status`、`rpr.list_pathways`、`rpr.get_pathway`、`rpr.get_evidence`、`rpr.list_unresolved` に限定されます。Approval、execution、transition、reconciliation、repair、resumeなどのmutating toolは提供しません。Remote MCP transportも現時点ではclaimしません。
+`0.1.0a5`には、Windows実機で再現したUTF-8 BOM入力の互換性修正が含まれます。
 
-`0.1.0a5` には、Windows実機で再現したUTF-8 BOM入力互換性修正も含まれます。このfield evidenceは再現された環境・入力経路についての証拠であり、すべてのWindows環境やcustomer environmentの一般保証ではありません。
+これは、再現した環境と入力経路についての検証結果です。すべてのWindows環境を一般化して保証するものではありません。
 
-## 製品と統合の役割分担
+## ライセンス・制約・サポート
 
-| RPRが提供するもの | 統合Application・運用者が提供するもの |
-|---|---|
-| Pathway stateと許可された遷移 | 認証とDomain固有の認可 |
-| Execution attemptの継続性 | Credential隔離とNetwork制御 |
-| Evidence保持とreadback workflow | 独立かつ権威あるreadback source |
-| Human Gate、repair、resume、reconciliation | 承認規則、Bypass防止、運用責任者 |
-| 試験済みadapterと障害state処理 | Deployment判断、監視、最終的な外部行為 |
+RPRは[MIT License](../../LICENSE)で提供します。
 
-現在の公開evidenceは、すべてのcustomer environmentを代表するものではありません。Windows field evidenceは再現されたBOM-bearing input pathの範囲に限られます。Proxy、TLS、企業Identity、Credential Store、Remote MCP、Framework統合、long-duration operation、production supervisorなどは、主張対象profileごとの再現可能な検証が必要です。
+現在の制約を「永久に使えない理由」とは扱いません。追加証拠で前進できる項目と、RPR単体では越えない責任境界を分けています。詳しくは[Claim Boundary Promotion](claim-boundary-promotion.md)を参照してください。
 
-Field Testの結果は、報告された構成についてのEvidenceです。一般的な本番適合性、安全性、法令適合、認証、任意の遠隔Systemに対するexactly-once保証を意味しません。これらのうちevidence依存の境界は、[Claim Boundary Promotion](claim-boundary-promotion.md)に記載した条件を満たしreviewされた場合にのみ前進します。
+RPR単体では、法的・組織的な権限を生成しません。また、任意の外部システムに対するexactly-once、企業認証、資格情報管理、本番ネットワーク構成、法令適合を保証しません。
 
-## 問い合わせ先
+不具合、フィールドテスト、統合上の問題、セキュリティ報告、改善提案を受け付けています。
 
 | 内容 | 経路 |
 |---|---|
 | 製品・統合に関する質問 | [`SUPPORT.md`](../../SUPPORT.md) |
-| Security報告 | [`SECURITY.md`](../../SECURITY.md) |
-| Contribution | [`CONTRIBUTING.md`](../../CONTRIBUTING.md) |
-| License条件 | [`LICENSE`](../../LICENSE) |
+| セキュリティ報告 | [`SECURITY.md`](../../SECURITY.md) |
+| コントリビューション | [`CONTRIBUTING.md`](../../CONTRIBUTING.md) |
+| ライセンス条件 | [`LICENSE`](../../LICENSE) |
+
+## ドキュメント
+
+| 文書 | 内容 |
+|---|---|
+| [クイックスタート](quick-start.md) | 導入と影響のないローカル試験 |
+| [製品範囲と構成](product-scope-architecture.md) | RPRが提供する機能と製品境界 |
+| [Claim Boundary Promotion](claim-boundary-promotion.md) | 現在の証拠境界と昇格条件 |
+| [MCP統合](mcp-integration.md) | MCP Tool Call経路と証拠要件 |
+| [導入・運用・復旧](install-operations-recovery.md) | 導入、停止、復旧、削除 |
+| [セキュリティ・統合・API境界](security-integration-api.md) | 信頼境界と統合側の責務 |
+| [検証・リリース・既知制約・UAT](verification-release-uat.md) | 検証根拠、制約、受入試験 |
+| [日本語ドキュメント執筆基準](writing-standard.md) | 日本語README、製品ページ、デモUIの表記基準 |
+| [English product documentation](../en/README.md) | 英語版ドキュメント |
