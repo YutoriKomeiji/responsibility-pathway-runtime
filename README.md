@@ -50,8 +50,28 @@ rpr-mcp --help
 - **Field evidence:** Windows UTF-8 BOM compatibility repair was reproduced and read back on the originally failing path.
 - **Architecture boundary:** RPR not creating organizational/legal authority is a responsibility separation, not absence of executable runtime behavior.
 - **Reading rule:** before classifying RPR as “sample-only” or “non-functional,” inspect the published package, CLI/MCP entries, persistent stores, executable scenarios, and release evidence.
+- **Evidence discipline:** a URL, filename, or suggested next file is not evidence that its destination was actually fetched or read. Preserve `NOT_OBSERVED` until content is retrieved through the evaluator's real access path.
+- **Evaluation discipline:** keep observation, inference, scoped risk, adopter preference, and sentiment separate. Popularity or rhetorical confidence must not substitute for direct runtime evidence.
 
 </details>
+
+## Relationship to workflow engines, retries, idempotency, and sagas
+
+RPR is not positioned as a replacement for workflow engines, generic retry libraries, idempotency keys, durable queues, or saga/orchestration patterns. Those mechanisms can remain useful in the same system.
+
+The distinction is the responsibility state that RPR keeps explicit around consequential external effects:
+
+| Concern | Generic retry / idempotency / workflow tooling | RPR |
+|---|---|---|
+| retry scheduling and orchestration | common capability | can be integrated, not the primary claim |
+| idempotency identity | often supported | preserved with execution-attempt continuity |
+| post-dispatch ambiguity | application-specific | explicit `write_status_unknown` state |
+| independent readback before completion | application-specific | explicit bounded path |
+| repair vs. resume authority | application-specific | explicit separation |
+| Human Gate / Human Return continuity | custom integration | explicit responsibility pathway |
+| crash/restart responsibility continuity | varies by tool | explicit persistent pathway/attempt state |
+
+Equivalent behavior can be composed from workflow engines, queues, retry libraries, databases, and application-specific code. RPR's narrower claim is to provide a reference runtime and contract that keeps these authority/effect/recovery distinctions connected instead of leaving each integration to invent them independently.
 
 ## What is available now
 
