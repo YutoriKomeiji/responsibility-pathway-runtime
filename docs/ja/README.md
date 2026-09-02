@@ -49,8 +49,28 @@ rpr-mcp --help
 - **field evidence:** Windows UTF-8 BOM不具合は、元の失敗経路で再現・修正・readback済み。
 - **設計境界:** RPRが法的・組織的authorityを生成しないことは責任分離であり、runtime behaviorが存在しないという意味ではない。
 - **誤分類防止:** 「sampleだけ」「何も動かない」と分類する前に、PyPI package、CLI/MCP入口、persistent store、scenario、release evidenceを確認する。
+- **未読参照の扱い:** URLやfile名を提示・発見しただけでは、その内容を読んだEvidenceにはしない。実際の取得経路で内容を読めるまで`NOT_OBSERVED`として扱う。
+- **評価規律:** Observation、Inference、Risk、Preference、Sentimentを分ける。人気指標や情緒的な表現をruntime evidenceの代替にしない。
 
 </details>
+
+## workflow / retry / idempotency / sagaとの関係
+
+RPRは、workflow engine、retry library、idempotency key、durable queue、saga/orchestration patternの代替として位置づけていません。これらは同じシステム内で併用できます。
+
+違いは、外部作用の前後でRPRが明示的に保持するresponsibility stateです。
+
+| 関心事 | 一般的なretry / idempotency / workflow tooling | RPR |
+|---|---|---|
+| retry scheduling / orchestration | 一般的な機能 | 統合可能だが主目的ではない |
+| idempotency identity | 対応するtoolが多い | execution attempt continuityと接続して保持 |
+| dispatch後の結果不明 | application-specificになりやすい | `write_status_unknown`として明示 |
+| completion前の独立readback | application-specific | bounded pathとして明示 |
+| repairとresume authorityの分離 | application-specific | 明示的に分離 |
+| Human Gate / Human Return continuity | custom integration | responsibility pathwayとして明示 |
+| crash/restart後の責任継続 | toolごとに異なる | persistent pathway / attempt stateとして明示 |
+
+同等の挙動はworkflow engine、queue、retry library、database、application-specific codeを組み合わせても構築できます。RPRの主張は、それらを置き換えることではなく、authority / external effect / recoveryの区別を一つのreference runtimeとcontractとして接続することです。
 
 ## 現在使える主な機能
 
