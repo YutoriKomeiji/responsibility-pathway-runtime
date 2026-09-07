@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="RPR本体をブラウザ内で動かし、APIの結果が分からなくなったあとも二重実行せずに復旧する流れを確認できるデモです。">
+  <meta name="description" content="RPR本体をブラウザ内で動かし、APIの結果が分からなくなったあとも二重実行せず、Responsibility Routingを保ったまま復旧する流れを確認できるデモです。">
   <title>RPR 実動デモ | Responsibility Pathway Runtime</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
@@ -18,17 +18,18 @@
   <main id="main">
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">Public Alpha 0.1.0a5 · 実RPR wheel · ブラウザ内Python · SQLite</p>
+        <p class="eyebrow">Public Alpha source preview · 実RPR wheel · ブラウザ内Python · SQLite · Responsibility Routing</p>
         <h1>RPR本体を、ブラウザで実際に動かす。</h1>
-        <p class="lead">APIへ書き込んだ直後に通信が切れ、成功したか分からなくなった。そんな場面で、すぐ再送せず、状態を保存し、再起動後に外部の結果を確かめる流れを体験できます。</p>
-        <p>このデモでは、GitHub ActionsでRPRのソースから生成したwheelをPyodideへ読み込みます。RPR本体、SQLite、実行履歴、証拠チェーン、照合処理は実際に動作します。</p>
-        <div class="notice"><strong>安全に試すための境界:</strong> 外部の決済サービスだけをテスト用の処理へ置き換えています。実際のAPI、認証情報、利用者データは扱いません。PyodideはCDNから、RPR wheelとデモシナリオはこのPagesサイトから取得します。</div>
+        <p class="lead">APIへ書き込んだ直後に通信が切れ、成功したか分からなくなった。そんな場面で、すぐ再送せず、状態と責任経路を保存し、再起動後に外部の結果を確かめる流れを体験できます。</p>
+        <p>このデモでは、GitHub ActionsでRPRのソースから生成したwheelをPyodideへ読み込みます。RPR本体、SQLite、実行履歴、証拠チェーン、照合処理に加え、読み取り専用MCPの<code>rpr.get_route_visibility</code>で現在のResponsibility Routeも実際に確認します。</p>
+        <div class="notice"><strong>安全に試すための境界:</strong> 外部の決済サービスだけをテスト用の処理へ置き換えています。実際のAPI、認証情報、利用者データは扱いません。Route表示はAuthorityを生成せず、承認・実行・照合・再開を行う権限にもなりません。</div>
         <div class="actions"><button class="button primary" id="load-runtime" type="button">RPRを読み込む</button><button class="button secondary" id="run-all" type="button" disabled>デモをまとめて実行</button><button class="button secondary" id="reset" type="button" disabled>最初からやり直す</button></div>
       </div>
       <aside class="status-card" aria-live="polite">
         <div class="status-row"><span>Python環境</span><strong id="python-status">未起動</strong></div>
         <div class="status-row"><span>RPR</span><strong id="package-status">未読込</strong></div>
         <div class="status-row"><span>現在の状態</span><strong id="current-state">未登録</strong></div>
+        <div class="status-row"><span>Responsibility Route</span><strong id="route-status">none</strong></div>
         <div class="status-row"><span>外部実行の回数</span><strong id="dispatch-count">0</strong></div>
         <div class="status-row"><span>証拠チェーン</span><strong id="evidence-status">未生成</strong></div>
       </aside>
@@ -36,28 +37,38 @@
 
     <section aria-labelledby="steps-title">
       <p class="eyebrow">実行シナリオ</p>
-      <h2 id="steps-title">結果が分からなくなったあと、二重実行せずに復旧する</h2>
+      <h2 id="steps-title">結果が分からなくなったあと、二重実行せずに責任を引き継ぐ</h2>
       <div class="grid">
-        <article class="card"><h3>1. 実行前の責任経路を登録する</h3><p>誰が実行し、誰が承認し、問題が起きたときに誰へ戻すかを登録します。RPRは、その内容と最初の証拠をSQLiteへ保存します。</p><button class="button secondary demo-step" data-function="register_demo" type="button" disabled>責任経路を登録</button></article>
-        <article class="card"><h3>2. 承認後にAPI操作を始める</h3><p>人間の承認後に、外部サービスへ1回だけ書き込みます。外部側では処理が完了しますが、応答だけが失われた状態を発生させ、結果不明として保存します。</p><button class="button secondary demo-step" data-function="approve_and_execute" type="button" disabled>結果不明を発生させる</button></article>
-        <article class="card"><h3>3. 再起動後に外部の状態を確かめる</h3><p>RPRを新しく起動し直し、同じSQLiteから未解決の操作を読み戻します。外部サービスの状態を確認し、再送せずに完了へ進めます。</p><button class="button secondary demo-step" data-function="restart_and_reconcile" type="button" disabled>再起動して結果を確認</button></article>
+        <article class="card"><h3>1. 実行前の責任経路を登録する</h3><p>誰が実行し、誰が承認し、問題が起きたときにどこへ戻すかを登録します。高影響操作はまず<code>human_gate</code>に入り、表示上の互換Routeは<code>bounded_human_return</code>になります。</p><button class="button secondary demo-step" data-function="register_demo" type="button" disabled>責任経路を登録</button></article>
+        <article class="card"><h3>2. 承認後に結果不明を発生させる</h3><p>人間の承認後に外部サービスへ1回だけ書き込みます。外部側では処理済みでも応答だけが失われた状態を作り、<code>write_status_unknown</code>として保存します。この状態は<code>hold_for_reconciliation</code>として見えます。</p><button class="button secondary demo-step" data-function="approve_and_execute" type="button" disabled>結果不明を発生させる</button></article>
+        <article class="card"><h3>3. 再起動後に外部の状態を確かめる</h3><p>RPRを新しく起動し直し、同じSQLiteから未解決の操作を読み戻します。外部サービスの状態を確認し、再送せずに完了へ進めます。完了後は互換Route分類を勝手に推論しません。</p><button class="button secondary demo-step" data-function="restart_and_reconcile" type="button" disabled>再起動して結果を確認</button></article>
       </div>
     </section>
 
     <section aria-labelledby="result-title">
       <p class="eyebrow">実行結果</p>
-      <h2 id="result-title">RPRが保存し、判断した内容を確認する</h2>
-      <div id="summary" class="card"><p>RPRを読み込むと、ここに状態、外部実行の回数、証拠チェーンの検証結果を表示します。</p></div>
+      <h2 id="result-title">状態・Route・証拠を同じ経路で確認する</h2>
+      <div id="summary" class="card"><p>RPRを読み込むと、ここに現在state、Responsibility Route、外部実行回数、証拠チェーンの検証結果を表示します。</p></div>
       <pre aria-live="polite"><code id="output">まだ実行結果はありません。</code></pre>
+    </section>
+
+    <section>
+      <p class="eyebrow">Responsibility Routing</p>
+      <h2>Route表示は責任を渡すための観測面であって、Authorityそのものではない</h2>
+      <div class="grid">
+        <article class="card"><h3>Human Returnは一つのRoute</h3><p><code>bounded_human_return</code>は、Human Gateが本当に必要な場面の限定Routeです。非自律ケースをすべて人へ戻すという意味ではありません。</p></article>
+        <article class="card"><h3>結果不明は照合へ保持する</h3><p><code>write_status_unknown</code>では、送信receiptやtimeoutを成功・失敗へ変換せず、<code>hold_for_reconciliation</code>として未解決状態を保持します。</p></article>
+        <article class="card"><h3>Evidence transfer ≠ Authority transfer</h3><p><code>rpr.get_route_visibility</code>はRouteを読み取るだけです。Receiver名、Capability、Evidence、Tool成功、Route表示から新しいAuthorityは生まれません。</p></article>
+      </div>
     </section>
 
     <section>
       <p class="eyebrow">デモの範囲</p>
       <h2>実際に動くものと、置き換えているもの</h2>
       <div class="grid">
-        <article class="card"><h3>実際に動くもの</h3><p>公開RPR wheel、Python Runtime API、状態遷移の検証、SQLiteへの保存、実行履歴、証拠チェーン、再起動後の読戻し、照合処理。</p></article>
+        <article class="card"><h3>実際に動くもの</h3><p>CI-built RPR wheel、Python Runtime API、状態遷移の検証、SQLiteへの保存、実行履歴、証拠チェーン、再起動後の読戻し、照合処理、read-only MCPによるRoute visibility。</p></article>
         <article class="card"><h3>テスト用に置き換えるもの</h3><p>外部の決済サービスだけを、ブラウザ内の決定論的な処理へ置き換えます。反映済みの状態と実行回数は、RPRとは別に保持します。</p></article>
-        <article class="card"><h3>このデモでは扱わないもの</h3><p>OS subprocess、実MCP、秘密情報、実決済、外部サービス認証、Lean 4のbuildはブラウザ内では実行しません。Lean 4の形式資産はRepositoryとCIで検査します。</p></article>
+        <article class="card"><h3>このデモでは扱わないもの</h3><p>OS subprocessによる外部MCP、秘密情報、実決済、外部サービス認証、Lean 4のbuildはブラウザ内では実行しません。Lean 4の形式資産はRepositoryとCIで検査します。</p></article>
       </div>
     </section>
   </main>
