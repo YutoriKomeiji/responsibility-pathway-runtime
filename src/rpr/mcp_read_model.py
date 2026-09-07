@@ -9,6 +9,7 @@ from typing import Any
 from urllib.parse import quote
 
 from .models import PathwayState
+from .route_visibility import build_route_visibility
 
 
 _TERMINAL_STATES = frozenset(
@@ -106,6 +107,18 @@ class SQLiteReadModel:
         if row is None:
             raise KeyError(pathway_id)
         return self._pathway_row(row)
+
+    def get_route_visibility(self, pathway_id: str) -> dict[str, Any]:
+        """Return internal read-only routing visibility without changing MCP output."""
+
+        pathway = self.get_pathway(pathway_id)
+        return {
+            "pathway_id": pathway["pathway_id"],
+            **build_route_visibility(
+                state=pathway["state"],
+                definition=pathway["definition"],
+            ),
+        }
 
     def get_evidence(self, pathway_id: str, *, limit: int = 500) -> list[dict[str, Any]]:
         pathway_id = _required_id(pathway_id)
