@@ -2,7 +2,7 @@
 
 ## Supported release
 
-Security reports are accepted for the current public alpha candidate `0.1.0a2`, Freeze ID `RPR-CF-2026-08-01-02`.
+Security reports are accepted for the current published public alpha `0.1.0a5`, Freeze ID `RPR-CF-2026-08-02-01`.
 
 ## Reporting
 
@@ -25,7 +25,11 @@ RPR does not claim to provide a production identity provider, secret manager, ne
 
 ## Ambiguous external effects
 
-When transport failure occurs after dispatch, treat the result as potentially applied. Preserve evidence, stop automatic continuation, perform independent readback or reconciliation, and route unresolved cases to an authorized Human Gate. Do not retry merely to demonstrate the issue.
+When transport failure occurs after dispatch, treat the result as potentially applied. Preserve evidence, stop automatic continuation, and perform independent readback or reconciliation.
+
+If the effect remains unresolved, preserve it under an explicit Responsibility Route. The correct next state may be a reconciliation hold, bounded Human Return, another explicitly delegated eligible receiver, or stop-and-preserve-residue. Do not manufacture a Human Gate merely because the outcome is uncertain, and do not retry merely to demonstrate the issue.
+
+Evidence transfer, receiver capability, transport success, or recovered state do not create Authority. Any next receiver must be eligible for the bounded action and must operate within declared delegation.
 
 ## Disclosure
 
