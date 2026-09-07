@@ -139,6 +139,7 @@ def test_server_exposes_only_read_only_tools(tmp_path):
             "rpr.get_status",
             "rpr.list_pathways",
             "rpr.get_pathway",
+            "rpr.get_route_visibility",
             "rpr.get_evidence",
             "rpr.list_unresolved",
         ]
@@ -147,6 +148,33 @@ def test_server_exposes_only_read_only_tools(tmp_path):
             for name in names
             for fragment in ("approve", "execute", "reconcile", "resume", "transition", "write")
         )
+    finally:
+        read_model.close()
+
+
+def test_route_visibility_tool_is_read_only_and_non_authorizing(tmp_path):
+    read_model, server = _server(tmp_path)
+    try:
+        _initialize(server)
+        response = server.handle(
+            {
+                "jsonrpc": "2.0",
+                "id": 6,
+                "method": "tools/call",
+                "params": {
+                    "name": "rpr.get_route_visibility",
+                    "arguments": {"pathway_id": "p-pending"},
+                },
+            }
+        )
+        assert response is not None
+        value = response["result"]["structuredContent"]
+        assert value["pathway_id"] == "p-pending"
+        assert value["compatibility_route"] == "bounded_human_return"
+        assert value["declared_route"] is None
+        assert value["authority_inferred"] is False
+        assert value["human_return_point"] == "operator_console"
+        assert value["residual_owner"] == "owner"
     finally:
         read_model.close()
 
