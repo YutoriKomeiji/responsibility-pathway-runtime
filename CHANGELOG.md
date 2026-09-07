@@ -1,14 +1,14 @@
 <!--
 Language: English
 Document-Type: Changelog
-Status: Candidate
+Status: Release Approved / Publication Pending
 -->
 
 # Changelog
 
 All notable changes to Responsibility Pathway Runtime are recorded here.
 
-## [0.1.0a6] - Release candidate / unpublished
+## [0.1.0a6] - Release approved / publication pending
 
 ### Added
 
@@ -32,19 +32,24 @@ All notable changes to Responsibility Pathway Runtime are recorded here.
 - the main quality workflow uses cheap preflight before full runtime/package/demo, then Lean and reproducible-artifact verification;
 - duplicate `fix/**` push validation was removed, stale runs are cancelled by concurrency, and Pages uses a relevance classifier to avoid expensive browser/wheel validation for unrelated PR deltas.
 
-### Evidence boundary
+### Evidence
 
 - product-quality repair PR #46 was merged to `main` as `13bea0ae7d67c9507db7d8a1983dea1c57803a5c` after exact-head PR validation;
-- repaired `main` subsequently passed full runtime/package/demo validation, reproducible-artifact verification, Lean 4/cross-model checks, and English/Japanese browser/Pyodide Responsibility Routing verification before this fresh candidate was prepared;
-- this candidate must still produce its own exact-head CI and artifact evidence; evidence from repaired `main` is predecessor evidence, not candidate evidence;
-- `CLM-13` remains evidence-bounded and must not be promoted beyond the retained exact candidate evidence.
+- fresh candidate head `10e1d45a545c743019475bda5e536d757c3a377d` passed Public export quality #331 and Pages #133;
+- full standalone suite passed with 477 tests; production-grade demo tests passed with 4 tests;
+- Lean 4/cross-model parity, English/Japanese browser/Pyodide Responsibility Routing E2E, clean wheel installation, and reproducible artifact verification passed;
+- retained candidate wheel SHA256 is `99098c30f681ebde36f6843aab5816268405f488a7dd034f0013afedd9e076f9`;
+- retained candidate sdist SHA256 is `f8732ccb502d97785d140f45a43e11272c5788ceb9f3d9d0ea11efec2655ebdf`;
+- fresh candidate PR #47 was merged to `main` as `b6e75fca5ef6fde1c5a359664463a213d1a70716`;
+- explicit Master Human Gate authorization for `0.1.0a6` Public Alpha release, GitHub prerelease, and PyPI publication was granted on 2026-09-07.
 
 ### Release boundary
 
-- `0.1.0a6` is not published by this changelog entry;
-- the currently published product remains `0.1.0a5` until explicit release approval and publication readback complete;
-- no release approval marker, tag, GitHub Release, PyPI publication authorization, production-ready claim, enterprise-ready claim, legal/compliance certification, universal exactly-once claim, or full-formal-verification claim is created by candidate preparation;
-- tag creation, GitHub Release publication, and PyPI publication remain an explicit Master Human Gate.
+- `0.1.0a6` is release-authorized but is not yet claimed as publicly published until exact-tag GitHub prerelease, Trusted Publisher workflow, PyPI acceptance, and public readback complete;
+- `release/0.1.0a6.approved` and `release/0.1.0a6.pypi-approved` record the bounded Human Gate authorization;
+- the currently published product remains `0.1.0a5` until publication readback completes;
+- publication does not add a production-ready, enterprise-ready, legal/compliance certification, universal exactly-once, customer-environment, or full-formal-verification claim;
+- later tags, GitHub Releases, binary publication, and stronger product claims remain separately Human-Gated.
 
 ## [0.1.0a5] - 2026-08-31
 
