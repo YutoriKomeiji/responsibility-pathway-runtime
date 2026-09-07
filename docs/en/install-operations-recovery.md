@@ -2,7 +2,7 @@
 Document Title: RPR Installation Operations and Recovery
 Document Type: Public Product Guide
 Status: Public Alpha
-Version: 0.1.0a5
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
@@ -10,7 +10,7 @@ Body Language: English
 
 # Installation, operation, and recovery
 
-This guide describes recommended integration practices for published `0.1.0a5` and the current repository source boundary. It is not a hosted service commitment, managed-operations agreement, or warranty. RPR is provided under the [MIT License](../../LICENSE).
+This guide describes recommended integration practices for published `0.1.0a6` and the current repository source boundary. It is not a hosted service commitment, managed-operations agreement, or warranty. RPR is provided under the [MIT License](../../LICENSE).
 
 ## Deployment baseline
 
