@@ -6,14 +6,48 @@ on:
     branches:
       - main
       - release/**
-      - fix/**
+
+# Cost control: for an open PR, keep only the newest run alive. Branch pushes under
+# fix/** are intentionally not a second trigger; the pull_request run is authoritative.
+concurrency:
+  group: public-export-quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
+  preflight:
+    name: Cheap preflight / 軽量事前検証
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate public export and terminology
+        run: python tools/validate_public_export.py
+      - name: Compile shipped Python sources
+        run: python -m compileall -q tools src examples tests
+      - name: Check bilingual static site entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s site/index.html
+          test -s site/ja.html
+          test -s site/styles.css
+          test -s site/app.js
+          grep -F 'href="ja.html"' site/index.html
+          grep -F 'href="index.html"' site/ja.html
+          grep -F 'prefers-reduced-motion' site/styles.css
+          grep -F 'lang="en"' site/index.html
+          grep -F 'lang="ja"' site/ja.html
+
   runtime-package-validation:
     name: Complete runtime, package, and demo validation / Runtime・Package・Demo完全検証
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,6 +80,7 @@ jobs:
 
   reproducible-artifacts:
     name: Reproducible artifact verification / 配布物再現性検証
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -115,6 +150,7 @@ jobs:
 
   formal-validation:
     name: Lean 4 and cross-model validation / Lean 4・モデル整合検証
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -140,43 +176,9 @@ jobs:
       - name: Verify JSON, Python, and Lean parity
         run: python -m pytest -q tests/test_formal_consistency.py tests/test_canonical_transition_spec.py
 
-  structural-validation:
-    name: Structural and bilingual validation / 構造・日英検証
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Validate public export and terminology
-        run: python tools/validate_public_export.py
-      - name: Compile shipped Python sources
-        run: python -m compileall -q tools src examples tests
-
-  site-validation:
-    name: Static site validation / 静的site検証
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Check bilingual entry points
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s site/index.html
-          test -s site/ja.html
-          test -s site/styles.css
-          test -s site/app.js
-          grep -F 'href="ja.html"' site/index.html
-          grep -F 'href="index.html"' site/ja.html
-          grep -F 'prefers-reduced-motion' site/styles.css
-          grep -F 'lang="en"' site/index.html
-          grep -F 'lang="ja"' site/ja.html
-
   release-gate-placeholder:
     name: Release gate declaration / Release Gate宣言
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - name: Confirm final release remains human-approved
