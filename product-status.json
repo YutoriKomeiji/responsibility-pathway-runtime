@@ -13,7 +13,7 @@
   "blocker_issue": null,
   "candidate": {
     "version": "0.1.0a6",
-    "state": "approved-for-publication",
+    "state": "release-approved",
     "source_base": "0.1.0a5",
     "repair_main_commit": "13bea0ae7d67c9507db7d8a1983dea1c57803a5c",
     "candidate_merge_commit": "b6e75fca5ef6fde1c5a359664463a213d1a70716",
