@@ -47,6 +47,61 @@ class RuntimeDecision(StrEnum):
     DENY = "deny"
 
 
+class ResponsibilityRouteClass(StrEnum):
+    CONTINUE_AUTONOMOUSLY = "continue_autonomously"
+    AI_RESOLVE_WITHIN_DELEGATION = "ai_resolve_within_delegation"
+    HOLD_FOR_RECONCILIATION = "hold_for_reconciliation"
+    BOUNDED_HUMAN_RETURN = "bounded_human_return"
+    STOP_AND_PRESERVE_RESIDUE = "stop_and_preserve_residue"
+
+
+class ReceiverEligibility(StrEnum):
+    ELIGIBLE = "eligible"
+    INELIGIBLE = "ineligible"
+    REQUIRES_REEVALUATION = "requires_reevaluation"
+
+
+@dataclass(frozen=True)
+class ResponsibilityRoute:
+    route_class: ResponsibilityRouteClass
+    source_holder: str
+    destination: str
+    receiver_eligibility: ReceiverEligibility
+    authority_class: str
+    delegation_scope: str
+    unresolved_payload: tuple[str, ...]
+    allowed_next_actions: tuple[str, ...]
+    closure_condition: str
+    reevaluation_condition: str
+    residual_owner: str
+    expires_at: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        value = asdict(self)
+        value["route_class"] = self.route_class.value
+        value["receiver_eligibility"] = self.receiver_eligibility.value
+        value["unresolved_payload"] = list(self.unresolved_payload)
+        value["allowed_next_actions"] = list(self.allowed_next_actions)
+        return value
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> "ResponsibilityRoute":
+        return cls(
+            route_class=ResponsibilityRouteClass(value["route_class"]),
+            source_holder=str(value["source_holder"]),
+            destination=str(value["destination"]),
+            receiver_eligibility=ReceiverEligibility(value["receiver_eligibility"]),
+            authority_class=str(value["authority_class"]),
+            delegation_scope=str(value["delegation_scope"]),
+            unresolved_payload=tuple(str(item) for item in value.get("unresolved_payload", [])),
+            allowed_next_actions=tuple(str(item) for item in value.get("allowed_next_actions", [])),
+            closure_condition=str(value["closure_condition"]),
+            reevaluation_condition=str(value["reevaluation_condition"]),
+            residual_owner=str(value["residual_owner"]),
+            expires_at=None if value.get("expires_at") is None else str(value["expires_at"]),
+        )
+
+
 @dataclass(frozen=True)
 class PathwayDefinition:
     pathway_id: str
@@ -62,13 +117,20 @@ class PathwayDefinition:
     resume_authority: str
     human_return_point: str
     residual_owner: str
+    responsibility_route: ResponsibilityRoute | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        value = asdict(self)
+        value["action_class"] = self.action_class.value
+        value["environment_trust"] = self.environment_trust.value
+        if self.responsibility_route is not None:
+            value["responsibility_route"] = self.responsibility_route.to_dict()
+        return value
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "PathwayDefinition":
+        route_value = value.get("responsibility_route")
         return cls(
             pathway_id=str(value["pathway_id"]),
             action_name=str(value["action_name"]),
@@ -83,6 +145,7 @@ class PathwayDefinition:
             resume_authority=str(value["resume_authority"]),
             human_return_point=str(value["human_return_point"]),
             residual_owner=str(value["residual_owner"]),
+            responsibility_route=None if route_value is None else ResponsibilityRoute.from_dict(route_value),
             metadata=dict(value.get("metadata", {})),
         )
 
@@ -103,6 +166,7 @@ class InspectionResult:
     degradation_mode: str
     next_required_authority: str | None = None
     next_required_action: str | None = None
+    responsibility_route_available: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -113,4 +177,5 @@ class InspectionResult:
             "degradation_mode": self.degradation_mode,
             "next_required_authority": self.next_required_authority,
             "next_required_action": self.next_required_action,
+            "responsibility_route_available": self.responsibility_route_available,
         }
