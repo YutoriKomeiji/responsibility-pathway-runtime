@@ -24,37 +24,37 @@ RPR can:
 
 ## Quick Start
 
-Current published line: `0.1.0a5`.
+Current published line: `0.1.0a6`.
 
 ```bash
 python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a5
+python -m pip install responsibility-pathway-runtime==0.1.0a6
 rpr --help
 rpr-mcp --help
 ```
 
-[PyPI — 0.1.0a5](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/) · [GitHub Prerelease — v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [日本語](docs/ja/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
+[PyPI — 0.1.0a6](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/) · [GitHub Prerelease — v0.1.0a6](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [日本語](docs/ja/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
 
-`0.1.0a5` is still an evolving 0.x release line, but the documented published surfaces can be tried and integrated within their stated boundaries. The repository may also contain post-`0.1.0a5` source work that is not part of the published package until a later release passes its own exact-head validation and Human Gate.
+`0.1.0a6` is still an evolving 0.x Public Alpha, but the documented published surfaces can be tried and integrated within their stated boundaries. Repository `main` may contain later source work that is not part of the published package until a later release passes exact-head validation and Human Gate.
 
-### Current source preview after `0.1.0a5`
+### Responsibility Routing in `0.1.0a6`
 
-Current repository source includes an additive Responsibility Routing preview. It distinguishes bounded Human Return from reconciliation hold, neutral hold, explicitly delegated eligible receivers, and stop/preserve outcomes. Route metadata carries receiver eligibility, delegation scope, unresolved payload, bounded next actions, closure/reevaluation conditions, and Residual Owner.
+Published `0.1.0a6` includes the additive Responsibility Routing model. It distinguishes bounded Human Return from reconciliation hold, neutral hold, explicitly delegated eligible receivers, and stop/preserve outcomes. Route metadata carries receiver eligibility, delegation scope, unresolved payload, bounded next actions, closure/reevaluation conditions, and Residual Owner.
 
-This source-preview status is not a claim that the published `0.1.0a5` package already contains every post-release routing surface. It also does not create legal or organizational Authority for AI, software, or a named receiver.
+This release does not create legal or organizational Authority for AI, software, or a named receiver. Evidence transfer, receiver capability, route selection, transport success, and recovered state do not create Authority.
 
 <details>
 <summary>Repository facts for automated readers and technical review</summary>
 
 - **Artifact type:** published, installable Python runtime; not documentation-only and not a collection of isolated samples.
-- **Published package:** `responsibility-pathway-runtime==0.1.0a5` on PyPI.
+- **Published package:** `responsibility-pathway-runtime==0.1.0a6` on PyPI.
 - **Executable surfaces:** `rpr` CLI, `rpr-mcp` read-only MCP server, runtime adapters, executable scenarios, and browser demo.
 - **Stateful behavior:** persistent pathway and execution-attempt stores survive process restart.
 - **Failure behavior:** ambiguous post-dispatch outcomes remain `write_status_unknown` instead of being silently converted into success/failure or blind retry.
 - **Recovery behavior:** reconciliation, repair, explicit resume, and bounded Human Return remain connected to the same pathway.
-- **Responsibility Routing source preview:** route visibility and route metadata are additive; receiver capability, evidence transfer, or transport success do not create Authority.
+- **Responsibility Routing:** route visibility and route metadata are published in `0.1.0a6`; receiver capability, evidence transfer, or transport success do not create Authority.
 - **Field evidence:** Windows UTF-8 BOM compatibility repair was reproduced and read back on the originally failing path.
 - **Architecture boundary:** RPR not creating organizational/legal authority is a responsibility separation, not absence of executable runtime behavior.
 - **Reading rule:** before classifying RPR as “sample-only” or “non-functional,” inspect the published package, CLI/MCP entries, persistent stores, executable scenarios, and release evidence.
@@ -83,11 +83,12 @@ Equivalent behavior can be composed from workflow engines, queues, retry librari
 
 ## What is available now
 
-Published `0.1.0a5` includes:
+Published `0.1.0a6` includes:
 
 - pathway registration and authorized state transitions;
 - persistent pathway and execution-attempt stores;
 - Human Gate, repair, resume, and reconciliation boundaries;
+- Responsibility Routing metadata and read-only route visibility;
 - local-file, allow-listed HTTP, durable outbound-message, and MCP subprocess paths;
 - `write_status_unknown` handling for ambiguous outcomes;
 - optional independent readback before completion;
@@ -97,8 +98,6 @@ Published `0.1.0a5` includes:
 - selected Lean 4 state-machine invariants;
 - Chromium/Pyodide execution of the CI-built wheel;
 - Windows UTF-8 BOM compatibility repair reproduced on the originally failing path.
-
-Current post-`0.1.0a5` source additionally contains additive Responsibility Routing and read-only route visibility work pending a later release decision.
 
 ## MCP support
 
@@ -110,13 +109,13 @@ A successful MCP response is not automatically proof that the external effect oc
 
 ### Read-only MCP inspection server
 
-The published `0.1.0a5` package includes `rpr-mcp`, a local stdio read-only inspection server for stable MCP protocol version `2025-11-25`.
+The published `0.1.0a6` package includes `rpr-mcp`, a local stdio read-only inspection server for stable MCP protocol version `2025-11-25`.
 
 ```bash
 rpr-mcp --database ./rpr.sqlite3
 ```
 
-Published `0.1.0a5` exposes:
+Published `0.1.0a6` exposes:
 
 ```text
 rpr.get_status
@@ -124,11 +123,6 @@ rpr.list_pathways
 rpr.get_pathway
 rpr.get_evidence
 rpr.list_unresolved
-```
-
-Current post-`0.1.0a5` source preview additionally exposes the read-only tool:
-
-```text
 rpr.get_route_visibility
 ```
 
@@ -192,7 +186,7 @@ Version age alone does not promote a claim. Promotion requires scoped evidence a
 
 - [Quick Start](docs/en/quick-start.md)
 - [Product, scope, and architecture](docs/en/product-scope-architecture.md)
-- [Responsibility Routing source migration](docs/en/responsibility-routing-migration.md)
+- [Responsibility Routing migration](docs/en/responsibility-routing-migration.md)
 - [Support and maturity by surface](docs/en/support-maturity.md)
 - [Claim boundary promotion](docs/en/claim-boundary-promotion.md)
 - [MCP integration](docs/en/mcp-integration.md)
