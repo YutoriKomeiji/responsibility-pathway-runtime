@@ -11,26 +11,16 @@
   "release_approved": true,
   "publication_blocked": false,
   "blocker_issue": null,
-  "candidate": {
+  "candidate": null,
+  "release_evidence": {
     "version": "0.1.0a6",
-    "state": "published",
     "source_base": "0.1.0a5",
     "repair_main_commit": "13bea0ae7d67c9507db7d8a1983dea1c57803a5c",
     "candidate_merge_commit": "b6e75fca5ef6fde1c5a359664463a213d1a70716",
     "candidate_exact_head": "10e1d45a545c743019475bda5e536d757c3a377d",
     "release_commit": "9f71a34f5d7eb0e25359ccf31d0c6d85570203d8",
-    "reason": "Responsibility Routing semantics and visibility after repository-wide product-quality repair",
-    "release_approved": true,
-    "publication_blocked": false,
-    "exact_head_validation": "passed",
-    "artifact_evidence": "retained",
-    "independent_candidate_audit": "passed",
     "release_authorization": "Master Human Gate approved 2026-09-07",
-    "publication_status": "published-and-publicly-read-back"
-  },
-  "release_evidence": {
     "tag": "v0.1.0a6",
-    "tag_commit": "9f71a34f5d7eb0e25359ccf31d0c6d85570203d8",
     "github_prerelease": "https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6",
     "pypi": "https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/",
     "publish_workflow_run": 34087946734,
