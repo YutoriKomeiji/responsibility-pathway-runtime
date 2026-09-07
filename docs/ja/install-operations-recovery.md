@@ -2,7 +2,7 @@
 Document Title: RPR 導入・運用・復旧
 Document Type: Public Product Guide
 Status: Public Alpha
-Version: 0.1.0a5
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: Japanese
 Body Language: Japanese
@@ -10,7 +10,7 @@ Body Language: Japanese
 
 # 導入・運用・復旧
 
-この文書は、公開済み`0.1.0a5`と現行repository source境界における推奨integration / operation手順を示します。Hosted service、managed operation、support SLA、保証を提供するものではありません。RPRは[`MIT License`](../../LICENSE)に基づいて提供されます。
+この文書は、公開済み`0.1.0a6`と現行repository source境界における推奨integration / operation手順を示します。Hosted service、managed operation、support SLA、保証を提供するものではありません。RPRは[`MIT License`](../../LICENSE)に基づいて提供されます。
 
 ## Deployment baseline
 
