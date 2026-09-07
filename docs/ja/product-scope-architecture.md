@@ -1,8 +1,8 @@
 <!--
 Document Title: RPR 製品範囲とarchitecture
 Document Type: Public Product Guide
-Status: Public Alpha with Post-Release Source Preview
-Version: 0.1.0a5
+Status: Public Alpha
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: Japanese
 Body Language: Japanese
@@ -50,7 +50,7 @@ Host ApplicationまたはAgent
   -> complete | write_status_unknown | repair | reconcile | bounded human gate | hold
 ```
 
-公開済み`0.1.0a5`にはlocal read-only `rpr-mcp` inspection serverも含まれます。現行post-`0.1.0a5` sourceは`rpr.get_route_visibility`を追加していますが、これは次release承認前のsource previewです。Remote MCP Service、Hosted Transport、企業Identity、Service固有readbackは環境ごとの評価が必要です。
+公開済み`0.1.0a6`にはlocal read-only `rpr-mcp` inspection serverと`rpr.get_route_visibility`が含まれます。Remote MCP Service、Hosted Transport、企業Identity、Service固有readbackは環境ごとの評価が必要です。
 
 ## State、route、Evidenceの原則
 
@@ -75,11 +75,11 @@ Host applicationは、許可action、authentication / authorization、receiver e
 
 Responsibility Pathway Engineering（RPE）はexternal gate decisionを提供できます。RPEはactionを実行せず、RPRのexecution Evidenceを置き換えません。RPE不在、malformed output、unsupported version、inapplicable resultは、implicit permissionやinvented human destinationへ変換せずfail closedで扱います。一方、明示的にconfiguredされたhigh-impact Human Gateが自身のAuthority条件から必要な場合、そのbounded Human Gateは維持されます。
 
-## Published releaseとsource previewの境界
+## Published releaseの境界
 
-公開済みpackageは`0.1.0a5`です。Repository sourceには次package承認前のpost-release Responsibility Routing workが含まれる場合があります。Sourceが存在するだけでは、package contract、release Evidence、support maturityは昇格しません。
+現在の公開済みpackageは`0.1.0a6`です。Repository sourceには次package承認前のworkが含まれる場合があります。Sourceが存在するだけでは、package contract、release Evidence、support maturityは昇格しません。
 
-次releaseには、修復済み`main`から再構築したfresh candidate、exact-head test / document / claim validation、明示的Human Gate approvalが必要です。
+次releaseには、`main`から再構築したfresh candidate、exact-head test / document / claim validation、明示的Human Gate approvalが必要です。
 
 ## Licenseと非主張
 
