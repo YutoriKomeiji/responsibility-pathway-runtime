@@ -1,14 +1,14 @@
 <!--
 Language: English
 Document-Type: Changelog
-Status: Release Approved / Publication Pending
+Status: Published Public Alpha
 -->
 
 # Changelog
 
 All notable changes to Responsibility Pathway Runtime are recorded here.
 
-## [0.1.0a6] - Release approved / publication pending
+## [0.1.0a6] - 2026-09-07
 
 ### Added
 
@@ -23,12 +23,13 @@ All notable changes to Responsibility Pathway Runtime are recorded here.
 - non-human routes no longer require a legacy Human Return point merely to be valid, while bounded Human Return / high-impact cases still require a concrete return point;
 - stale EN/JA product documentation, MCP descriptions, release identities, formal-scope language, and production-demo claims were reconciled with implemented source semantics;
 - runtime recreation is no longer described as OS-process restart evidence where no process-level test exists;
-- the Responsibility Routing claim/test registry now binds the new feature to executable unit/component/integration/product/browser evidence without overstating Lean coverage.
+- the Responsibility Routing claim/test registry now binds the new feature to executable unit/component/integration/product/browser evidence without overstating Lean coverage;
+- PyPI package metadata now uses a release-specific long description so pre-publication package validation does not require the repository public-current README to claim publication before readback.
 
 ### Product-quality and CI controls
 
 - the repository-wide repair established a release flow from requirement/design through source, unit, component, integration, system/E2E, persistence/restart, API/MCP/CLI, EN/JA public surfaces, claim/evidence registries, exact-head CI, and Human Gate;
-- public-export validation now detects bilingual/version/routing semantic drift;
+- public-export validation detects bilingual/version/routing semantic drift;
 - the main quality workflow uses cheap preflight before full runtime/package/demo, then Lean and reproducible-artifact verification;
 - duplicate `fix/**` push validation was removed, stale runs are cancelled by concurrency, and Pages uses a relevance classifier to avoid expensive browser/wheel validation for unrelated PR deltas.
 
@@ -38,16 +39,21 @@ All notable changes to Responsibility Pathway Runtime are recorded here.
 - fresh candidate head `10e1d45a545c743019475bda5e536d757c3a377d` passed Public export quality #331 and Pages #133;
 - full standalone suite passed with 477 tests; production-grade demo tests passed with 4 tests;
 - Lean 4/cross-model parity, English/Japanese browser/Pyodide Responsibility Routing E2E, clean wheel installation, and reproducible artifact verification passed;
-- retained candidate wheel SHA256 is `99098c30f681ebde36f6843aab5816268405f488a7dd034f0013afedd9e076f9`;
-- retained candidate sdist SHA256 is `f8732ccb502d97785d140f45a43e11272c5788ceb9f3d9d0ea11efec2655ebdf`;
 - fresh candidate PR #47 was merged to `main` as `b6e75fca5ef6fde1c5a359664463a213d1a70716`;
-- explicit Master Human Gate authorization for `0.1.0a6` Public Alpha release, GitHub prerelease, and PyPI publication was granted on 2026-09-07.
+- explicit Master Human Gate authorization for `0.1.0a6` Public Alpha release, GitHub prerelease, and PyPI publication was granted on 2026-09-07;
+- a first publication attempt stopped before PyPI upload at the rendered long-description gate; no package was published from that attempt;
+- PR #49 repaired that circular package-metadata contract and merged as release commit `9f71a34f5d7eb0e25359ccf31d0c6d85570203d8` after exact-head full validation;
+- tag `v0.1.0a6` points to that release commit and GitHub prerelease `RPR v0.1.0a6` was published;
+- normal `release: published` Trusted Publisher workflow run `34087946734` completed successfully;
+- PyPI accepted both artifacts with `200 OK` and public human readback confirmed the `0.1.0a6` project page and file details;
+- published wheel SHA256 is `3db42d6d1289e2a1f1a20afc8d181a7bc433dcbb8e7ea87416415192a6ca6cb2`;
+- published sdist SHA256 is `0690b9ea23831ea5dc24578accecb68fccc7a0737bbf71facdd09be629f0874f`;
+- PyPI Trusted Publishing and digital attestations are present for the published files.
 
 ### Release boundary
 
-- `0.1.0a6` is release-authorized but is not yet claimed as publicly published until exact-tag GitHub prerelease, Trusted Publisher workflow, PyPI acceptance, and public readback complete;
+- `0.1.0a6` is the current published Public Alpha;
 - `release/0.1.0a6.approved` and `release/0.1.0a6.pypi-approved` record the bounded Human Gate authorization;
-- the currently published product remains `0.1.0a5` until publication readback completes;
 - publication does not add a production-ready, enterprise-ready, legal/compliance certification, universal exactly-once, customer-environment, or full-formal-verification claim;
 - later tags, GitHub Releases, binary publication, and stronger product claims remain separately Human-Gated.
 
