@@ -1,8 +1,8 @@
 <!--
 Document Title: RPR Product Scope and Architecture
 Document Type: Public Product Guide
-Status: Public Alpha with Post-Release Source Preview
-Version: 0.1.0a5
+Status: Public Alpha
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
@@ -50,7 +50,7 @@ host application or agent
   -> complete | write_status_unknown | repair | reconcile | bounded human gate | hold
 ```
 
-Published `0.1.0a5` also includes the local read-only `rpr-mcp` inspection server. Current post-`0.1.0a5` source adds `rpr.get_route_visibility`; that tool is source-preview work pending a later release decision. Remote MCP services, hosted transports, enterprise identity, and service-specific readback require environment-specific evaluation.
+Published `0.1.0a6` includes the local read-only `rpr-mcp` inspection server and `rpr.get_route_visibility`. Remote MCP services, hosted transports, enterprise identity, and service-specific readback require environment-specific evaluation.
 
 ## State, route, and evidence principles
 
@@ -75,11 +75,11 @@ The host application defines permitted actions, authentication/authorization, re
 
 Responsibility Pathway Engineering (RPE) may provide an external gate decision. RPE does not execute the action or replace RPR execution evidence. Missing, malformed, unsupported, or inapplicable RPE output must fail closed without becoming implicit permission or an invented human destination. An explicitly configured high-impact Human Gate remains valid when its own authority conditions require one.
 
-## Published-release versus source-preview boundary
+## Published-release boundary
 
-The published package is `0.1.0a5`. Repository source may contain post-release Responsibility Routing work before a later package is approved. Source availability does not by itself promote the package contract, release evidence, or support maturity.
+The current published package is `0.1.0a6`. Repository source may contain later work before another package is approved. Source availability does not by itself promote the package contract, release evidence, or support maturity.
 
-A later release requires a fresh candidate rebuilt from repaired `main`, exact-head test/document/claim validation, and explicit Human Gate approval.
+A later release requires a fresh candidate rebuilt from `main`, exact-head test/document/claim validation, and explicit Human Gate approval.
 
 ## License and non-claims
 
