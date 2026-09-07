@@ -142,7 +142,7 @@
       "status": "implemented_unverified",
       "evidence_level": "E1",
       "implementation_anchors": ["src/rpr/models.py", "src/rpr/inspection.py", "src/rpr/routing.py", "src/rpr/route_visibility.py", "src/rpr/runtime.py"],
-      "test_ids": ["RPR-RTE-001", "RPR-RTE-002", "RPR-RTE-003", "RPR-RTE-004", "E2E-ROUTE-01"],
+      "test_ids": ["RPR-RTE-001", "RPR-RTE-002", "RPR-RTE-003", "RPR-RTE-004", "RPR-RTE-005", "RPR-RTE-006", "RPR-RTE-007", "RPR-RTE-008", "E2E-ROUTE-01", "E2E-ROUTE-02"],
       "evidence_ids": ["EV-CODE"],
       "residual_owner": "Akihisa Ono",
       "permitted_wording": "Current RPR source represents bounded Responsibility Routing, preserves receiver eligibility and Residual Owner metadata, and does not infer Authority from route or evidence transfer; release-level assurance remains pending exact-head validation.",
