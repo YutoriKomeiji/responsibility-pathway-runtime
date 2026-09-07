@@ -116,13 +116,12 @@ def test_inspection_serialization_includes_next_operational_step():
     value = inspect_pathway(pathway()).to_dict()
     assert value["next_required_authority"] == "approver"
     assert value["next_required_action"] == "perform_explicit_human_review"
-    assert value["responsibility_route_available"] is False
+    assert "responsibility_route_available" not in value
 
 
-def test_additive_responsibility_route_is_visible_without_replacing_human_gate_semantics():
+def test_additive_responsibility_route_does_not_replace_human_gate_semantics():
     result = inspect_pathway(pathway(responsibility_route=route()))
     assert result.valid
-    assert result.responsibility_route_available is True
     assert result.decision is RuntimeDecision.HUMAN_GATE
 
 
