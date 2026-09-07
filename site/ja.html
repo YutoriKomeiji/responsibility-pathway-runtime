@@ -17,11 +17,11 @@
   <main id="main">
     <section class="hero" id="top">
       <div class="hero-copy">
-        <p class="eyebrow">MIT License · 公開版 0.1.0a5</p>
+        <p class="eyebrow">MIT License · 公開版 0.1.0a6</p>
         <h1>AIの外部操作を、止める。確かめる。責任の行き先を曖昧にしない。</h1>
         <p class="lede">RPRは、AIエージェントや自動処理がファイル、API、メッセージ、業務システムを変更するときに、誰のAuthorityで実行したか、何が起きたか、結果をどう確かめたか、失敗後にどのResponsibility Routeで処理を継続するかを一つの経路として残すPython Runtimeです。Human Returnはbounded routeの一つであり、すべての不確実性のgeneric fallbackではありません。</p>
-        <div class="actions"><a class="button primary" href="https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/">PyPIから導入する</a><a class="button secondary" href="demo.html">実RPRデモを動かす</a></div>
-        <dl class="release-facts" aria-label="公開情報"><div><dt>公開版</dt><dd>0.1.0a5</dd></div><div><dt>Tag</dt><dd>v0.1.0a5</dd></div><div><dt>Source</dt><dd>post-a5 routing preview</dd></div></dl>
+        <div class="actions"><a class="button primary" href="https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/">PyPIから導入する</a><a class="button secondary" href="demo.html">実RPRデモを動かす</a></div>
+        <dl class="release-facts" aria-label="公開情報"><div><dt>公開版</dt><dd>0.1.0a6</dd></div><div><dt>Tag</dt><dd>v0.1.0a6</dd></div><div><dt>Routing</dt><dd>a6で公開済み</dd></div></dl>
       </div>
       <div class="pathway-card" aria-label="責任経路図"><div class="node">操作の提案</div><span>↓</span><div class="node">Actor + Authority</div><span>↓</span><div class="node accent">RPR Pathway</div><span>↓</span><div class="node">実行 + readback</div><span>↓</span><div class="node">Evidence · Responsibility Routing · Residual Owner</div></div>
     </section>
@@ -33,7 +33,7 @@
         <article><h3>Attempt continuity</h3><p>Operation、attempt、idempotency identityを保存し、restartやretry後も同じ外部作用を無自覚に二重実行しません。</p></article>
         <article><h3>Independent readback</h3><p>関数の戻り値やHTTP/MCP応答だけで完了にせず、変更先をreadbackして期待したeffectを確認します。</p></article>
         <article><h3>Fail-closed ambiguity</h3><p>Write後に通信が切れた場合は<code>write_status_unknown</code>として保存し、根拠のない成功判定や自動再送を防ぎます。</p></article>
-        <article><h3>Responsibility Routing</h3><p>現行sourceはreconciliation hold、eligible delegated receiver、bounded Human Return、stop/preserveを区別します。Fail closedは自動的にHuman Gateを意味しません。</p></article>
+        <article><h3>Responsibility Routing</h3><p>公開済み0.1.0a6はreconciliation hold、eligible delegated receiver、bounded Human Return、stop/preserveを区別します。Fail closedは自動的にHuman Gateを意味しません。</p></article>
         <article><h3>Residual ownership</h3><p>未解決effectや元に戻せない影響が残る場合も、unresolved payloadとResidual Ownerを暗黙に消しません。</p></article>
       </div>
     </section>
@@ -44,8 +44,8 @@
     </section>
 
     <section class="section split" id="mcp">
-      <div><p class="eyebrow">現在のMCP対応</p><h2>MCPの応答だけで「external effectも成功した」と決めない。</h2><p>公開済み<code>0.1.0a5</code>は、Local MCP Serverへのoutbound経路と、read-only <code>rpr-mcp</code> inspection serverを含みます。Subprocess、stdio、JSON-RPC framing、Server/Tool binding、Execution Attempt continuity、ambiguous outcomeのfail-closed処理を提供します。</p><p>現行post-a5 sourceは、read-only Responsibility Routing visibilityをpreviewします。変更を伴うToolでは、必要なreadbackなしにcompletionへ進みません。</p><div class="actions"><a class="button primary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/docs/ja/mcp-integration.md">MCP統合ガイドを読む</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues/new/choose">MCPの動作結果を報告する</a></div></div>
-      <aside class="boundary-card"><h3>現在の境界</h3><ul><li>Local subprocessとstdioのOutbound経路を実装済み</li><li>Server Identity、Capability、Tool Schemaを実行前にbinding</li><li>結果不明のCallを黙って再送しない</li><li><code>rpr-mcp</code>のlocal stdio read-only inspection serverを公開済み</li><li>現行sourceはread-only route visibilityをpreview</li><li>Mutating MCP Server ToolとRemote MCP Transportは未主張</li></ul></aside>
+      <div><p class="eyebrow">現在のMCP対応</p><h2>MCPの応答だけで「external effectも成功した」と決めない。</h2><p>公開済み<code>0.1.0a6</code>は、Local MCP Serverへのoutbound経路、read-only <code>rpr-mcp</code> inspection server、read-only Responsibility Routing visibilityを含みます。Subprocess、stdio、JSON-RPC framing、Server/Tool binding、Execution Attempt continuity、ambiguous outcomeのfail-closed処理を提供します。</p><p>変更を伴うToolでは、必要なreadbackなしにcompletionへ進みません。</p><div class="actions"><a class="button primary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/docs/ja/mcp-integration.md">MCP統合ガイドを読む</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues/new/choose">MCPの動作結果を報告する</a></div></div>
+      <aside class="boundary-card"><h3>現在の境界</h3><ul><li>Local subprocessとstdioのOutbound経路を実装済み</li><li>Server Identity、Capability、Tool Schemaを実行前にbinding</li><li>結果不明のCallを黙って再送しない</li><li><code>rpr-mcp</code>のlocal stdio read-only inspection serverを公開済み</li><li><code>rpr.get_route_visibility</code>をread-onlyで公開済み</li><li>Mutating MCP Server ToolとRemote MCP Transportは未主張</li></ul></aside>
     </section>
 
     <section class="section split" id="demo">
@@ -59,14 +59,14 @@
     </section>
 
     <section class="section quick-start" id="start">
-      <div><p class="eyebrow">導入方法</p><h2>公開済み0.1.0a5をPyPIから、影響のない環境で試してください。</h2><p>Repository sourceにはpost-release workが含まれる場合があります。Fresh candidateのexact-head validationとHuman Gateを通過するまで、公開packageとsource previewを同一視しません。</p></div>
+      <div><p class="eyebrow">導入方法</p><h2>公開済み0.1.0a6をPyPIから、影響のない環境で試してください。</h2><p>Repository sourceには次release向けworkが含まれる場合があります。Fresh candidateのexact-head validationとHuman Gateを通過するまで、公開packageと未公開sourceを同一視しません。</p></div>
       <pre><code>python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a5
+python -m pip install responsibility-pathway-runtime==0.1.0a6
 rpr --help
 rpr-mcp --help</code></pre>
-      <div class="actions"><a class="button primary" href="https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/">PyPIを開く</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5">Prereleaseを見る</a></div>
+      <div class="actions"><a class="button primary" href="https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/">PyPIを開く</a><a class="button secondary" href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6">Prereleaseを見る</a></div>
     </section>
   </main>
   <footer><p>Responsibility Pathway Runtime · MIT License · Copyright © 2026 Akihisa Ono</p><nav aria-label="フッターナビゲーション"><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime">GitHub</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/docs/ja/mcp-integration.md">MCP統合</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/SECURITY.md">Security</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime/blob/main/CONTRIBUTING.md">Contributing</a><a href="index.html" hreflang="en" lang="en">English</a></nav></footer>
