@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "product": "Responsibility Pathway Runtime",
   "version": "0.1.0a5",
   "release_channel": "public-alpha",
@@ -12,6 +12,33 @@
   "publication_blocked": false,
   "blocker_issue": null,
   "candidate": null,
+  "source_preview": {
+    "status": "product_quality_repair_in_progress",
+    "release_promoted": false,
+    "issue": 45,
+    "feature": "Responsibility Routing",
+    "semantics": [
+      "Human Return is a bounded Responsibility Route rather than the generic fail-closed destination",
+      "neutral hold is valid when receiver eligibility or Authority is not established",
+      "Evidence transfer, capability, route selection, transport success, and recovered state do not create Authority",
+      "Residual Owner remains explicit across routing"
+    ],
+    "implemented_surfaces": [
+      "route model and serialization",
+      "inspection and fail-closed routing",
+      "SQLite persistence and route visibility",
+      "read-only MCP route visibility",
+      "unit/component/integration/product E2E tests"
+    ],
+    "blocked_by": [
+      "remaining cross-surface documentation and assurance reconciliation",
+      "exact-head full CI",
+      "English and Japanese browser route assertions",
+      "independent audit and main readback",
+      "fresh release candidate rebuild",
+      "release Human Gate"
+    ]
+  },
   "human_gate": {
     "required_for": [
       "release tags after 0.1.0a5",
@@ -48,11 +75,13 @@
     "identity or credential management",
     "exactly-once effects across arbitrary remote systems",
     "full formal verification",
-    "automatic transfer of final responsibility to the runtime"
+    "automatic transfer of final responsibility to the runtime",
+    "formal proof of Responsibility Routing receiver eligibility or delegation semantics"
   ],
   "open_release_gates": [
     "retain Human Gate for any later tag, GitHub Release, or binary publication",
     "retain Human Gate for any production-ready or enterprise-ready claim",
-    "retain customer-equivalent external-environment validation as incomplete"
+    "retain customer-equivalent external-environment validation as incomplete",
+    "do not promote post-a5 Responsibility Routing source work until exact-head product-quality validation is complete"
   ]
 }
