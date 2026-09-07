@@ -3,13 +3,23 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 
 import pytest
 
 from rpr.authority import AuthorityError
 from rpr.evidence import verify_chain
 from rpr.executor import ExecutionRequest
-from rpr.models import ActionClass, EnvironmentTrust, PathwayDefinition, PathwayState, RuntimeDecision
+from rpr.models import (
+    ActionClass,
+    EnvironmentTrust,
+    PathwayDefinition,
+    PathwayState,
+    ReceiverEligibility,
+    ResponsibilityRoute,
+    ResponsibilityRouteClass,
+    RuntimeDecision,
+)
 from rpr.rpe import AllowAllDevelopmentEvaluator, PythonRpeEvaluator, RpeContractError
 from rpr.runtime import ResponsibilityPathwayRuntime
 from rpr.storage import IdempotencyConflictError, SQLiteStore
@@ -110,3 +120,27 @@ def test_transition_and_event_are_atomic_on_event_conflict(tmp_path) -> None:
     runtime._start_execution_pathway("p-1", execution_request(), "agent")
     assert store.get_state("p-1") is PathwayState.RUNNING
     assert runtime.verify_evidence("p-1").valid
+
+
+def test_responsibility_route_round_trips_through_existing_definition_json(tmp_path) -> None:
+    store = SQLiteStore(tmp_path / "route.db")
+    runtime = ResponsibilityPathwayRuntime(store=store, rpe=AllowAllDevelopmentEvaluator())
+    route = ResponsibilityRoute(
+        route_class=ResponsibilityRouteClass.AI_RESOLVE_WITHIN_DELEGATION,
+        source_holder="agent-a",
+        destination="agent-b",
+        receiver_eligibility=ReceiverEligibility.ELIGIBLE,
+        authority_class="delegated-runtime",
+        delegation_scope="readback-only",
+        unresolved_payload=("external_effect",),
+        allowed_next_actions=("readback",),
+        closure_condition="effect verified",
+        reevaluation_condition="authority or tool context changes",
+        residual_owner="owner",
+    )
+    definition = replace(pathway("route-1"), responsibility_route=route)
+    runtime.register(definition, idempotency_key="route-key")
+
+    restored = store.get_definition("route-1")
+    assert restored.responsibility_route == route
+    assert store.schema_version == 1
