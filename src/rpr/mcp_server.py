@@ -25,6 +25,7 @@ _TOOLS: tuple[dict[str, Any], ...] = (
     {"name": "rpr.get_status", "description": "Return read-only RPR database status and pathway counts.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False}},
     {"name": "rpr.list_pathways", "description": "List RPR pathways without changing runtime state.", "inputSchema": {"type": "object", "properties": {"limit": {"type": "integer", "minimum": 1, "maximum": 1000}}, "additionalProperties": False}},
     {"name": "rpr.get_pathway", "description": "Return one RPR pathway definition and current state.", "inputSchema": {"type": "object", "properties": {"pathway_id": {"type": "string", "minLength": 1}}, "required": ["pathway_id"], "additionalProperties": False}},
+    {"name": "rpr.get_route_visibility", "description": "Return read-only Responsibility Routing visibility for one RPR pathway without granting Authority.", "inputSchema": {"type": "object", "properties": {"pathway_id": {"type": "string", "minLength": 1}}, "required": ["pathway_id"], "additionalProperties": False}},
     {"name": "rpr.get_evidence", "description": "Return retained evidence events for one RPR pathway.", "inputSchema": {"type": "object", "properties": {"pathway_id": {"type": "string", "minLength": 1}, "limit": {"type": "integer", "minimum": 1, "maximum": 5000}}, "required": ["pathway_id"], "additionalProperties": False}},
     {"name": "rpr.list_unresolved", "description": "List pathways that are not completed, denied, or aborted.", "inputSchema": {"type": "object", "properties": {"limit": {"type": "integer", "minimum": 1, "maximum": 1000}}, "additionalProperties": False}},
 )
@@ -75,6 +76,7 @@ class ReadOnlyRprMcpServer:
         if name == "rpr.get_status": _require_keys(arguments, allowed=set()); return self.read_model.status()
         if name == "rpr.list_pathways": _require_keys(arguments, allowed={"limit"}); return {"pathways": self.read_model.list_pathways(limit=arguments.get("limit", 100))}
         if name == "rpr.get_pathway": _require_keys(arguments, allowed={"pathway_id"}, required={"pathway_id"}); return self.read_model.get_pathway(arguments["pathway_id"])
+        if name == "rpr.get_route_visibility": _require_keys(arguments, allowed={"pathway_id"}, required={"pathway_id"}); return self.read_model.get_route_visibility(arguments["pathway_id"])
         if name == "rpr.get_evidence":
             _require_keys(arguments, allowed={"pathway_id", "limit"}, required={"pathway_id"})
             return {"pathway_id": arguments["pathway_id"], "events": self.read_model.get_evidence(arguments["pathway_id"], limit=arguments.get("limit", 500))}
