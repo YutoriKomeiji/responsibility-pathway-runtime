@@ -2,7 +2,7 @@
 
 ## Supported release
 
-Security reports are accepted for the current published public alpha `0.1.0a5`, Freeze ID `RPR-CF-2026-08-02-01`.
+Security reports are accepted for the current published public alpha `0.1.0a6`, released from commit `9f71a34f5d7eb0e25359ccf31d0c6d85570203d8`.
 
 ## Reporting
 
@@ -10,7 +10,7 @@ Do not open a public Issue for a suspected vulnerability that could expose crede
 
 Include:
 
-- affected version and Freeze ID;
+- affected version and release/tag identity;
 - affected component and deployment assumptions;
 - impact and required privileges;
 - minimal reproduction with secrets removed;
