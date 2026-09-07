@@ -60,7 +60,7 @@ Client Processが再起動した、またはTransportがtimeoutしたという�
 
 ## 未公開の読み取り専用RPR MCP Server Preview
 
-現在のSource Treeには、既存のRPR SQLite Pathway Storeを参照するPhase 1の読み取り専用stdio MCP Serverがあります。このSource Previewは、**公開済みPyPI `0.1.0a2`には含まれておらず**、新しいPackage Releaseとしてもまだ昇格していません。
+現在のSource Treeには、既存のRPR SQLite Pathway Storeを参照するPhase 1の読み取り専用stdio MCP Serverがあります。このSource Previewは、それ自体では新しいPackage Releaseを意味しません。
 
 Editable installしたSourceから起動します。
 
@@ -69,13 +69,16 @@ python -m pip install -e .
 rpr-mcp --database ./rpr.sqlite3
 ```
 
-Previewが公開するToolは次の5つだけです。
+現在のSource Previewが公開するToolは次に限定しています。
 
 - `rpr.get_status`
 - `rpr.list_pathways`
 - `rpr.get_pathway`
+- `rpr.get_route_visibility`
 - `rpr.get_evidence`
 - `rpr.list_unresolved`
+
+`rpr.get_route_visibility(pathway_id)`は、Responsibility Routingを読み取り専用で確認するためのinspection surfaceです。現在state、既存semanticsから確定している限定的なcompatibility route、保存済みdeclared route、Human Return point、Residual Owner、および`authority_inferred: false`を返せます。このToolはreceiverを選択せず、Authorityを付与せず、承認・実行・reconciliation・resume・state mutationも行いません。
 
 Serverは既存SQLite Fileを`mode=ro`で開きます。承認、実行、状態遷移、照合、修復、再開を行うMCP Toolは持ちません。Status応答にはDatabaseのFilesystem Pathを含めません。
 
@@ -88,7 +91,7 @@ Local MCP Client設定例:
 }
 ```
 
-> **信頼境界:** 読み取り専用でも、情報が非機密になるわけではありません。Pathway Definitionと保持Evidenceには運用情報が含まれる場合があります。Databaseを読むOS権限を既に持つ、信頼されたLocal MCP Clientだけで使ってください。認証、認可、Tenant分離、Redaction Gatewayの代替ではありません。
+> **信頼境界:** 読み取り専用でも、情報が非機密になるわけではありません。Pathway Definition、Route Metadata、保持Evidenceには運用情報が含まれる場合があります。Databaseを読むOS権限を既に持つ、信頼されたLocal MCP Clientだけで使ってください。認証、認可、Tenant分離、Redaction Gatewayの代替ではありません。
 
 ## 検証済み範囲と未検証範囲
 
@@ -98,7 +101,8 @@ Local MCP Client設定例:
 
 - SQLiteをread-onlyで開き、write statementを拒否すること
 - MCP initialize、`tools/list`、`tools/call`
-- 空、一覧、個別、Evidence、未解決Pathwayの結果
+- 空、一覧、個別、Route Visibility、Evidence、未解決Pathwayの結果
+- Route VisibilityがAuthorityを推論しないこと
 - malformed JSON-RPCと不正Argument
 - structured Tool Errorと存在しないPathway ID
 - stdoutにJSON-RPC Message以外を出さないこと
@@ -123,7 +127,7 @@ RPRは、任意のMCP ServerやClientが信頼できると自動判定しませ�
 - 重要な外部作用を確認する独立readback
 - Repair、Reconciliation、Resume、Residual Owner
 - RPRを通らない別経路の実行を防ぐこと
-- 信頼されていないMCP ClientからPathwayやEvidenceを読ませないこと
+- 信頼されていないMCP ClientからPathway、Route、Evidenceを読ませないこと
 
 ## まだ提供していないもの
 
