@@ -2,7 +2,7 @@
 Document Title: RPR Product Documentation
 Document Type: Public Product Documentation Index
 Status: Public Alpha
-Version: 0.1.0a5
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
@@ -12,9 +12,9 @@ Body Language: English
 
 Responsibility Pathway Runtime (RPR) is an MIT-licensed runtime control and evidence component for governed external actions. The software is provided under the terms of the [MIT License](../../LICENSE), including its warranty and liability disclaimer.
 
-The current published package is public-alpha `0.1.0a5`. Repository `main` may contain post-`0.1.0a5` source work that is not part of the published package until a later release passes exact-head validation and Human Gate.
+The current published package is public-alpha `0.1.0a6`. Repository `main` may contain later source work that is not part of the published package until a later release passes exact-head validation and Human Gate.
 
-[PyPI — 0.1.0a5](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/) · [GitHub Prerelease — v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [Public repository](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
+[PyPI — 0.1.0a6](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/) · [GitHub Prerelease — v0.1.0a6](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [Public repository](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
 
 The documentation explains tested behavior and integration responsibilities; it does not create a warranty, certification, service commitment, or guarantee of fitness for a particular deployment.
 
@@ -24,27 +24,27 @@ The documentation explains tested behavior and integration responsibilities; it 
 |---|---|
 | [Quick Start](quick-start.md) | Install the current PyPI public alpha and run a low-impact local rehearsal |
 | [Product scope and architecture](product-scope-architecture.md) | Understand what RPR does, does not do, and where it sits |
-| [Responsibility Routing migration](responsibility-routing-migration.md) | Understand the additive post-a5 routing model and compatibility boundary |
-| [Support and maturity](support-maturity.md) | See per-surface maturity and source-preview/released distinctions |
+| [Responsibility Routing migration](responsibility-routing-migration.md) | Understand the additive routing model and compatibility boundary published in `0.1.0a6` |
+| [Support and maturity](support-maturity.md) | See per-surface maturity and evidence boundaries |
 | [Claim Boundary Promotion](claim-boundary-promotion.md) | Review evidence-limited and permanent responsibility boundaries |
 | [MCP integration](mcp-integration.md) | Understand the current outbound MCP tool-call and read-only inspection boundaries |
 | [Installation, operation, and recovery](install-operations-recovery.md) | Prepare, operate, stop, restore, and remove an integration |
 | [Security, integration, and API boundary](security-integration-api.md) | Define trust boundaries and host-application obligations |
 | [Verification, release notes, known issues, and UAT](verification-release-uat.md) | Review evidence, limitations, and a minimum acceptance plan |
 
-## Responsibility Routing source-preview boundary
+## Responsibility Routing boundary
 
-Current repository source contains an additive Responsibility Routing model. Human Return remains valid as a bounded route, but generic fail-closed behavior is not synonymous with Human Gate.
+Published `0.1.0a6` contains the additive Responsibility Routing model. Human Return remains valid as a bounded route, but generic fail-closed behavior is not synonymous with Human Gate.
 
 The route model preserves receiver eligibility, delegation scope, unresolved payload, bounded next actions, closure/reevaluation conditions, and Residual Owner. Evidence transfer, receiver capability, successful transport, recovered state, or route selection do not create Authority.
 
-This source-preview work is not automatically part of the published `0.1.0a5` wheel. A later package release requires a fresh candidate, exact-head validation, claim/test/document parity, and an explicit release Human Gate.
+A later package release still requires a fresh candidate, exact-head validation, claim/test/document parity, and an explicit release Human Gate.
 
 ## Current MCP boundary
 
-The published RPR `0.1.0a5` line can govern outbound calls from a host application to an MCP server, including local subprocess/stdio transport, admitted server and tool bindings, fail-closed ambiguous outcomes, and optional independent readback. The published package also includes `rpr-mcp`, a local stdio read-only inspection server, and the field-reproduced Windows UTF-8 BOM CLI compatibility repair.
+The published RPR `0.1.0a6` line can govern outbound calls from a host application to an MCP server, including local subprocess/stdio transport, admitted server and tool bindings, fail-closed ambiguous outcomes, and optional independent readback. The published package also includes `rpr-mcp`, a local stdio read-only inspection server, the field-reproduced Windows UTF-8 BOM CLI compatibility repair, and read-only Responsibility Routing visibility.
 
-Published `0.1.0a5` read-only tools are:
+Published `0.1.0a6` read-only tools are:
 
 ```text
 rpr.get_status
@@ -52,11 +52,6 @@ rpr.list_pathways
 rpr.get_pathway
 rpr.get_evidence
 rpr.list_unresolved
-```
-
-Current post-`0.1.0a5` source preview additionally exposes:
-
-```text
 rpr.get_route_visibility
 ```
 
