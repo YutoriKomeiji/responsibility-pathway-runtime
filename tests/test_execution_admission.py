@@ -56,7 +56,7 @@ def test_non_executable_pathway_does_not_leave_started_attempt() -> None:
     ledger = SQLiteExecutionAttemptLedger()
     runtime = ResponsibilityPathwayRuntime(attempt_ledger=ledger)
     registration = runtime.register(definition(), idempotency_key="pathway-1")
-    assert registration.state is PathwayState.HUMAN_GATE
+    assert registration.state is PathwayState.HELD
 
     executor = CountingExecutor()
     with pytest.raises(ValueError, match="pathway must be approved or running"):

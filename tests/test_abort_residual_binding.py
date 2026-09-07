@@ -17,7 +17,7 @@ def definition(pathway_id: str) -> PathwayDefinition:
     return PathwayDefinition(
         pathway_id=pathway_id,
         action_name="external_mutation",
-        action_class=ActionClass.REVERSIBLE_EXTERNAL,
+        action_class=ActionClass.HIGH_IMPACT,
         environment_trust=EnvironmentTrust.TRUSTED_INTERNAL,
         decision_owner="owner",
         approval_authority="reviewer",

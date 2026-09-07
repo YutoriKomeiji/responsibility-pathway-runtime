@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-EXPECTED_CLAIMS = {f"CLM-{index:02d}" for index in range(1, 13)}
+EXPECTED_CLAIMS = {f"CLM-{index:02d}" for index in range(1, 14)}
 ALLOWED_STATUSES = {
     "not_implemented",
     "implemented_unverified",
