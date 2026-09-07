@@ -1,835 +1,396 @@
 # RPR Runtime Claim Assurance Case
 
-Status: Draft / Active Assurance Basis
-Version: 0.1
-Owner: Akihisa Ono
-Repository role: RPP development canonical source
-Product target: Responsibility Pathway Runtime (RPR)
-Release boundary: Private development only. This document does not authorize public release or a production-ready claim.
+Status: Active source-preview assurance basis
+Version: 0.2
+Published baseline: `0.1.0a5`
+Release boundary: This document does not authorize release, production-readiness claims, or Authority transfer.
 
 ## 1. Purpose
 
-This document defines how each bounded RPR product claim is technically justified.
+This assurance case explains why RPR's bounded product claims are technically supportable, what could falsify them, which mechanisms and tests are relevant, and which risks remain outside the product boundary.
 
-The runtime product test specification defines what must be tested. This assurance case defines why the selected mechanisms, tests, and retained evidence are relevant to each claim, which assumptions they depend on, and which residual risks remain.
-
-A claim is not accepted merely because a test with a similar name passes. Acceptance requires a traceable chain:
+Claim acceptance follows this chain:
 
 ```text
-bounded product claim
-  -> threat or counterexample
-  -> technical mechanism
+bounded claim
+  -> counterexample/threat
+  -> mechanism
   -> trusted assumptions
-  -> implementation surface
+  -> implementation anchors
   -> falsification-oriented tests
   -> retained evidence
-  -> residual-risk statement
+  -> residual risk
+  -> permitted wording
 ```
 
-## 2. Assurance method
+A test with a similar name is not enough. Evidence must bind to the exact source lineage and the claim must not exceed the tested boundary.
 
-Each claim entry uses the following fields.
+## 2. Global assurance rules
 
-- **Claim**: the exact bounded statement RPR may make.
-- **Threat / counterexample**: the failure that would falsify the claim.
-- **Mechanism**: the runtime design intended to prevent or detect the failure.
-- **Implementation anchor**: the source modules or generated artifacts carrying the mechanism.
-- **Trusted assumptions**: properties outside the mechanism that the claim depends on.
-- **Verification strategy**: unit, component, integration, E2E, formal, package, or adversarial checks.
-- **Required evidence**: durable artifacts needed to substantiate the result.
-- **Residual risk**: what remains unproven or outside the boundary.
-- **Permitted wording**: the strongest externally usable wording after the required evidence passes.
+### 2.1 Falsification before confirmation
 
-## 3. Global assurance rules
+Every safety- or responsibility-relevant claim MUST have at least one negative/adversarial test capable of disproving it. Happy-path tests alone are insufficient.
 
-### 3.1 Falsification before confirmation
+### 2.2 Cross-surface agreement is part of the claim
 
-Every safety-relevant claim MUST include at least one negative or adversarial test capable of falsifying the claim. A happy-path test alone is insufficient.
+If the same product concept appears in source, persistence, MCP/CLI, documentation, site/demo, claim registries, or formal evidence, those surfaces must agree. A green source test does not cure a stale public contract.
 
-### 3.2 Mechanism diversity
+### 2.3 `Fail closed` does not identify the receiver
 
-Where practical, a claim SHOULD be supported by more than one evidence type, such as:
+Stopping safely is distinct from routing responsibility. Missing RPE, malformed contracts, invalid routes, ineligible receivers, and unresolved effects must not automatically become Human Gate. Human Return is a bounded Responsibility Route.
 
-- executable tests;
-- persistent-state inspection;
-- event-chain verification;
-- generated-model parity;
-- selected Lean 4 invariants;
-- clean-install execution;
-- source and artifact residue audit.
+### 2.4 Evidence is not Authority
 
-Multiple tests that exercise the same code path are not independent evidence.
+Evidence transfer, receiver capability, confidence, route selection, transport success, tool success, or recovered state do not create or enlarge Authority.
 
-### 3.3 Assumptions are part of the claim
+### 2.5 Residual Owner survives routing
 
-SQLite transaction semantics, filesystem atomic replacement behavior, trusted principal resolution, executor contracts, and external readback quality MUST be stated rather than silently treated as proven by RPR.
+The Residual Owner is not silently replaced by a route destination or by successful transfer. A change of ownership requires an explicit authorized redesign.
 
-### 3.4 Evidence must identify the tested build
+### 2.6 Historical evidence remains historical
 
-Evidence MUST bind to the commit SHA, package version, workflow run, Python and OS versions, test IDs, and artifact hashes.
+Old release records are not rewritten to resemble current state. Current source-preview and current published package are stated separately.
 
-### 3.5 Claim weakening on missing evidence
+### 2.7 Exact-head evidence
 
-If required evidence is unavailable, skipped, stale, or produced by a narrower boundary than the claim, the claim MUST be weakened rather than inferred.
+Retained evidence must identify the tested commit SHA, package version/candidate role, workflow run, environment, test IDs, and artifact hashes. A changed frozen candidate requires fresh validation.
 
-## 4. Claim assurance matrix
+### 2.8 Claim weakening on missing evidence
 
-### CLM-01 Declared state and authority govern dispatch
+Missing, blocked, stale, or narrower evidence weakens the claim. It never becomes an inferred pass.
 
-**Claim**
+## 3. Evidence levels
 
-External actions are admitted only through a declared executable pathway state and declared authority.
+- **E0** — proposed claim only.
+- **E1** — implementation exists; local/source inspection evidence only.
+- **E2** — executable unit/component evidence.
+- **E3** — integration/product/system and retained CI evidence within a bounded environment.
+- **E4** — broader independent/field evidence for a declared deployment profile.
+- **E5** — reserved for stronger evidence forms explicitly defined later; never inferred from version age.
 
-**Threat / counterexample**
+Current Responsibility Routing claim `CLM-13` remains below release-level assurance until exact-head L1-L5 evidence is complete.
 
-- execution from `human_gate`, `held`, `denied`, `completed`, or an unknown pathway;
-- execution by an actor other than the declared execution or resume authority;
-- replay access leaking prior results or appending events before authorization;
-- a development evaluator acting as an implicit allow fallback.
+## 4. Core claim assurance matrix
 
-**Mechanism**
+### CLM-01 — Declared state and Authority govern dispatch
 
-- canonical state-transition table;
-- `ensure_transition()` transition rejection;
-- `authorize_transition()` actor-role comparison;
-- fail-closed initial-state selection;
-- replay authorization before result access;
-- explicit, opt-in development evaluator.
+**Claim**  
+Within the configured RPR boundary, external actions are admitted only from executable pathway state and declared actor Authority.
 
-**Implementation anchors**
+**Counterexamples**
+- execution from held, denied, completed, unknown, or otherwise non-executable state;
+- unauthorized actor dispatch;
+- replay result leakage before authorization;
+- development evaluator becoming implicit allow.
 
-- `src/rpr/runtime.py`;
-- `src/rpr/state_machine.py`;
-- `src/rpr/authority.py`;
-- `src/rpr/inspection.py`;
-- `src/rpr/rpe.py`;
-- canonical transition JSON and generated Python table.
+**Mechanisms**
+- canonical transition table;
+- `ensure_transition()`;
+- Authority checks;
+- execution admission before executor invocation;
+- explicit opt-in development evaluator.
 
-**Trusted assumptions**
+**Anchors**
+- `src/rpr/runtime.py`
+- `src/rpr/authority.py`
+- `src/rpr/state_machine.py`
 
-- actor strings or bound principals accurately represent authenticated identities at the integration boundary;
-- the runtime is the enforced path to the executor;
-- callers cannot invoke the underlying external mutation outside RPR and still attribute it to RPR.
+**Evidence**
+- `RPR-AUT-*`, `RPR-PRE-*`, admission negative tests;
+- zero executor calls on rejected paths;
+- unchanged durable state and no false attempt residue.
 
-**Verification strategy**
+**Residual risk**  
+Host identity binding, credential issuance, and bypass paths outside RPR remain integrator-owned.
 
-- `RPR-AUT-001` through `RPR-AUT-008`;
-- `RPR-PRE-001` through `RPR-PRE-003`;
-- `RPR-ADM-003` through `RPR-ADM-005`;
-- negative replay tests with unauthorized actors;
-- JSON/Python/Lean transition parity.
+### CLM-02 — Explicit configured Human Gate cannot be bypassed
 
-**Required evidence**
+**Claim**  
+Where the pathway explicitly requires human-held approval Authority, dispatch remains blocked until authorized approval.
 
-- zero executor calls on every rejected path;
-- unchanged durable pathway state;
-- no retained pre-dispatch attempt;
-- no unauthorized replay event;
-- reason code and required authority in diagnostics;
-- CI log bound to commit SHA.
+**Counterexamples**
+- RPE allow bypasses configured approval;
+- missing approval Authority becomes approval;
+- wrong actor approves;
+- executor called while configured Human Gate remains unresolved.
 
-**Residual risk**
+**Mechanisms**
+- distinction between evaluator decision and pathway approval;
+- configured approval transition;
+- actor/Authority checks.
 
-RPR does not itself prove production identity, secure token issuance, endpoint exclusivity, or absence of side-channel execution paths.
+**Boundary**  
+This claim does **not** say every fail-closed case should become Human Gate.
 
-**Permitted wording**
+### CLM-03 — Pre-dispatch rejection does not create false dispatch uncertainty
 
-"Within the configured RPR boundary, declared state and actor authority are enforced before dispatch and replay-result access."
+**Claim**  
+RPR does not retain an attempt implying possible external mutation when rejection occurs before executor invocation.
 
-### CLM-02 Human Gate prevents unauthorized external action
+**Threats**
+- attempt row survives invalid state/actor rejection;
+- cleanup removes a different/finalized attempt;
+- crash boundary makes pre-dispatch and post-dispatch uncertainty indistinguishable.
 
-**Claim**
+**Mechanisms**
+- scoped request fingerprints and attempt identity;
+- restricted pre-dispatch cleanup;
+- durable attempt lifecycle.
 
-Human Gate and explicit approval prevent dispatch until the declared human authority authorizes continuation.
+### CLM-04 — Persisted completed/unresolved attempts are not silently redispatched
 
-**Threat / counterexample**
+**Claim**  
+Identical persisted attempts replay from durable state without automatic duplicate dispatch within the tested runtime/storage boundary.
 
-- RPE returns `allow` and bypasses configured approval;
-- missing approval authority becomes implicit approval;
-- unauthorized actor approves;
-- executor is called while state remains `awaiting_approval` or `human_gate`.
+**Threats**
+- restart loses the attempt;
+- same idempotency key with changed payload accepted;
+- concurrent begin authorizes two dispatches;
+- unresolved attempt gets retried automatically.
 
-**Mechanism**
+**Evidence**
+- idempotency/replay tests;
+- runtime recreation and fault-injection tests;
+- executor call-count assertions.
 
-- distinction between RPE decision and pathway approval state;
-- `_initial_state()` producing `awaiting_approval` when approval is configured;
-- explicit `awaiting_approval -> approved` transition;
-- approval-authority enforcement;
-- executor admission limited to `approved` or authorized resume state.
+### CLM-05 — Completion requires the configured verified readback
 
-**Implementation anchors**
+**Claim**  
+Transport/executor success does not establish consequential external completion when configured readback is required.
 
-- `src/rpr/runtime.py`;
-- `src/rpr/authority.py`;
-- `src/rpr/inspection.py`;
-- canonical transitions.
+**Threats**
+- callback success before remote commit;
+- stale/wrong resource readback;
+- missing readback collapses to completed.
 
-**Trusted assumptions**
+**Mechanisms**
+- separate execution status and `ReadbackEvidence`;
+- completion only after verified readback;
+- mismatch/unavailable readback retains uncertainty or repair path.
 
-- approval credentials are resolved and bound correctly by the host system;
-- approval is not fabricated outside the trusted principal resolver.
+### CLM-06 — Unknown remains unknown until sufficient classification
 
-**Verification strategy**
+**Claim**  
+Possible-dispatch uncertainty survives timeout, disconnect, restart, and insufficient observation until reconciliation establishes a bounded result.
 
-- `RPR-ADM-002`, `RPR-ADM-003`;
-- `RPR-AUT-001`, `RPR-AUT-002`;
-- `E2E-01`, `E2E-02`;
-- adversarial approval with wrong actor, missing authority, and stale state.
+**Threats**
+- unknown -> failed -> automatic retry;
+- unknown -> completed from callback inference;
+- restart weakens uncertainty;
+- reconciliation redispatches instead of observing.
 
-**Required evidence**
+**Mechanisms**
+- `write_status_unknown`;
+- durable pathway/attempt storage;
+- observation-only reconciliation;
+- no automatic redispatch.
 
-- persisted `awaiting_approval` or `human_gate` state;
-- executor call count zero before approval;
-- evidence event identifying approving actor and reason;
-- successful dispatch only after authorized transition.
+### CLM-07 — Durable state survives runtime recreation
 
-**Residual risk**
+**Claim**  
+Pathway, attempt, and Evidence state are restored when new runtime/store objects reopen the same tested SQLite state.
 
-The semantic quality of the human decision and organizational legitimacy of the approver are outside the runtime proof boundary.
+**Boundary**  
+Runtime recreation is not automatically an OS-process restart claim. Process-interruption claims require process-level tests.
 
-**Permitted wording**
+### CLM-08 — Reconciliation restores internal coherence
 
-"RPR enforces an explicit approval transition and prevents configured external dispatch before authorized approval."
+**Claim**  
+Within tested interruption windows, reconciliation aligns attempt classification, pathway state, and Evidence without redispatch.
 
-### CLM-03 Durable attempts do not create false dispatch uncertainty
+**Residual risk**  
+Pathway and attempt storage may span separate SQLite transactions; cross-database atomicity is not claimed unless specifically tested/proved.
 
-**Claim**
+### CLM-09 — Repair readiness and resume Authority remain separate
 
-Dispatch attempts are durably recorded without leaving false evidence that an external action may have occurred when rejection happened before executor invocation.
+**Claim**  
+Repair completion does not itself authorize resume. Resume identity and Authority remain explicit.
 
-**Threat / counterexample**
+**Threats**
+- repair owner resumes without resume Authority;
+- restored state is treated as renewed approval;
+- compensation inferred from failure.
 
-- attempt row inserted before state or actor validation and retained after rejection;
-- cleanup removes another request's attempt;
-- cleanup deletes a finished or actually dispatched attempt;
-- crash between insert and dispatch makes pre-dispatch and post-dispatch uncertainty indistinguishable.
+**Current assurance posture**  
+Implemented with bounded E2E coverage, but broader compensation/residual-closure product assurance remains constrained by declared claim registry status.
 
-**Mechanism**
+### CLM-10 — Evidence is ordered, hash-linked, inspectable, and redacted within policy
 
-- transactional attempt insertion;
-- scoped pre-dispatch cleanup;
-- status and result predicates restricting deletion;
-- pathway, attempt, idempotency, and request-fingerprint binding;
-- explicit dispatch-phase classification or equivalent recoverable marker.
+**Claim**  
+RPR produces inspectable ordered Evidence and detects tested tampering while applying configured redaction.
 
-**Implementation anchors**
+**Non-claim**  
+The ledger is not independently signed non-repudiation or an externally immutable timestamp service.
 
-- `src/rpr/attempts.py`;
-- `src/rpr/runtime.py`;
-- execution request fingerprinting.
+### CLM-11 — Selected state model is cross-checked across JSON/Python/Lean
 
-**Trusted assumptions**
+**Claim**  
+Selected canonical state/transition relations are cross-checked across JSON, generated Python, and Lean 4, with selected invariants machine-checked.
 
-- SQLite transaction and uniqueness semantics hold;
-- no external effect occurs before the executor call boundary;
-- request fingerprint canonicalization is stable for supported parameter types.
+**Critical boundary**  
+Lean does not formally prove:
+- Python runtime correctness as a whole;
+- receiver eligibility;
+- delegation scope correctness;
+- Authority non-propagation through arbitrary integrations;
+- Responsibility Routing as an organizational process.
 
-**Verification strategy**
+### CLM-12 — Tested build/install path is reproducible within the declared environment
 
-- `RPR-PRE-001` through `RPR-PRE-005`;
-- `RPR-CRS-001` through `RPR-CRS-003`;
-- multi-connection negative tests;
-- mutation test that deliberately removes the cleanup predicate and must fail.
+**Claim**  
+The exact tested wheel/source distribution can be built, installed, and exercised in the declared clean environment when release evidence is fresh.
 
-**Required evidence**
+**Threats**
+- artifact digest from a different head;
+- source tree used instead of built wheel;
+- stale package metadata;
+- candidate changed after freeze.
 
-- absence of an attempt row after rejected pre-dispatch calls;
-- retained row after simulated actual dispatch uncertainty;
-- conflict errors for mismatched identifiers or fingerprints;
-- SQLite contents captured after each crash point.
+## 5. CLM-13 — Bounded Responsibility Routing
 
-**Residual risk**
+**Current status:** implementation/source-preview claim; release-level assurance pending exact-head validation.
 
-Without an explicit persisted dispatch-phase marker, some crash boundaries may remain conservatively unresolved and require claim restriction.
+### Claim
 
-**Permitted wording**
+Current RPR source can represent a bounded Responsibility Route that preserves:
 
-"RPR distinguishes rejected pre-dispatch calls from persisted possible-dispatch uncertainty within the tested SQLite execution boundary."
+- route class;
+- source holder and destination;
+- receiver eligibility;
+- Authority class;
+- delegation scope;
+- unresolved payload;
+- bounded next actions;
+- closure condition;
+- reevaluation condition;
+- Residual Owner;
+- optional expiry.
 
-### CLM-04 Completed and unresolved attempts are not silently re-dispatched
+The runtime/inspection surface does not infer Authority from the existence of the route or Evidence transfer.
 
-**Claim**
+### Threats / falsifiers
 
-Identical completed or unresolved attempts are replayed from durable state and are not automatically sent again.
+1. **False Autonomy** — work continues automatically after route/Authority conditions require hold or transfer.
+2. **Proxy Return** — responsibility is routed to an AI/system that lacks receiver eligibility or required Authority.
+3. **False Escalation** — generic error/unavailability is turned into Human Gate even though no human destination was established.
+4. **Nominal Human Return** — a human is named but lacks Authority, context, or bounded next-decision scope.
+5. **Authority laundering** — capability, Evidence, successful transport, or route selection silently becomes Authority.
+6. **Residual Owner loss** — route destination silently replaces the owner of unresolved residue.
+7. **Route drift across restart** — persisted declared route or externally visible compatibility classification changes without material state change.
+8. **Claim drift** — docs/site/demo say routing is released/formally proved beyond executable Evidence.
 
-**Threat / counterexample**
+### Mechanisms
 
-- process restart loses the attempt and repeats the mutation;
-- same idempotency key with different payload is accepted;
-- concurrent runtimes both dispatch;
-- unauthorized actor obtains replay data;
-- terminal pathway state causes an implicit new execution.
+- `ResponsibilityRoute` and `ReceiverEligibility` model;
+- additive persistence through pathway serialization;
+- route validation in `inspection.py`;
+- neutral HOLD for generic invalid/unavailable route conditions;
+- explicit high-impact Human Gate only where independently justified;
+- compatibility mapping in `routing.py`;
+- read-only `route_visibility.py` with `authority_inferred: false`;
+- Residual Owner equality validation;
+- exact-head public surface validator;
+- bilingual browser semantic assertions.
 
-**Mechanism**
+### Implementation anchors
 
-- unique attempt ID and pathway-scoped idempotency key;
-- request fingerprint comparison;
-- `started` versus persisted result distinction;
-- replay return before executor invocation, but only after authorization;
-- transactional concurrent `begin()` behavior.
+- `src/rpr/models.py`
+- `src/rpr/inspection.py`
+- `src/rpr/routing.py`
+- `src/rpr/route_visibility.py`
+- `src/rpr/runtime.py`
+- `src/rpr/mcp_read_model.py`
+- `src/rpr/mcp_server.py`
 
-**Implementation anchors**
+### Required executable evidence
 
-- `src/rpr/attempts.py`;
-- `src/rpr/runtime.py`.
+- `RPR-RTE-001` — structural validation;
+- `RPR-RTE-002` — no false human escalation;
+- `RPR-RTE-003` — reevaluation hold;
+- `RPR-RTE-004` — Authority non-propagation / compatibility;
+- `RPR-RTE-005` — bounded Human Return requirements;
+- `RPR-RTE-006` — Residual Owner preservation;
+- `RPR-RTE-007` — neutral RPE failure;
+- `RPR-RTE-008` — read-only route visibility;
+- `E2E-ROUTE-01` — ambiguity -> runtime recreation -> no redispatch -> reconciliation;
+- `E2E-ROUTE-02` — English/Japanese browser route semantics.
 
-**Trusted assumptions**
+Only IDs actually bound to executable files in `specs/test-id-registry.json` count as executable Evidence. Specified-only IDs remain planned requirements.
 
-- all retries reuse stable operation, attempt, and idempotency identifiers according to the documented contract;
-- SQLite is shared by competing runtime instances in the tested deployment mode.
+### Required cross-surface evidence
 
-**Verification strategy**
+- root README and EN/JA documentation distinguish published `0.1.0a5` from post-release source preview;
+- MCP docs distinguish the five published a5 read-only tools from current source `rpr.get_route_visibility`;
+- site/demo contains and executes routing semantics;
+- public validator detects missing EN/JA pairs and required route anchors;
+- product status records routing as unpromoted source preview;
+- formal docs explicitly exclude receiver eligibility/delegation proof;
+- claim registry does not mark CLM-13 passing before exact-head CI.
 
-- `RPR-IDM-001` through `RPR-IDM-006`;
-- `RPR-CRS-004` through `RPR-CRS-010`;
-- `E2E-03`, `E2E-06`, `E2E-07`;
-- executor spy proving call count remains one.
+### Trusted assumptions
 
-**Required evidence**
+- receiver eligibility and delegation source-of-truth supplied by the integration are meaningful;
+- actor/identity binding supplied by the host is accurate within its deployment boundary;
+- the route is not bypassed by an alternate execution path;
+- external Evidence sources are sufficiently authoritative for the specific classification claimed.
 
-- executor call count;
-- persisted attempt row and fingerprint;
-- conflict exception for changed request data;
-- independent runtime restart logs;
-- concurrency trace showing one dispatch maximum.
+### Residual risks
 
-**Residual risk**
+- RPR does not determine legal/institutional accountability;
+- arbitrary organizations may use different delegation/eligibility systems;
+- source-preview compatibility may evolve before a stable release;
+- routing metadata does not itself enforce external actors outside RPR;
+- Lean does not prove routing semantics;
+- customer-specific identity/network/MCP environments require separate evidence.
 
-Provider-side behavior may still duplicate an effect if the provider ignores the supplied idempotency contract or the executor violates RPR's dispatch boundary.
+### Permitted wording before release-level assurance
 
-**Permitted wording**
+> “Current RPR source represents bounded Responsibility Routing, preserves declared receiver-eligibility and Residual Owner metadata, and does not infer Authority from route or Evidence transfer. Release-level assurance remains pending exact-head product-quality validation.”
 
-"RPR prevents automatic duplicate dispatch for identical persisted attempts within the tested runtime and storage boundary."
+### Stronger wording gate
 
-### CLM-05 Completion requires verified readback
+Do not promote CLM-13 to release-level `passing/E3` until:
 
-**Claim**
+- full exact-head CI passes;
+- English and Japanese browser route E2E passes;
+- current documentation/site/demo/registry audit passes;
+- independent review/readback is complete;
+- repaired branch is merged and main is read back;
+- a fresh release candidate is rebuilt from repaired main.
 
-Executor return or callback success is not treated as proof of external completion without verified readback.
+## 6. Product-quality assurance against recurrence
 
-**Threat / counterexample**
+The audit that introduced CLM-13 identified **cross-surface semantic drift** as a systemic defect class. Future assurance therefore includes process controls, not only behavior tests.
 
-- executor reports success before remote commit;
-- response is lost after effect;
-- readback observes the wrong resource or stale state;
-- mismatch is collapsed to completed;
-- provider callback is forged or semantically weaker than the claimed effect.
+A change that alters state, decision, routing, Authority, Evidence meaning, owner semantics, external-effect claims, or release identity must enumerate affected product surfaces before completion.
 
-**Mechanism**
+The change remains release-blocked until:
 
-- separate `ExecutionStatus` and `ReadbackEvidence`;
-- completion transition only when status is succeeded and readback is present and verified;
-- unknown or repair-required state otherwise;
-- executor-specific expected-versus-observed comparison.
+1. source semantics are correct;
+2. negative tests falsify the previous wrong behavior;
+3. persistence/restart behavior is checked;
+4. public interfaces are aligned;
+5. EN/JA docs and demos are aligned;
+6. claim/test registries are updated;
+7. CI can detect the same drift class automatically;
+8. exact-head evidence is retained.
 
-**Implementation anchors**
+## 7. Assurance stop conditions
 
-- `src/rpr/executor.py`;
-- `src/rpr/runtime.py`;
-- supplied executor readback implementations.
+Claim promotion stops if any of the following occurs:
 
-**Trusted assumptions**
+- a required test is missing, skipped, stale, or bound only in prose;
+- an invalid/unavailable route still becomes Human Gate without an independently justified human receiver;
+- Authority can be inferred from Evidence/capability/route/transport;
+- Residual Owner can silently disappear/change;
+- route metadata is lost across persistence/restart;
+- `write_status_unknown` can silently complete or redispatch;
+- source-preview behavior is described as already present in published a5;
+- runtime recreation is described as process restart without process-level evidence;
+- Lean scope is overstated;
+- EN/JA active surfaces materially disagree;
+- the candidate head differs from the head that generated retained Evidence.
 
-- readback source is sufficiently independent and authoritative for the specific effect;
-- expected and observed identifiers refer to the same target;
-- filesystem and provider read APIs reflect committed state within the documented consistency model.
+## 8. Human Gate
 
-**Verification strategy**
-
-- `RPR-EXE-001` through `RPR-EXE-005`;
-- deliberate success-without-readback;
-- deliberate hash or resource mismatch;
-- stale and forged readback fixtures;
-- `E2E-01`, `E2E-03`.
-
-**Required evidence**
-
-- expected and observed values;
-- readback source and reason;
-- pathway state after callback-only success;
-- no `completed` evidence until readback verification.
-
-**Residual risk**
-
-Readback proves only the selected observable property at the selected time; it does not prove all downstream consequences, legal validity, or permanent delivery.
-
-**Permitted wording**
-
-"RPR requires configured verified readback before marking the tested external effect completed."
-
-### CLM-06 Unknown remains unknown until independent classification
-
-**Claim**
-
-Timeout, disconnect, crash, or incomplete persistence after possible dispatch remains explicitly unresolved until reconciliation establishes a bounded classification.
-
-**Threat / counterexample**
-
-- unknown becomes failed and is retried automatically;
-- unknown becomes completed based only on callback inference;
-- restart drops the unresolved state;
-- repeated restart weakens uncertainty;
-- reconciliation mutates the external system instead of observing it.
-
-**Mechanism**
-
-- explicit `write_status_unknown` state and execution status;
-- no transition from unknown directly to completed without reconciliation path;
-- durable attempt and pathway persistence;
-- observation-only reconciliation strategy;
-- idempotent reconciliation result persistence.
-
-**Implementation anchors**
-
-- `src/rpr/models.py`;
-- canonical transitions;
-- `src/rpr/reconciliation.py`;
-- `src/rpr/runtime.py`;
-- persistence stores.
-
-**Trusted assumptions**
-
-- reconciliation observer does not reissue the mutation;
-- observer evidence is authoritative enough for its classification;
-- host system does not bypass RPR and retry independently.
-
-**Verification strategy**
-
-- `RPR-IDM-002`;
-- `RPR-CRS-004` through `RPR-CRS-010`;
-- `RPR-REC-001` through `RPR-REC-007`;
-- `E2E-03`, `E2E-04`, `E2E-07`.
-
-**Required evidence**
-
-- persisted unresolved attempt and pathway state across a new runtime;
-- zero redispatch calls;
-- observer call trace distinct from executor call trace;
-- reconciliation event and resulting state;
-- repeated reconciliation produces no duplicate event.
-
-**Residual risk**
-
-Some external systems may not expose sufficient independent evidence; in that case the correct outcome remains unresolved or requires human repair.
-
-**Permitted wording**
-
-"RPR preserves possible-dispatch uncertainty until configured reconciliation supplies sufficient evidence."
-
-### CLM-07 Restart preserves responsibility-pathway state
-
-**Claim**
-
-Restart does not erase durable pathway, attempt, or evidence state.
-
-**Threat / counterexample**
-
-- only the attempt ledger is durable while pathway state is memory-only;
-- new runtime reconstructs a different definition or state;
-- evidence ordering changes;
-- migration silently resets unknown or gate states;
-- process-local executor cache is mistaken for durable replay state.
-
-**Mechanism**
-
-- SQLite pathway store;
-- SQLite attempt ledger;
-- canonical serialization and fingerprints;
-- ordered evidence sequence and hash chain;
-- schema metadata and forward-version rejection;
-- new runtime construction using the same database files.
-
-**Implementation anchors**
-
-- `src/rpr/storage.py`;
-- `src/rpr/attempts.py`;
-- `src/rpr/evidence.py`;
-- model serialization.
-
-**Trusted assumptions**
-
-- database files survive and are durably flushed by the underlying platform;
-- SQLite and filesystem durability settings meet the stated deployment assumptions;
-- backups, disk failure, and hostile database replacement are outside the current claim unless separately tested.
-
-**Verification strategy**
-
-- `RPR-PER-001` through `RPR-PER-009`;
-- `RPR-CRS-001` through `RPR-CRS-010`;
-- `E2E-01`, `E2E-03`, `E2E-05`, `E2E-07`;
-- mandatory closure of original connections and construction of new objects.
-
-**Required evidence**
-
-- database artifact hashes before and after restart;
-- recovered definitions, states, attempt results, fingerprints, and ordered events;
-- evidence-chain verification after restart;
-- migration and newer-schema rejection logs.
-
-**Residual risk**
-
-The current claim is bounded to tested single-node SQLite persistence and does not establish distributed-database correctness or disaster recovery.
-
-**Permitted wording**
-
-"RPR restores pathway, attempt, and evidence state across process restart in the tested SQLite deployment mode."
-
-### CLM-08 Reconciliation keeps attempt, pathway, and evidence coherent
-
-**Claim**
-
-Reconciliation updates the durable attempt classification, pathway state, and evidence consistently.
-
-**Threat / counterexample**
-
-- ledger says succeeded while pathway remains unknown;
-- pathway becomes completed without reconciliation evidence;
-- crash between updates creates permanent divergence;
-- repeated reconciliation duplicates transitions or evidence;
-- unauthorized actor reconciles.
-
-**Mechanism**
-
-- runtime-integrated reconciliation API;
-- authorization before observation result application;
-- a transaction spanning compatible durable updates, or a recoverable journaled protocol if stores remain separate;
-- deterministic mapping from reconciliation result to pathway state;
-- idempotency key or reconciliation identity;
-- evidence event tied to attempt and observer result.
-
-**Implementation anchors**
-
-- planned changes to `src/rpr/runtime.py`;
-- `src/rpr/reconciliation.py`;
-- `src/rpr/attempts.py`;
-- `src/rpr/storage.py`;
-- evidence builder.
-
-**Trusted assumptions**
-
-- observer output is truthful for the declared property;
-- cross-store atomicity is not assumed unless pathway and attempt data share a transaction boundary;
-- if separate stores remain, recovery metadata is durable and complete.
-
-**Verification strategy**
-
-- `RPR-REC-001` through `RPR-REC-007`;
-- `RPR-CRS-007`, `RPR-CRS-008`;
-- repeated reconciliation;
-- crash injection at every persistence sub-step;
-- unauthorized reconciliation attempt.
-
-**Required evidence**
-
-- same classification visible in attempt record, pathway state, and latest event;
-- observer identity and evidence summary;
-- no duplicate event after replay;
-- recovery result after injected crash.
-
-**Residual risk**
-
-This claim is not currently satisfied by the standalone ledger-only reconciliation helper and remains blocked until runtime integration is implemented and tested.
-
-**Permitted wording**
-
-No external product claim is permitted until the blocking implementation and tests pass.
-
-### CLM-09 Repair, resume, compensation, and residual ownership are explicit and authorized
-
-**Claim**
-
-Failure recovery does not silently collapse responsibility; repair, resume, compensation, and residual closure require declared actors and durable evidence.
-
-**Threat / counterexample**
-
-- execution actor self-approves repair or resume;
-- compensation is inferred and executed automatically;
-- a new attempt loses linkage to the failed attempt;
-- partial completion becomes generic failure;
-- residual impact is closed without residual-owner acceptance.
-
-**Mechanism**
-
-- distinct repair and resume states;
-- repair-owner and resume-authority rules;
-- explicit compensation pathway definition;
-- new attempt identity with prior-attempt linkage;
-- residual-owner abort or closure authority;
-- durable repair and compensation evidence.
-
-**Implementation anchors**
-
-- state model and transition table;
-- `src/rpr/authority.py`;
-- runtime repair and resume APIs;
-- attempt and evidence records.
-
-**Trusted assumptions**
-
-- organizational role assignment is legitimate;
-- compensation semantics are supplied by the integrating application;
-- irreversible effects are disclosed rather than assumed reversible.
-
-**Verification strategy**
-
-- `RPR-RPR-001` through `RPR-RPR-007`;
-- `E2E-05`;
-- unauthorized repair, resume, compensation, and closure attempts;
-- partial-effect fixtures.
-
-**Required evidence**
-
-- repair owner, failed condition, repair evidence, resume authority, prior and new attempt IDs, compensation declaration, and residual-owner decision;
-- valid ordered evidence chain across the lifecycle.
-
-**Residual risk**
-
-RPR cannot prove that a real-world repair or compensation is ethically, legally, or economically sufficient.
-
-**Permitted wording**
-
-"RPR records and enforces declared authority for the tested repair, resume, compensation, and residual-closure pathway."
-
-### CLM-10 Evidence is ordered, tamper-evident, inspectable, and redacted
-
-**Claim**
-
-Evidence is durably ordered, hash-linked, inspectable, and filtered according to the configured redaction policy.
-
-**Threat / counterexample**
-
-- event removal, reordering, substitution, or payload modification is undetected;
-- state transition occurs without an event;
-- secrets or authorization headers are persisted;
-- untrusted payload forges actor or event structure;
-- diagnostics contradict durable state.
-
-**Mechanism**
-
-- sequence-ordered event persistence;
-- previous-hash and event-hash linkage;
-- atomic state-and-event transaction;
-- structured event construction controlled by runtime;
-- redaction before persistence;
-- verification and inspection APIs.
-
-**Implementation anchors**
-
-- `src/rpr/evidence.py`;
-- `src/rpr/storage.py`;
-- `src/rpr/redaction.py`;
-- `src/rpr/inspection.py`;
-- `src/rpr/runtime.py`.
-
-**Trusted assumptions**
-
-- hash function implementation behaves as expected;
-- the database and code are not both replaced by a fully privileged attacker;
-- hash linkage provides tamper evidence, not cryptographic non-repudiation or signed provenance.
-
-**Verification strategy**
-
-- `RPR-EVD-001` through `RPR-EVD-006`;
-- `RPR-PER-004`;
-- removal, reordering, substitution, and payload mutation tests;
-- secret-seeded negative tests;
-- restart-chain verification.
-
-**Required evidence**
-
-- ordered events and hashes;
-- verifier result and failure index for tampering;
-- absence assertions for configured secrets;
-- state and inspection equivalence.
-
-**Residual risk**
-
-Current hash chaining is not a digital signature, trusted timestamp, external notarization, or proof against a privileged attacker rewriting the database and recomputing hashes.
-
-**Permitted wording**
-
-"RPR produces ordered, hash-linked, inspectable evidence with configured redaction; it does not claim signed non-repudiation."
-
-### CLM-11 JSON, Python, and Lean 4 agree on the selected transition model
-
-**Claim**
-
-The canonical JSON model, generated Python transition representation, and selected Lean 4 model agree on the states and transitions included in the parity boundary.
-
-**Threat / counterexample**
-
-- generated Python is stale;
-- Lean model omits or adds a transition without detection;
-- documentation claims whole-runtime verification;
-- CI runs Lean but does not check the relevant theorems or freshness.
-
-**Mechanism**
-
-- canonical machine-readable state model;
-- generated Python transition artifact;
-- parity scripts comparing state and transition sets;
-- Lean definitions and selected invariants;
-- CI freshness and `lake build` checks;
-- release-claim audit.
-
-**Implementation anchors**
-
-- canonical JSON specifications;
-- generated `_generated_transitions.py`;
-- parity and generation tools;
-- Lean source and lake project;
-- release-audit scripts.
-
-**Trusted assumptions**
-
-- parity scripts correctly parse all representations in the declared subset;
-- Lean toolchain and trusted kernel are functioning;
-- runtime code outside the generated transition table is not implied to be formally verified.
-
-**Verification strategy**
-
-- `RPR-FRM-001` through `RPR-FRM-005`;
-- stale generated-artifact negative test;
-- deliberate JSON/Python and Python/Lean mismatch fixtures;
-- clean Lean build;
-- documentation phrase audit.
-
-**Required evidence**
-
-- compared state and transition counts and hashes;
-- parity output;
-- Lean build output naming checked modules;
-- list of theorem names and exact claims they support;
-- release-audit result.
-
-**Residual risk**
-
-This does not prove Python executor behavior, SQLite semantics, external effects, legal compliance, or total system safety.
-
-**Permitted wording**
-
-"RPR cross-checks its selected canonical transition model across JSON, generated Python, and Lean 4, with selected invariants machine-checked in CI."
-
-### CLM-12 Built artifacts are usable in a clean environment
-
-**Claim**
-
-The released candidate artifacts contain the required runtime and can be installed and exercised without relying on the development repository.
-
-**Threat / counterexample**
-
-- editable install hides missing package data;
-- wheel omits schemas, generated transitions, or notices;
-- CLI works only from source checkout;
-- legacy names or private paths leak into the artifact;
-- release metadata overstates verified scope.
-
-**Mechanism**
-
-- wheel and sdist build;
-- clean virtual-environment install;
-- import, CLI, and documented scenario execution;
-- artifact content and residue inspection;
-- metadata and claim audit;
-- RC rehearsal without publication.
-
-**Implementation anchors**
-
-- `pyproject.toml`;
-- package-data configuration;
-- CLI entry point;
-- build, audit, and RC rehearsal tools;
-- documentation quick start.
-
-**Trusted assumptions**
-
-- tested Python versions and operating systems represent the declared support matrix;
-- untested platforms are not implied supported.
-
-**Verification strategy**
-
-- `RPR-PKG-001` through `RPR-PKG-010`;
-- installation from artifact path only;
-- removal of source checkout from `PYTHONPATH`;
-- artifact manifest and SHA-256 verification.
-
-**Required evidence**
-
-- artifact names and hashes;
-- fresh-environment package list;
-- import and CLI output;
-- quick-start output;
-- artifact manifest;
-- residue and release-audit results.
-
-**Residual risk**
-
-Passing the clean-environment suite does not establish performance, availability, security hardening, or compatibility outside the declared support matrix.
-
-**Permitted wording**
-
-"The tested RPR wheel and source distribution install and execute the documented scenario in a clean supported environment."
-
-## 5. Cross-cutting technical evidence
-
-The following evidence types SHALL be retained and linked to the corresponding claim IDs.
-
-| Evidence ID | Evidence type | Technical purpose |
-|---|---|---|
-| EV-CODE | source commit and diff | identifies the exact implementation under test |
-| EV-TEST | test ID, result, and log | demonstrates executable behavior and negative cases |
-| EV-DB | pathway, attempt, and event database snapshots | demonstrates durable-state classifications |
-| EV-CALL | executor and observer call trace | distinguishes mutation dispatch from observation |
-| EV-CHAIN | evidence verification output | demonstrates ordering and detects selected tampering |
-| EV-PARITY | JSON/Python/Lean comparison output | demonstrates representation agreement in the declared subset |
-| EV-LEAN | Lean build and theorem inventory | demonstrates selected machine-checked invariants |
-| EV-ART | wheel/sdist manifest and hashes | binds release evidence to artifacts |
-| EV-CLEAN | clean-install and quick-start transcript | demonstrates installed-product usability |
-| EV-AUDIT | release claim and residue audit | prevents unsupported or stale public claims |
-
-## 6. Required claim-to-test traceability
-
-A machine-readable traceability manifest SHALL map every claim ID to:
-
-- required test IDs;
-- implementation anchors;
-- evidence IDs;
-- current status: `not_implemented`, `implemented_unverified`, `passing`, `failing`, `deferred`, or `out_of_scope`;
-- residual owner for every deferral;
-- permitted wording at the current evidence level.
-
-A claim MUST NOT be marked `passing` when any required Blocker or Critical test is missing, skipped, or failing.
-
-## 7. Evidence strength levels
-
-- **E0 — Assertion only**: documentation exists; no implementation evidence.
-- **E1 — Mechanism present**: implementation anchor exists; tests incomplete.
-- **E2 — Component verified**: unit and component tests pass, including negative cases.
-- **E3 — Runtime verified**: integration, persistence, authorization, and restart tests pass.
-- **E4 — Product candidate verified**: mandatory E2E, crash, concurrency, package, and formal-parity checks pass with retained evidence.
-- **E5 — Operationally validated**: external deployment evidence exists under a declared environment and threat model. Not currently claimed.
-
-Public Alpha wording requires E4 for the relevant claim. Production-ready wording is prohibited at E4 and requires a separately approved operational assurance specification.
-
-## 8. Current assurance assessment
-
-At version 0.1:
-
-- the test specification provides broad claim and test coverage;
-- several implementation mechanisms already exist;
-- the explicit claim-to-mechanism-to-evidence mapping was previously incomplete;
-- replay authorization, integrated reconciliation, real restart, crash recovery, and concurrency remain blocking gaps;
-- no claim depending on those gaps may be represented as fully verified;
-- RPR remains a private productization candidate within RPP.
-
-## 9. Completion rule
-
-This assurance case is fulfilled only when:
-
-1. every bounded product claim has a complete traceability entry;
-2. every trusted assumption is declared and scoped;
-3. every Blocker and Critical threat has a falsification-oriented test;
-4. required evidence is retained and bound to the tested build;
-5. residual risks and excluded claims are present in product documentation;
-6. public wording does not exceed the achieved evidence strength;
-7. the Human Gate approves export or release.
+Assurance evidence supports a release decision; it does not make the decision. Tag creation, GitHub Release, PyPI publication, and stronger public claims remain explicit human actions after the exact candidate evidence is reviewed.
