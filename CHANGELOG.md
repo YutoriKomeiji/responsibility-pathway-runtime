@@ -1,12 +1,45 @@
 <!--
 Language: English
 Document-Type: Changelog
-Status: Public Alpha
+Status: Candidate
 -->
 
 # Changelog
 
 All notable changes to Responsibility Pathway Runtime are recorded here.
+
+## [0.1.0a6] - Release candidate / unpublished
+
+### Added
+
+- Responsibility Routing compatibility vocabulary that keeps Human Return as a bounded route rather than a universal fallback;
+- serializable `ResponsibilityRoute` metadata with receiver eligibility, delegation scope, unresolved payload, bounded next actions, closure/reevaluation conditions, and Residual Owner preservation;
+- explicit compatibility classification of `human_gate` as `bounded_human_return` and `write_status_unknown` as `hold_for_reconciliation`;
+- internal read-only route visibility and the public read-only MCP tool `rpr.get_route_visibility(pathway_id)`;
+- bilingual browser demonstration that shows Responsibility Route, persisted runtime state, evidence, restart/reconciliation, and duplicate-dispatch prevention in one scenario;
+- English browser-demo entry point for external evaluation.
+
+### Authority and compatibility boundaries
+
+- route destination, receiver capability, evidence, and route visibility do not create execution or reconciliation Authority;
+- existing Human Gate behavior remains valid as a bounded compatibility route;
+- existing MCP response shapes remain unchanged; route visibility is exposed through a separate opt-in read-only tool;
+- no mutating MCP tool, new dispatch behavior, runtime state-machine replacement, or persistent schema migration is introduced by this candidate;
+- legacy no-route serialization shape and SQLite schema version 1 remain preserved by the migration slice.
+
+### Evidence
+
+- PRs #40–#43 were integrated with exact-head CI/readback before this release-candidate branch was created;
+- the Responsibility Routing browser demo runs the public read-only MCP route-visibility tool against the CI-built wheel while only the external payment provider is simulated;
+- exact-head `0.1.0a6` candidate validation and candidate artifact evidence remain pending on this branch and must be green before any release decision.
+
+### Release boundary
+
+- `0.1.0a6` is not published by this changelog entry;
+- `product-status.json` keeps the currently published product at `0.1.0a5` and records `0.1.0a6` separately as an unapproved, publication-blocked candidate;
+- no release approval marker, GitHub Release workflow, tag, or PyPI publication authorization is created by this candidate preparation;
+- production-ready, enterprise-ready, legal/compliance certification, universal exactly-once, full-formal-verification, and customer-environment claims remain outside scope;
+- tag creation, GitHub Release publication, and PyPI publication require an explicit Master Human Gate.
 
 ## [0.1.0a5] - 2026-08-31
 
