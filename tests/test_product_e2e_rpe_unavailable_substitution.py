@@ -41,7 +41,7 @@ def definition(pathway_id: str) -> PathwayDefinition:
     )
 
 
-def test_unavailable_rpe_fails_closed_and_explicit_substitution_uses_new_pathway(tmp_path) -> None:
+def test_unavailable_rpe_holds_and_explicit_substitution_uses_new_pathway(tmp_path) -> None:
     store_path = tmp_path / "pathways.sqlite3"
     attempt_path = tmp_path / "attempts.sqlite3"
     workspace = tmp_path / "workspace"
@@ -56,8 +56,8 @@ def test_unavailable_rpe_fails_closed_and_explicit_substitution_uses_new_pathway
         idempotency_key="register-rpe-unavailable",
     )
 
-    assert blocked.decision.value == "human_gate"
-    assert blocked.state is PathwayState.HUMAN_GATE
+    assert blocked.decision.value == "hold"
+    assert blocked.state is PathwayState.HELD
     assert "rpe_unavailable" in blocked.reason_codes
 
     blocked_request = ExecutionRequest(
@@ -77,7 +77,7 @@ def test_unavailable_rpe_fails_closed_and_explicit_substitution_uses_new_pathway
         )
 
     assert blocked_executor.calls == 0
-    assert blocked_runtime.store.get_state(blocked_id) is PathwayState.HUMAN_GATE
+    assert blocked_runtime.store.get_state(blocked_id) is PathwayState.HELD
     assert not (workspace / "blocked.txt").exists()
     with pytest.raises(KeyError):
         blocked_runtime.attempt_ledger.get(blocked_request.attempt_id)
@@ -113,7 +113,7 @@ def test_unavailable_rpe_fails_closed_and_explicit_substitution_uses_new_pathway
     assert substitute.state is PathwayState.AWAITING_APPROVAL
     assert substitute.reason_codes[-1] == "authorized_substitute_evaluator"
     assert captured[0]["responsibility_pathway"]["pathway_id"] == substitute_id
-    assert restarted.store.get_state(blocked_id) is PathwayState.HUMAN_GATE
+    assert restarted.store.get_state(blocked_id) is PathwayState.HELD
 
     with pytest.raises(AuthorityError, match="approval_authority"):
         restarted.transition(
@@ -156,6 +156,6 @@ def test_unavailable_rpe_fails_closed_and_explicit_substitution_uses_new_pathway
         "executed after explicit substitution and approval\n"
     )
     assert restarted.store.get_state(substitute_id) is PathwayState.COMPLETED
-    assert restarted.store.get_state(blocked_id) is PathwayState.HUMAN_GATE
+    assert restarted.store.get_state(blocked_id) is PathwayState.HELD
     assert restarted.verify_evidence(substitute_id).valid
     assert restarted.verify_evidence(blocked_id).valid

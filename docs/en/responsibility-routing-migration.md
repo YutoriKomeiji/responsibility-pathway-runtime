@@ -1,22 +1,22 @@
-# Responsibility Routing migration baseline
+# Responsibility Routing compatibility baseline
 
-Status: design baseline for DAN-96. This document does not change runtime behavior or publish a new release.
+Status: implemented source-preview compatibility baseline. The currently published PyPI line remains `0.1.0a5`; this document does not itself publish a new release.
 
 ## Purpose
 
-RPR currently preserves a durable responsibility pathway through approval, execution, uncertain external effect, reconciliation, repair, and resume. The current public API and state model make Human Gate and `human_return_point` first-class concepts. DAN-96 generalizes the top-level abstraction from Human Return to Responsibility Routing while preserving Human Return as a bounded route subtype.
+Responsibility Pathway Runtime (RPR) preserves a durable responsibility pathway through approval, execution, uncertain external effect, reconciliation, repair, and resume. The first public-alpha design made Human Gate and `human_return_point` prominent. Responsibility Routing generalizes the top-level responsibility-transfer model while preserving Human Return as one bounded route.
 
-This migration must remain backward-compatible with the current Public Alpha surface until an explicit release decision is made.
+The compatibility goal is additive change: keep existing state values, persistence, authority fields, and legacy serialization valid while adding route semantics that do not silently create Authority.
 
 ## Core rule
 
-A responsibility-bearing transition is valid only when the selected route preserves the information needed for the next holder to act within legitimate authority and without losing unresolved residue.
+A responsibility-bearing transition is valid only when the selected route preserves enough information for the next holder to act within legitimate Authority and without losing unresolved residue.
 
-Evidence transfer does not create Authority. Capability, model confidence, agent consensus, tool success, recovered checkpoint state, or receipt of a handoff does not silently extend delegation.
+Evidence transfer does not create Authority. Receiver capability, model confidence, agent consensus, tool success, route visibility, recovered checkpoint state, or receipt of a handoff does not silently extend delegation.
 
-## Route outcomes
+## Implemented source-level route vocabulary
 
-The initial design vocabulary is:
+`ResponsibilityRouteClass` currently defines:
 
 - `CONTINUE_AUTONOMOUSLY`
 - `AI_RESOLVE_WITHIN_DELEGATION`
@@ -24,124 +24,123 @@ The initial design vocabulary is:
 - `BOUNDED_HUMAN_RETURN`
 - `STOP_AND_PRESERVE_RESIDUE`
 
-These names are design-level outcomes, not yet public runtime enum values.
+These values exist in the source model, but they are not a promise that every class is already selected automatically by runtime dispatch logic. The first compatibility cycle intentionally classifies only states whose mapping is already justified by existing RPR semantics.
 
-## Required route payload
+## Implemented route record
 
-A future Responsibility Route record should preserve, at minimum:
+`ResponsibilityRoute` can retain:
 
-- source holder or current responsibility state;
-- destination / route class;
+- route class;
+- source holder;
+- destination;
 - receiver eligibility;
-- Authority class and delegation scope;
+- Authority class;
+- delegation scope;
 - unresolved payload / residue;
-- evidence and provenance semantics;
 - allowed next actions;
-- reevaluation / closure condition;
-- timing or expiry where material;
-- Residual Owner.
+- closure condition;
+- reevaluation condition;
+- Residual Owner;
+- optional expiry.
 
-## Current RPR compatibility map
+The record is attached additively to `PathwayDefinition`. When no route is supplied, the legacy serialized definition shape is preserved. Existing SQLite schema version 1 remains unchanged because the optional route is stored inside the existing definition JSON.
+
+The route types are not currently promoted through the top-level `rpr` Python export surface. The externally documented source-preview inspection contract is the separate read-only MCP tool described below.
+
+## Implemented compatibility mapping
+
+Only two current-state mappings are automatic:
+
+- `PathwayState.HUMAN_GATE` -> `bounded_human_return`
+- `PathwayState.WRITE_STATUS_UNKNOWN` -> `hold_for_reconciliation`
+
+Other states remain unclassified until their routing semantics are explicitly designed and reviewed. In particular, completed, repair-ready, or running state is not automatically converted into a new responsibility route merely because a route class exists.
+
+## Human Return remains valid, but bounded
 
 ### `PathwayDefinition.human_return_point`
 
 Classification: `NARROW_BUT_VALID`.
 
-The field remains valid for the bounded human-return route. It should not continue to represent the existence of all valid return/routing options.
-
-Migration direction: retain the field for compatibility and introduce route-level metadata separately. Do not destructively rename it in the first migration.
+The field remains valid when a concrete Human Return is required. It is no longer treated as a universal prerequisite for non-human responsibility routes.
 
 ### `PathwayState.HUMAN_GATE`
 
 Classification: `NARROW_BUT_VALID`.
 
-The state is still necessary when a pathway requires an explicit human decision or authority. It is not a universal routing destination.
-
-Migration direction: preserve the state and define it as one route-specific runtime state. Do not infer that all non-autonomous cases must enter `HUMAN_GATE`.
+The state remains valid for a real human-held decision or Authority boundary. It is not the generic destination for every invalid configuration, unavailable evaluator, ineligible receiver, or unresolved external effect.
 
 ### `RuntimeDecision.HUMAN_GATE`
 
 Classification: `NARROW_BUT_VALID`.
 
-The decision remains meaningful for bounded human-return cases but is too narrow as the only non-autonomous routing decision.
-
-Migration direction: future routing logic should distinguish human return from reconciliation hold, delegated AI resolution, and stop/preserve outcomes. Compatibility adapters may continue to map a bounded human route to `HUMAN_GATE`.
+A high-impact action with a configured approval authority and concrete return point can still require Human Gate. Generic fail-closed conditions use `HOLD` unless a valid Human Gate is independently justified.
 
 ### `InspectionResult.human_return_available`
 
 Classification: `NARROW_BUT_VALID`.
 
-This answers only whether the legacy human-return surface is available.
+This continues to report the legacy Human Return surface only. It must not be interpreted as general route availability or Returnability.
 
-Migration direction: retain it for compatibility and add a route-oriented inspection result later, e.g. route availability / candidate routes / next eligible holder. Do not reinterpret the boolean as general Returnability.
+## Receiver eligibility and false escalation
 
-### explicit authority fields
+An active route with an ineligible receiver, invalid route payload, Residual Owner mismatch, or missing bounded action is invalid and held for definition repair. `REQUIRES_REEVALUATION` is also held until eligibility is rechecked.
 
-Current examples include `approval_authority`, `stop_authority`, and `resume_authority`.
+These conditions do not manufacture a Human Gate. Naming a human is not a safe fallback when receiver eligibility, Authority, context, or bounded next-decision scope has not been established.
 
-Classification: `STILL_VALID`.
+## RPE unavailability and contract failure
 
-Migration direction: reuse these semantics. Responsibility Routing must never infer Authority from evidence, capability, confidence, transport success, or route selection.
+RPE unavailability, adapter failure, or contract mismatch remains fail-closed, but it does not by itself prove that a human receiver is the correct route. The neutral result is `HOLD`.
 
-### owner fields
+If local pathway inspection independently requires a valid Human Gate—for example, a configured high-impact action—the more restrictive Human Gate decision still wins when results are combined.
 
-Current examples include `decision_owner`, `evidence_owner`, `repair_owner`, and `residual_owner`.
+## Authority and ownership
 
-Classification: `STILL_VALID`.
+Existing explicit Authority fields such as `approval_authority`, `stop_authority`, and `resume_authority` remain valid. Existing owner fields such as `decision_owner`, `evidence_owner`, `repair_owner`, and `residual_owner` remain valid.
 
-Migration direction: preserve them. A future route record may reference or narrow these owners, but routing must not silently replace the Residual Owner merely because a new receiver was selected.
+Responsibility Routing does not grant execution or reconciliation Authority from route destination, receiver capability, evidence, or visibility. The route must preserve the pathway Residual Owner unless ownership is explicitly redesigned through a separately authorized change.
 
-### `WRITE_STATUS_UNKNOWN` and reconciliation
+## Unknown external effects
 
-Classification: `STILL_VALID`.
+`write_status_unknown` remains a first-class unresolved state. The route visibility layer reports it as `hold_for_reconciliation`; it is not converted into success, failure, blind retry, or forced Human Return.
 
-This is already a non-human route condition: unresolved effect state remains owned until independent readback / reconciliation can classify it.
+Independent readback / reconciliation remains responsible for classifying the external effect. Repair completion still does not create resume Authority.
 
-Migration direction: model this explicitly as `HOLD_FOR_RECONCILIATION` at the routing layer while preserving the current runtime state and reconciliation machinery.
+## Read-only route visibility
 
-### repair / `READY_TO_RESUME` / resume authority
+The source preview includes `rpr.get_route_visibility(pathway_id)` in the local read-only MCP server. The result can expose:
 
-Classification: `STILL_VALID`.
+- current state;
+- justified compatibility route, when one exists;
+- persisted declared route, when present;
+- Human Return point;
+- Residual Owner;
+- `authority_inferred: false`.
 
-Repair completion does not create resume Authority. A restored execution path and permission to resume remain separate.
+The tool cannot approve, execute, reconcile, repair, resume, select a receiver, or mutate pathway state.
 
-Migration direction: keep the existing distinction and require reevaluation when route-relevant material state has changed.
+## Failure classes covered by the design
 
-### inspection / diagnostics / read-only MCP surfaces
+- **False Autonomy** — execution continues after delegation, Authority, eligibility, or unresolved-residue conditions require another route.
+- **Proxy Return** — work is sent to an AI/system that lacks required Authority or eligibility while appearing safely returned.
+- **False Escalation** — work is sent to a human merely because another component failed, without evidence that Human Return is the valid route.
+- **Nominal Human Return** — a human is named or notified but lacks Authority, context, eligibility, or bounded next-decision scope.
 
-Classification: `STILL_VALID`, with route visibility extension required.
+## Verification layers
 
-Migration direction: add route state and receiver-eligibility information without removing existing fields in the first compatibility cycle.
+The compatibility slice is covered through multiple layers:
 
-## Failure classes
+- unit tests for route serialization, legacy positional/wire compatibility, route validation, Authority non-propagation, and compatibility mapping;
+- component tests for SQLite persistence and route visibility;
+- MCP integration tests for the separate read-only route tool and database byte invariance;
+- runtime/product tests for fail-closed RPE fallback, high-impact Human Gate preservation, ambiguous writes, restart, reconciliation, and duplicate-dispatch prevention;
+- browser/Pyodide tests for the route-visible live demo;
+- package build, clean-install, structural/bilingual, reproducibility, and formal state-model checks in CI.
 
-The migration must make the following failures testable:
+Lean 4 currently verifies selected pathway state-machine invariants. Route metadata, receiver eligibility, and Responsibility Routing selection semantics are not yet formally proved by the Lean layer.
 
-- **False Autonomy** — execution remains autonomous after delegation/Authority or unresolved-residue conditions require another route.
-- **Proxy Return** — work is sent to an AI/system that lacks the required Authority or eligibility, while appearing to have been safely returned.
-- **False Escalation** — work is sent to a human even though an explicitly delegated route could resolve it safely, causing unnecessary intervention burden.
-- **Nominal Human Return** — a human is named or notified but lacks the capability, context, Authority, or bounded next-decision scope needed to actually take responsibility.
+## Compatibility and release boundary
 
-## Smallest safe implementation slice
+This migration does not destructively rename Human Gate or `human_return_point`, does not change SQLite schema version 1, does not add mutating MCP tools, and does not claim that AI bears legal or institutional accountability.
 
-The first implementation slice should be additive and internal-facing:
-
-1. define route classes / outcomes without changing existing state values;
-2. define a serializable Responsibility Route record carrying eligibility, delegation, unresolved residue, allowed actions, closure condition, and Residual Owner;
-3. attach the record to pathway/runtime inspection without changing dispatch semantics;
-4. add compatibility mapping from bounded human route to existing Human Gate / `human_return_point` behavior;
-5. add tests proving Evidence transfer and receiver capability do not create Authority;
-6. add tests proving `WRITE_STATUS_UNKNOWN` maps to reconciliation hold rather than blind retry or forced Human Gate;
-7. only after readback, decide whether new public enums or storage migrations are warranted.
-
-## Non-goals for the first slice
-
-- no destructive rename of Human Gate / `human_return_point`;
-- no claim that AI bears legal or institutional accountability;
-- no automatic Authority transfer;
-- no replacement of execution, reconciliation, repair, or resume state machines;
-- no public release or compatibility break.
-
-## Stop gate
-
-Before changing persistent schemas, public enums, CLI/MCP output contracts, or release artifacts, perform a compatibility readback and explicit Human Gate review.
+Source integration is not the same as binary publication. The currently published package remains `0.1.0a5` until a separately approved release promotion is completed and read back.

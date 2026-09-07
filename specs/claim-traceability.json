@@ -24,7 +24,7 @@
       "test_ids": ["RPR-ADM-002", "RPR-AUT-001", "E2E-01"],
       "evidence_ids": ["EV-CODE", "EV-TEST", "EV-CHAIN"],
       "residual_owner": "Akihisa Ono",
-      "permitted_wording": "RPR enforces an explicit approval transition and prevents configured external dispatch before authorized approval.",
+      "permitted_wording": "RPR enforces an explicit configured approval transition and prevents configured external dispatch before authorized approval.",
       "blocked_by": []
     },
     {
@@ -123,7 +123,7 @@
       "test_ids": ["RPR-FRM-001", "RPR-FRM-005"],
       "evidence_ids": ["EV-PARITY", "EV-LEAN", "EV-AUDIT"],
       "residual_owner": "Akihisa Ono",
-      "permitted_wording": "RPR cross-checks its selected canonical transition model across JSON, generated Python, and Lean 4, with selected invariants machine-checked in CI.",
+      "permitted_wording": "RPR cross-checks its selected canonical state-transition model across JSON, generated Python, and Lean 4, with selected invariants machine-checked in CI. Responsibility Routing receiver eligibility and delegation semantics are outside this Lean claim.",
       "blocked_by": []
     },
     {
@@ -136,6 +136,17 @@
       "residual_owner": "Akihisa Ono",
       "permitted_wording": "The tested RPR wheel and source distribution install and execute the documented scenario in a clean supported environment.",
       "blocked_by": ["production-repository artifact digests require replacement after the integrity repair"]
+    },
+    {
+      "claim_id": "CLM-13",
+      "status": "implemented_unverified",
+      "evidence_level": "E1",
+      "implementation_anchors": ["src/rpr/models.py", "src/rpr/inspection.py", "src/rpr/routing.py", "src/rpr/route_visibility.py", "src/rpr/runtime.py"],
+      "test_ids": ["RPR-RTE-001", "RPR-RTE-002", "RPR-RTE-003", "RPR-RTE-004", "RPR-RTE-005", "RPR-RTE-006", "RPR-RTE-007", "RPR-RTE-008", "E2E-ROUTE-01", "E2E-ROUTE-02"],
+      "evidence_ids": ["EV-CODE"],
+      "residual_owner": "Akihisa Ono",
+      "permitted_wording": "Current RPR source represents bounded Responsibility Routing, preserves receiver eligibility and Residual Owner metadata, and does not infer Authority from route or evidence transfer; release-level assurance remains pending exact-head validation.",
+      "blocked_by": ["exact-head full CI", "browser EN/JA route assertions", "release candidate rebuild after repair"]
     }
   ]
 }

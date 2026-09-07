@@ -58,7 +58,7 @@
       <div class="grid">
         <article class="card"><h3>Human Returnは一つのRoute</h3><p><code>bounded_human_return</code>は、Human Gateが本当に必要な場面の限定Routeです。非自律ケースをすべて人へ戻すという意味ではありません。</p></article>
         <article class="card"><h3>結果不明は照合へ保持する</h3><p><code>write_status_unknown</code>では、送信receiptやtimeoutを成功・失敗へ変換せず、<code>hold_for_reconciliation</code>として未解決状態を保持します。</p></article>
-        <article class="card"><h3>Evidence transfer ≠ Authority transfer</h3><p><code>rpr.get_route_visibility</code>はRouteを読み取るだけです。Receiver名、Capability、Evidence、Tool成功、Route表示から新しいAuthorityは生まれません。</p></article>
+        <article class="card"><h3>Evidence transfer ≠ Authority transfer</h3><p><code>rpr.get_route_visibility</code>はRouteを読み取るだけです。Structured resultは<code>authority_inferred: false</code>を保持します。Receiver名、Capability、Evidence、Tool成功、Route表示から新しいAuthorityは生まれません。</p></article>
       </div>
     </section>
 

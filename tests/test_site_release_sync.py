@@ -26,12 +26,12 @@ def test_public_pages_release_version_matches_published_product() -> None:
     demo = (ROOT / "site" / "demo.html").read_text(encoding="utf-8")
     demo_js = (ROOT / "site" / "demo.js").read_text(encoding="utf-8")
 
-    assert f"Public Alpha · {version}" in english
+    assert f"published {version}" in english
     assert f"<dd>{version}</dd>" in english
     assert expected_tag in english
     assert f"responsibility-pathway-runtime=={version}" in english
 
-    assert f"Public Alpha {version}" in japanese
+    assert f"公開版 {version}" in japanese
     assert f"<dd>{version}</dd>" in japanese
     assert expected_tag in japanese
     assert f"responsibility-pathway-runtime=={version}" in japanese

@@ -1,8 +1,8 @@
 <!--
 Document Title: RPR MCP Integration
 Document Type: Public Product Guide
-Status: Public Alpha and Unreleased Source Preview
-Version: 0.1.0a2
+Status: Public Alpha with Post-Release Source Preview
+Version: 0.1.0a5
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
@@ -10,11 +10,11 @@ Body Language: English
 
 # MCP integration
 
-Responsibility Pathway Runtime (RPR) can govern outbound Model Context Protocol (MCP) tool calls made by a host application. In the published Public Alpha `0.1.0a2`, RPR acts as a client-side execution and evidence layer in front of an MCP server.
+Responsibility Pathway Runtime (RPR) can govern outbound Model Context Protocol (MCP) tool calls made by a host application. Published Public Alpha `0.1.0a5` also includes a local read-only `rpr-mcp` inspection server. Current repository source adds post-`0.1.0a5` Responsibility Routing visibility that is not part of the published `0.1.0a5` package.
 
-> **Published-release boundary:** PyPI `0.1.0a2` governs calls to an MCP server. It does not expose RPR pathway operations as MCP tools.
+> **Published-release boundary:** PyPI `0.1.0a5` governs outbound MCP calls and includes the local read-only RPR MCP inspection server. It does not include the post-release `rpr.get_route_visibility` tool or any mutating RPR MCP tool.
 
-## What is implemented in `0.1.0a2`
+## What is implemented in published `0.1.0a5`
 
 The published outbound MCP path includes:
 
@@ -28,17 +28,25 @@ The published outbound MCP path includes:
 - optional independent readback before a mutating effect is treated as complete;
 - restart and reconciliation paths that do not silently repeat an unresolved call.
 
+Published `rpr-mcp` exposes only:
+
+- `rpr.get_status`
+- `rpr.list_pathways`
+- `rpr.get_pathway`
+- `rpr.get_evidence`
+- `rpr.list_unresolved`
+
 ## Responsibility pathway around an outbound MCP call
 
 ```text
 host application or agent
   -> proposed MCP tool call
-  -> actor, authority, Human Gate, and pathway state
+  -> actor, declared Authority, pathway state, and Responsibility Routing
   -> admitted MCP server and tool binding
   -> tools/call over the configured transport
   -> tool result
   -> independent readback when required
-  -> completed | write_status_unknown | repair | reconcile | human gate
+  -> completed | write_status_unknown | repair | reconcile | bounded human gate | hold
 ```
 
 A successful JSON-RPC response is evidence that the MCP server returned a result. It is not, by itself, proof that a consequential external effect was applied correctly. For mutating tools, the integration should provide an independent and authoritative readback source.
@@ -56,20 +64,19 @@ RPR distinguishes between:
 | A success result is returned but required readback is unavailable | `write_status_unknown` |
 | Independent readback verifies the external effect | Succeeded with readback evidence |
 
-An unresolved call must not be retried merely because the client process restarted or the transport timed out.
+An unresolved call must not be retried merely because the client process restarted or the transport timed out. It also must not be converted automatically into Human Gate merely because the outcome is uncertain. Responsibility Routing may preserve the unresolved effect under a reconciliation hold or another explicitly eligible and authorized route.
 
-## Unreleased read-only RPR MCP server preview
+## Post-`0.1.0a5` Responsibility Routing source preview
 
-The current source tree contains a Phase 1 read-only stdio MCP server for inspecting an existing RPR SQLite pathway store. This source preview is not a new package release and does not change the published package boundary by itself.
+Current repository source adds the read-only tool:
 
-Start it from an editable source installation:
+- `rpr.get_route_visibility`
 
-```bash
-python -m pip install -e .
-rpr-mcp --database ./rpr.sqlite3
-```
+`rpr.get_route_visibility(pathway_id)` exposes current state, narrow compatibility route classification, a persisted declared route when present, the Human Return point, Residual Owner, and an explicit `authority_inferred: false` marker.
 
-The current source preview exposes only:
+The tool does not select a receiver, grant Authority, approve work, execute work, reconcile effects, resume execution, or mutate pathway state. Receiver capability, evidence transfer, successful transport, and route selection do not create Authority.
+
+The current source read-only tool set is therefore:
 
 - `rpr.get_status`
 - `rpr.list_pathways`
@@ -78,9 +85,25 @@ The current source preview exposes only:
 - `rpr.get_evidence`
 - `rpr.list_unresolved`
 
-`rpr.get_route_visibility(pathway_id)` is a read-only Responsibility Routing inspection surface. It can expose the current state, the narrow compatibility route classification already justified by RPR semantics, a persisted declared route when present, the Human Return point, the Residual Owner, and an explicit `authority_inferred: false` marker. The tool does not select a receiver, grant Authority, approve work, execute work, reconcile effects, resume execution, or mutate pathway state.
+This source-preview addition requires a fresh release candidate and exact-head validation before package publication.
 
-The server opens the existing SQLite file with `mode=ro`. It has no MCP tool for approval, execution, transition, reconciliation, repair, or resume. Status output does not disclose the database filesystem path.
+## Running the read-only server
+
+For published `0.1.0a5`:
+
+```bash
+python -m pip install responsibility-pathway-runtime==0.1.0a5
+rpr-mcp --database ./rpr.sqlite3
+```
+
+For the current source preview:
+
+```bash
+python -m pip install -e .
+rpr-mcp --database ./rpr.sqlite3
+```
+
+The server opens the existing SQLite file with `mode=ro`. It has no MCP tool for approval, execution, transition, reconciliation, repair, resume, or Authority grant. Status output does not disclose the database filesystem path.
 
 Example local MCP client configuration:
 
@@ -91,22 +114,20 @@ Example local MCP client configuration:
 }
 ```
 
-> **Trust boundary:** Read-only does not mean non-sensitive. Pathway definitions, route metadata, and retained evidence may contain operational information. Run the preview only for a trusted local MCP client under operating-system permissions that already allow reading the database. It is not an authentication, authorization, tenant-isolation, or redaction gateway.
+> **Trust boundary:** Read-only does not mean non-sensitive. Pathway definitions, route metadata, and retained evidence may contain operational information. Run the server only for a trusted local MCP client under operating-system permissions that already allow reading the database. It is not an authentication, authorization, tenant-isolation, or redaction gateway.
 
 ## Verified and unverified scope
 
-The published public-alpha verification includes local outbound MCP subprocess and stdio paths, fault injection, restart continuity, and duplicate-dispatch prevention in the tested environment.
+Published public-alpha verification includes local outbound MCP subprocess and stdio paths, read-only MCP inspection, fault injection, restart continuity, and duplicate-dispatch prevention in the tested environment.
 
-The read-only server preview adds tests for:
+The post-release route-visibility source preview adds tests for:
 
-- read-only SQLite opening and rejection of write statements;
-- MCP initialization, `tools/list`, and `tools/call`;
-- empty, listed, individual, route-visibility, evidence, and unresolved-pathway results;
-- route visibility that does not infer Authority;
-- malformed JSON-RPC and invalid arguments;
-- structured tool errors and missing pathway IDs;
-- stdout containing JSON-RPC messages only;
-- rejection of missing and non-RPR databases.
+- Responsibility Routing inspection without state mutation;
+- persisted declared route readback;
+- narrow state-to-route compatibility mapping;
+- `authority_inferred: false`;
+- invalid receiver and Authority non-propagation behavior;
+- malformed requests and missing pathway IDs.
 
 The following still require environment-specific evaluation:
 
@@ -118,23 +139,25 @@ The following still require environment-specific evaluation:
 
 ## Integration responsibilities
 
-RPR does not discover that an arbitrary MCP server or client is trustworthy. The integrating application and operator remain responsible for:
+RPR does not discover that an arbitrary MCP server, client, or route receiver is trustworthy or authorized. The integrating application and operator remain responsible for:
 
 - selecting and authenticating MCP peers;
+- supplying receiver eligibility and delegation source-of-truth;
 - protecting credentials, database files, and environment variables;
 - restricting process, network, filesystem, and tool permissions;
-- deciding which outbound tools require Human Gate;
+- deciding which outbound tools require bounded Human Gate;
 - supplying authoritative independent readback for consequential effects;
 - defining repair, reconciliation, resume, and residual ownership;
 - preventing alternate execution paths that bypass RPR;
 - preventing untrusted MCP clients from reading pathway, route, and evidence data.
 
-## Still not implemented
+## Not implemented as MCP mutations
 
-The source preview does not expose mutating RPR operations. Tools such as `rpr.request_human_gate`, `rpr.approve`, `rpr.execute`, `rpr.reconcile`, or `rpr.resume` remain future design candidates, not current capabilities.
+Current source does not expose mutating RPR MCP operations. Tools such as `rpr.request_human_gate`, `rpr.approve`, `rpr.execute`, `rpr.reconcile`, or `rpr.resume` are not current capabilities.
 
 See also:
 
 - [Product scope and architecture](product-scope-architecture.md)
+- [Responsibility Routing migration](responsibility-routing-migration.md)
 - [Security, integration, and API boundary](security-integration-api.md)
 - [Verification, release notes, known issues, and UAT](verification-release-uat.md)

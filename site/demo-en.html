@@ -58,7 +58,7 @@
       <div class="grid">
         <article class="card"><h3>Human Return is one bounded route</h3><p><code>bounded_human_return</code> represents cases that really need a human decision or human-held Authority. It is not the universal destination for every non-autonomous case.</p></article>
         <article class="card"><h3>Unknown effects stay in reconciliation</h3><p><code>write_status_unknown</code> is not silently converted into success, failure, or a retry. The unresolved effect remains visible as <code>hold_for_reconciliation</code>.</p></article>
-        <article class="card"><h3>Evidence transfer ≠ Authority transfer</h3><p><code>rpr.get_route_visibility</code> is read-only. A receiver name, capability, evidence item, tool success, or route display does not create new Authority.</p></article>
+        <article class="card"><h3>Evidence transfer ≠ Authority transfer</h3><p><code>rpr.get_route_visibility</code> is read-only. Its structured result carries <code>authority_inferred: false</code>. A receiver name, capability, evidence item, tool success, or route display does not create new Authority.</p></article>
       </div>
     </section>
 

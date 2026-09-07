@@ -18,7 +18,7 @@ REGISTRY = ROOT / "specs" / "test-id-registry.json"
 
 def test_canonical_claim_traceability_manifest_is_valid() -> None:
     data = validate_manifest(MANIFEST, root=ROOT, registry_path=REGISTRY)
-    assert len(data["claims"]) == 12
+    assert len(data["claims"]) == 13
 
 
 def _write(tmp_path: Path, name: str, data: dict) -> Path:

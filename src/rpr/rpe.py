@@ -40,7 +40,10 @@ class AllowAllDevelopmentEvaluator:
 class UnavailableRpeEvaluator:
     def evaluate(self, action_request: dict[str, Any]) -> RpeResult:
         del action_request
-        return RpeResult(RuntimeDecision.HUMAN_GATE, ("rpe_unavailable",))
+        # Unavailability is fail-closed, but it does not establish that a human
+        # receiver is eligible or required. Local inspection can independently
+        # require a bounded Human Gate when that route is actually justified.
+        return RpeResult(RuntimeDecision.HOLD, ("rpe_unavailable",))
 
 
 def _normalize_result(value: Any, *, expected_contract_version: str | None = None) -> RpeResult:
@@ -96,7 +99,7 @@ class PythonRpeEvaluator:
         except RpeContractError:
             raise
         except Exception as exc:  # fail closed across the external boundary
-            return RpeResult(RuntimeDecision.HUMAN_GATE, ("rpe_python_error", type(exc).__name__))
+            return RpeResult(RuntimeDecision.HOLD, ("rpe_python_error", type(exc).__name__))
 
 
 class RestRpeEvaluator:
@@ -125,4 +128,4 @@ class RestRpeEvaluator:
         except RpeContractError:
             raise
         except (error.URLError, TimeoutError, json.JSONDecodeError, UnicodeDecodeError) as exc:
-            return RpeResult(RuntimeDecision.HUMAN_GATE, ("rpe_rest_unavailable", type(exc).__name__))
+            return RpeResult(RuntimeDecision.HOLD, ("rpe_rest_unavailable", type(exc).__name__))

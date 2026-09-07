@@ -28,6 +28,16 @@
     {"test_id":"RPR-FRM-001","binding":"file_bound","source":"tests/test_product_e2e.py"},
     {"test_id":"RPR-FRM-005","binding":"file_bound","source":"tests/test_product_e2e.py"},
     {"test_id":"RPR-PKG-001","binding":"file_bound","source":"tests/test_product_e2e.py"},
-    {"test_id":"RPR-PKG-010","binding":"file_bound","source":"tests/test_product_e2e.py"}
+    {"test_id":"RPR-PKG-010","binding":"file_bound","source":"tests/test_product_e2e.py"},
+    {"test_id":"RPR-RTE-001","binding":"file_bound","source":"tests/test_inspection.py"},
+    {"test_id":"RPR-RTE-002","binding":"file_bound","source":"tests/test_responsibility_routing_fallbacks.py"},
+    {"test_id":"RPR-RTE-003","binding":"file_bound","source":"tests/test_responsibility_routing_fallbacks.py"},
+    {"test_id":"RPR-RTE-004","binding":"file_bound","source":"tests/test_responsibility_route.py"},
+    {"test_id":"RPR-RTE-005","binding":"file_bound","source":"tests/test_inspection.py"},
+    {"test_id":"RPR-RTE-006","binding":"file_bound","source":"tests/test_inspection.py"},
+    {"test_id":"RPR-RTE-007","binding":"file_bound","source":"tests/test_responsibility_routing_fallbacks.py"},
+    {"test_id":"RPR-RTE-008","binding":"file_bound","source":"tests/test_route_visibility.py"},
+    {"test_id":"E2E-ROUTE-01","binding":"file_bound","source":"tests/test_product_e2e_responsibility_routing.py"},
+    {"test_id":"E2E-ROUTE-02","binding":"file_bound","source":".github/workflows/pages.yml"}
   ]
 }

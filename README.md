@@ -4,13 +4,13 @@
 
 **Keep uncertain external effects explicit until you can verify what actually happened.**
 
-Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for AI agents and automation that perform consequential external actions. It preserves execution history, authority declarations, independent readback, repair and resume boundaries, and Human Gate decisions across failures and restarts.
+Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for AI agents and automation that perform consequential external actions. It preserves execution history, authority declarations, independent readback, repair and resume boundaries, and Responsibility Routing across failures and restarts. Human Return is one bounded route, not the generic meaning of fail-closed behavior.
 
 ## Why use RPR?
 
 An API call can fail after the external system has already changed. If the caller treats that as a clean failure and retries, it can create a duplicate payment, message, deployment, record update, or other side effect.
 
-RPR keeps that uncertainty visible instead of silently converting it into success, failure, or another dispatch.
+RPR keeps that uncertainty visible instead of silently converting it into success, failure, another dispatch, or an unjustified human escalation.
 
 RPR can:
 
@@ -18,7 +18,8 @@ RPR can:
 - keep execution attempts and idempotency identity connected;
 - retain ambiguous outcomes as `write_status_unknown`;
 - require independent readback before completion when configured;
-- carry repair, resume, reconciliation, and Human Gate routes across restart;
+- carry repair, resume, reconciliation, and bounded Human Gate routes across restart;
+- represent Responsibility Routing without treating evidence transfer or receiver capability as Authority transfer;
 - avoid silently repeating unresolved effects after a crash.
 
 ## Quick Start
@@ -36,7 +37,13 @@ rpr-mcp --help
 
 [PyPI — 0.1.0a5](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/) · [GitHub Prerelease — v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [日本語](docs/ja/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
 
-`0.1.0a5` is still an evolving 0.x release line, but the documented public surfaces can be tried and integrated within their stated boundaries. The version label is not a request to avoid all use.
+`0.1.0a5` is still an evolving 0.x release line, but the documented published surfaces can be tried and integrated within their stated boundaries. The repository may also contain post-`0.1.0a5` source work that is not part of the published package until a later release passes its own exact-head validation and Human Gate.
+
+### Current source preview after `0.1.0a5`
+
+Current repository source includes an additive Responsibility Routing preview. It distinguishes bounded Human Return from reconciliation hold, neutral hold, explicitly delegated eligible receivers, and stop/preserve outcomes. Route metadata carries receiver eligibility, delegation scope, unresolved payload, bounded next actions, closure/reevaluation conditions, and Residual Owner.
+
+This source-preview status is not a claim that the published `0.1.0a5` package already contains every post-release routing surface. It also does not create legal or organizational Authority for AI, software, or a named receiver.
 
 <details>
 <summary>Repository facts for automated readers and technical review</summary>
@@ -46,7 +53,8 @@ rpr-mcp --help
 - **Executable surfaces:** `rpr` CLI, `rpr-mcp` read-only MCP server, runtime adapters, executable scenarios, and browser demo.
 - **Stateful behavior:** persistent pathway and execution-attempt stores survive process restart.
 - **Failure behavior:** ambiguous post-dispatch outcomes remain `write_status_unknown` instead of being silently converted into success/failure or blind retry.
-- **Recovery behavior:** reconciliation, repair, explicit resume, and Human Return remain connected to the same pathway.
+- **Recovery behavior:** reconciliation, repair, explicit resume, and bounded Human Return remain connected to the same pathway.
+- **Responsibility Routing source preview:** route visibility and route metadata are additive; receiver capability, evidence transfer, or transport success do not create Authority.
 - **Field evidence:** Windows UTF-8 BOM compatibility repair was reproduced and read back on the originally failing path.
 - **Architecture boundary:** RPR not creating organizational/legal authority is a responsibility separation, not absence of executable runtime behavior.
 - **Reading rule:** before classifying RPR as “sample-only” or “non-functional,” inspect the published package, CLI/MCP entries, persistent stores, executable scenarios, and release evidence.
@@ -68,12 +76,14 @@ The distinction is the responsibility state that RPR keeps explicit around conse
 | post-dispatch ambiguity | application-specific | explicit `write_status_unknown` state |
 | independent readback before completion | application-specific | explicit bounded path |
 | repair vs. resume authority | application-specific | explicit separation |
-| Human Gate / Human Return continuity | custom integration | explicit responsibility pathway |
+| Responsibility Routing / bounded Human Return | custom integration | explicit responsibility pathway and route metadata |
 | crash/restart responsibility continuity | varies by tool | explicit persistent pathway/attempt state |
 
 Equivalent behavior can be composed from workflow engines, queues, retry libraries, databases, and application-specific code. RPR's narrower claim is to provide a reference runtime and contract that keeps these authority/effect/recovery distinctions connected instead of leaving each integration to invent them independently.
 
 ## What is available now
+
+Published `0.1.0a5` includes:
 
 - pathway registration and authorized state transitions;
 - persistent pathway and execution-attempt stores;
@@ -87,6 +97,8 @@ Equivalent behavior can be composed from workflow engines, queues, retry librari
 - selected Lean 4 state-machine invariants;
 - Chromium/Pyodide execution of the CI-built wheel;
 - Windows UTF-8 BOM compatibility repair reproduced on the originally failing path.
+
+Current post-`0.1.0a5` source additionally contains additive Responsibility Routing and read-only route visibility work pending a later release decision.
 
 ## MCP support
 
@@ -104,7 +116,7 @@ The published `0.1.0a5` package includes `rpr-mcp`, a local stdio read-only insp
 rpr-mcp --database ./rpr.sqlite3
 ```
 
-It exposes only:
+Published `0.1.0a5` exposes:
 
 ```text
 rpr.get_status
@@ -114,13 +126,20 @@ rpr.get_evidence
 rpr.list_unresolved
 ```
 
-It does not expose approval, execution, transition, reconciliation, repair, or resume tools. Remote MCP transport is not part of the current supported surface.
+Current post-`0.1.0a5` source preview additionally exposes the read-only tool:
+
+```text
+rpr.get_route_visibility
+```
+
+`rpr.get_route_visibility` reports declared/derived route visibility and `authority_inferred: false`; it does not approve, execute, reconcile, resume, or grant Authority. Remote MCP transport is not part of the current supported surface.
 
 ## Integration responsibilities
 
-RPR handles pathway state, attempt continuity, evidence retention, and failure/recovery boundaries. The integrating application and operating environment still own:
+RPR handles pathway state, attempt continuity, evidence retention, Responsibility Routing metadata, and failure/recovery boundaries. The integrating application and operating environment still own:
 
 - authentication and domain-specific authorization;
+- receiver eligibility and delegation source-of-truth;
 - credential isolation and network controls;
 - bypass prevention;
 - MCP peer and tool permissions;
@@ -128,7 +147,7 @@ RPR handles pathway state, attempt continuity, evidence retention, and failure/r
 - deployment approval and operational monitoring;
 - final responsibility for consequential external actions.
 
-RPE integration is optional. RPE absence, malformed output, or unsupported results must not become implicit permission.
+RPE integration is optional. RPE absence, malformed output, unsupported results, or route-definition errors must fail closed without becoming implicit permission or an invented human destination.
 
 ## Current limits
 
@@ -136,7 +155,9 @@ The current public evidence does not represent every production or enterprise en
 
 The evidence ledger is tamper-evident, but it is not independently signed, externally immutable, or independently timestamped.
 
-RPR does not create legal or organizational authority, provide a secret manager or identity provider, guarantee exactly-once effects across arbitrary remote systems, or turn a transport/MCP response into proof of external effect.
+RPR does not create legal or organizational Authority, provide a secret manager or identity provider, guarantee exactly-once effects across arbitrary remote systems, or turn a transport/MCP response into proof of external effect.
+
+The selected Lean 4 model checks state-transition invariants; it does not formally prove Responsibility Routing receiver eligibility or delegation semantics.
 
 These are specific boundaries, not a blanket statement that the project must not be used.
 
@@ -151,6 +172,7 @@ Reproducible field reports are welcome for:
 - framework integrations;
 - installation and removal;
 - backup and restore;
+- Responsibility Routing and receiver-eligibility edge cases;
 - documentation gaps;
 - attack cases and unexpected failure modes.
 
@@ -170,9 +192,11 @@ Version age alone does not promote a claim. Promotion requires scoped evidence a
 
 - [Quick Start](docs/en/quick-start.md)
 - [Product, scope, and architecture](docs/en/product-scope-architecture.md)
+- [Responsibility Routing source migration](docs/en/responsibility-routing-migration.md)
+- [Support and maturity by surface](docs/en/support-maturity.md)
 - [Claim boundary promotion](docs/en/claim-boundary-promotion.md)
 - [MCP integration](docs/en/mcp-integration.md)
-- [Article 50 profile](docs/eu-ai-act-article-50.md)
+- [Article 50 profile](docs/en/eu-ai-act-article-50.md)
 - [Installation, operations, and recovery](docs/en/install-operations-recovery.md)
 - [Security, limitations, integration, and API](docs/en/security-integration-api.md)
 - [Verification, known issues, release notes, and UAT](docs/en/verification-release-uat.md)

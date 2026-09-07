@@ -1,101 +1,105 @@
 # 本番級デモ：統治された仕入先支払実行
 
-> Responsibility Pathway Runtime `0.1.0a2` Public Alpha向けシナリオ。
+> 現行RPR repository source向けの実行可能integration scenarioです。公開package baselineは`0.1.0a5`で、現行sourceには公開wheelへまだ含まれていないpost-`0.1.0a5` Responsibility Routing workが含まれる場合があります。
 >
-> これは玩具的なカウンター、承認ボタンだけのモック、成功だけを見せる疑似デモではありません。凍結候補に含まれる実RPR runtime interfaceを使い、永続状態、Human Gateへの帰還、外部writeの曖昧性、独立readback、再起動継続、修復、reconciliationを検証する実行可能な統合シナリオです。
+> 成功だけを見せるsimulated walkthroughではありません。実RPR interfaceを使い、persistent state、configured Human Gate approval、external write ambiguity、independent readback、durable SQLite state上でのruntime recreation、reconciliation、duplicate-dispatch preventionを確認します。Payment providerだけは決定論的local integration fixtureです。
 
-## 業務シナリオ
+## Business scenario
 
-財務自動化serviceが承認済みの仕入先請求書を受け取り、allow-listされた支払APIへ支払指図を提案します。支払は重大な外部作用であり、callerがtimeoutしたという理由だけで再実行してはなりません。
+Finance automation serviceが承認済みsupplier invoiceを受け取り、allow-listされたpayment APIへpayment instructionを提案します。Paymentは重大なexternal effectであり、callerがtimeoutしたという理由だけで繰り返してはいけません。
 
-Host applicationは、次を保持します。
+Host applicationは次を保持します。
 
-- 提案されたactionと宣言されたauthority
+- proposed actionとdeclared Authority
 - operationと各execution attemptのidentity
-- dispatchを許可したHuman Gate decision
-- 外部requestと限定されたresponse evidence
-- 支払状態endpointからの独立readback
-- write結果が曖昧な場合の明示的な未解決状態
-- 重複dispatchを起こさないrestart-safe recovery
-- reconciliation、repair、resume、residual ownership
+- dispatchを許可するconfigured bounded Human Gate decision
+- external requestとbounded response Evidence
+- payment-status endpointからのindependent readback
+- write結果が曖昧な場合の明示的unresolved state
+- duplicate dispatchを起こさないrestart/recreation-safe recovery
+- reconciliation、repair/resume boundary、Residual Owner
 
-## 本番級デモと呼べる理由
+`Fail closed`は`send to a human`と同義ではありません。現行Responsibility Routingでは、unresolved effectをreconciliation holdへ保持できます。Human Returnはhuman-held Authorityが実際に必要な場合のbounded routeです。
 
-このシナリオは、凍結候補のtestで扱われる同じ製品経路を使用します。
+## このデモが実際に実行するもの
 
-- 永続的pathway storeとexecution-attempt store
-- 認可されたruntime transition
-- allow-listされたHTTP execution
+現行demoは次を使用します。
+
+- `ResponsibilityPathwayRuntime`
+- persistent SQLite pathway / execution-attempt store
+- authorized runtime transition
+- allow-listed HTTP execution
 - idempotency identityとduplicate-dispatch prevention
-- `write_status_unknown`によるfail-closed処理
-- completion前の独立readback
-- Human Gateへの帰還とresume
-- 未解決execution中のprocess restart
-- reconciliationと明示的repair decision
-- operational diagnosticsと保持されたevidence
+- `write_status_unknown` fail-closed handling
+- completion前のindependent readback
+- configured Human Gate approval
+- 同じdurable store上での新しいruntime object再構築
+- runtime-integrated reconciliation
+- Evidence chain verification
 
-外部支払serviceは、実金融systemへ接続せずに、通常完了、remote rejection、受付後timeout、readback unavailable、restart条件を再現する決定論的local integration fixtureです。Fixtureは統合test doubleですが、RPR runtime、persistence、state transition、executor path、diagnostics、recovery behaviorは実製品codeを使用します。
+External payment serviceはdeterministic localhost fixtureで置き換え、実financial systemへ接続せずauthorized completion、accept後timeout、readback unavailable、human rejectionを再現します。Fixtureはtest doubleですが、RPR runtime、persistence、transition、executor path、reconciliationはproduct codeです。
 
-## 役割と責任境界
+このcommand-line demo単体は、**OS process kill/restart boundaryを証明しません**。Process-level interruption/restart behaviorはrepository内の別test matrixで扱い、このdemoではdurable SQLite stateに対してruntime/store objectを再構築します。Runtime recreationをsubprocess restartと表現してはいけません。
+
+## RoleとResponsibility boundary
 
 | Role | Responsibility |
 |---|---|
-| Host finance application | 認証、請求書の妥当性、credential、network policy、支払domain authorization、bypass防止 |
-| Human approver | 最終的な支払認可と例外的reconciliation decision |
-| RPR | Pathway state、execution-attempt continuity、evidence retention、stop／repair／resume boundary |
-| Payment API fixture | 再現可能な統合testのための決定論的external effectとreadback behavior |
-| Operator | 環境設定、backup、diagnostics、incident handling、保持されたcustomer data |
+| Host finance application | Authentication、invoice validity、credential、network policy、payment-domain authorization、bypass prevention、receiver eligibility/delegation source-of-truth |
+| Human approver | configured bounded Human Gateがhuman-held Authorityを必要とする場合のpayment authorization |
+| RPR | Pathway state、execution-attempt continuity、Evidence retention、reconciliation/repair/resume boundary、configured route metadata |
+| Payment API fixture | 再現可能なintegration test向けdeterministic external effect / readback behavior |
+| Operator | Environment configuration、backup、diagnostics、incident handling、retained customer data |
 
-RPRは、請求書が法的に支払可能かを判断せず、承認者を認証せず、credentialを保護せず、任意のremote systemに対する普遍的exactly-once behaviorを保証しません。
+RPRはinvoiceが法的に支払可能かを決めず、approverを認証せず、organizational Authorityを生成せず、任意remote systemに対するexactly-onceを保証しません。Evidence transferやreceiver capabilityもAuthorityを生成しません。
 
-## デモ経路
+## Demonstration paths
 
-### Path A — 認可された完了
+### Path A — Authorized completion
 
-1. 支払pathwayを登録する。
-2. Dispatch前にHuman Gateへ戻す。
-3. 明示的なapprovalを記録する。
-4. 安定したidempotency identityで一度だけdispatchする。
-5. 支払状態を独立にreadbackする。
-6. Readbackが意図した支払を確認した後にのみcompleteとする。
-7. 保持されたpathway、attempt、authority、evidence recordを出力する。
+1. Payment pathwayをregisterする。
+2. Dispatch前のconfigured Human Gateへ入る。
+3. Explicit approvalを記録する。
+4. Stable idempotency identityで一度だけdispatchする。
+5. Payment statusをindependentにreadbackする。
+6. Readbackがintended paymentを確認した後だけcompleteする。
 
-期待結果：readback evidenceを持つcompleted pathwayと、1回だけのexternal dispatch。
+Expected result: verified readback付きcompleted pathway、external dispatchは1回。
 
-### Path B — Remote受付後のtimeout
+### Path B — Remote acceptance後timeout
 
-1. Fixtureが支払を受け付け、external effectを永続化する。
-2. RPRが確定responseを受け取る前にconnectionが失敗する。
-3. RPRは成功または安全なretryではなく、`write_status_unknown`を記録する。
-4. Processを終了し、再起動する。
-5. RPRが未解決attemptを復元し、blind redispatchを防ぐ。
-6. Reconciliationが独立status endpointを照会する。
-7. Operatorがreconciliation outcomeを記録し、明示的authority decisionの下でresumeまたはrepairする。
+1. Fixtureがpaymentをacceptしexternal effectを記録する。
+2. RPRがconclusive responseを受け取る前にconnectionが失敗する。
+3. RPRはsuccessやsafe retryではなく`write_status_unknown`を記録する。
+4. 同じSQLite store上で新しいruntimeを構築する。
+5. Re-executionはredispatchせずpersisted unresolved attemptを返す。
+6. Reconciliationがindependent status endpointをqueryする。
+7. Verified observationが2回目のpayment dispatchなしでpathwayを閉じる。
 
-期待結果：支払重複なし、曖昧性の可視化、attempt continuityの保持、明示的resolution evidence。
+Expected result: dispatch 1回、ambiguity可視、durable attempt continuity、明示的reconciliation Evidence。
 
 ### Path C — Readback unavailable
 
-1. Dispatchがaccepted responseを受け取る。
-2. 独立readbackが利用できない。
-3. Completionをblockしたままにする。
-4. Diagnosticsが未解決pathwayと必要なoperator actionを表示する。
-5. 後のreadbackまたは承認済みrepair routeで状態を解決する。
+1. Dispatchがaccepted responseを受ける。
+2. Independent readbackが利用できない。
+3. Completionは`write_status_unknown`のままblockされる。
+4. Runtime recreationでもblind redispatchしない。
+5. 十分なEvidenceが得られるまでreconciliationはunresolvedのまま残る。
 
-期待結果：acceptedをverified completionとして扱わない。
+Expected result: acceptedをverified completionとして扱わない。
 
 ### Path D — Human rejection
 
-1. 提案された支払を登録する。
-2. Human Gateへ戻す。
-3. 理由とauthority identityを伴うrejectionを記録する。
+1. Proposed paymentをregisterする。
+2. Configured Human Gateへ入る。
+3. ReasonとAuthority identityを伴うrejectionを記録する。
 4. External dispatchが発生していないことを確認する。
 
-期待結果：external effectが0件のterminatedまたはheld pathway。
+Expected result: denied pathway、external effect 0件。
 
-## 必須デモpackage
+## 実際のrepository内容
 
-公開repository exportには次を含めます。
+現行public repositoryには次があります。
 
 ```text
 examples/production-grade-demo/
@@ -103,39 +107,27 @@ examples/production-grade-demo/
 ├── README.ja.md
 ├── payment_service.py
 ├── run_demo.py
-├── scenarios/
-│   ├── authorized-completion.json
-│   ├── timeout-after-acceptance.json
-│   ├── readback-unavailable.json
-│   └── human-rejection.json
-├── expected/
-│   ├── authorized-completion.json
-│   ├── timeout-after-acceptance.json
-│   ├── readback-unavailable.json
-│   └── human-rejection.json
 └── tests/
     └── test_demo_scenarios.py
 ```
 
-Scriptは出荷されたRPR packageを呼び出し、デモ内部でpathway state machineを再実装してはなりません。
+現行実装に別個の`scenarios/`や`expected/`directoryはありません。Scenario selectionとassertionは`run_demo.py`と`tests/test_demo_scenarios.py`に実装されています。Documentationが存在しないartifactを示してはいけません。
 
-## 受入基準
+Scriptはinstall/import可能なRPR package interfaceを呼び出し、demo内部でpathway state machineを再実装しません。
 
-次のすべてがclean environmentで通過した場合にのみ、デモをrelease eligibleとします。
+## 現在存在するautomated acceptance
 
-- RPP source treeではなく凍結wheelからinstallする
-- localhost以外へのnetwork accessなしで動作する
-- 明示的state directoryがない限りtemporary directoryを使う
-- 決定論的なmachine-readable resultを生成する
-- timeout-after-acceptance scenarioでdispatchが1回だけであることを証明する
-- 実subprocess restartを通過する
-- product diagnostics経路で未解決workを表示する
-- 実credential、endpoint、personal data、internal repository linkを含まない
-- retained stateとevidenceをexpected outputと比較するautomated testを持つ
-- product behaviorと決定論的external fixtureを明確に区別する
+`tests/test_demo_scenarios.py`は次を確認します。
 
-## 品質と主張境界
+- authorized completionが1 dispatchで完了しEvidenceがvalid
+- timeout-after-acceptanceが`write_status_unknown`になり、runtime recreation後にreconcileし、dispatchは1回のまま
+- readback unavailableがcompleteしない
+- human rejectionでexternal effectが0件
 
-このデモの通過は、試験環境における宣言済みscenarioだけを検証します。実支払systemのproduction readiness、金融規制適合、credential security、普遍的exactly-once delivery、特定組織への適合性を立証しません。
+Release-level clean-wheel install、full test、artifact reproducibility、formal check、browser/Pyodide verification、exact-head CIは別のproduct gateです。このdemo testだけから推論してはいけません。
 
-実配備では、認証されたauthorization source、credential isolation、network control、独立external readback、operational ownership、incident procedureを別途用意する必要があります。
+## Qualityとclaim boundary
+
+このdemoのpassは、tested environmentにおける宣言済みscenarioを検証します。Real payment systemのproduction readiness、financial regulatory compliance、credential security、universal exactly-once、organizational delegationの正当性、特定organizationへの適合性は示しません。
+
+Real deploymentは、authenticated authorization source、receiver eligibility/delegation source-of-truth、credential isolation、network control、independent external readback、operational ownership、incident procedureを別途提供する必要があります。

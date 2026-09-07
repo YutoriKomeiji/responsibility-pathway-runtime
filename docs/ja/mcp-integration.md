@@ -1,8 +1,8 @@
 <!--
 Document Title: RPR MCP Integration Japanese Guide
 Document Type: Public Product Guide
-Status: Public Alpha and Unreleased Source Preview
-Version: 0.1.0a2
+Status: Public Alpha with Post-Release Source Preview
+Version: 0.1.0a5
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: Japanese
@@ -10,13 +10,13 @@ Body Language: Japanese
 
 # MCP統合
 
-Responsibility Pathway Runtime（RPR）は、統合ApplicationからMCP Serverへ送るTool Callを、責任経路の中で管理できます。公開済みPublic Alpha `0.1.0a2`では、RPRはMCP Serverの手前に置くClient側の実行・証拠レイヤーとして動きます。
+Responsibility Pathway Runtime（RPR）は、統合ApplicationからMCP Serverへ送るTool Callを責任経路の中で管理できます。公開済みPublic Alpha `0.1.0a5`には、local read-only `rpr-mcp` inspection serverも含まれます。現行repository sourceには、`0.1.0a5`公開後のResponsibility Routing visibilityが追加されていますが、これは公開済み`0.1.0a5` packageには含まれません。
 
-> **公開Releaseの境界:** PyPI `0.1.0a2`はMCP Serverへの呼び出しを統治します。RPR自身のPathway操作をMCP Toolとして公開する機能は含みません。
+> **公開Releaseの境界:** PyPI `0.1.0a5`はoutbound MCP Callを統治し、local read-only RPR MCP inspection serverを含みます。Post-releaseの`rpr.get_route_visibility`と、変更系RPR MCP Toolは含みません。
 
-## `0.1.0a2`で現在できること
+## 公開済み`0.1.0a5`でできること
 
-公開済みのoutbound MCP経路には、次が実装されています。
+公開済みのoutbound MCP経路には次が実装されています。
 
 - Local subprocessの起動とstdio transport
 - MCP JSON-RPC sessionとframing
@@ -24,28 +24,36 @@ Responsibility Pathway Runtime（RPR）は、統合ApplicationからMCP Server�
 - `tools/call`前のadmission check
 - Execution attemptの継続とEvidence保持
 - 送信前に確実に失敗した場合と、送信後かもしれない失敗の分離
-- 不明なTool Callを`write_status_unknown`として閉じずに保持
+- 不明なTool Callを`write_status_unknown`として保持
 - 変更を伴うToolについて、完了前に独立readbackを要求できる構造
 - Restart後も未解決Callを黙って再送しないreconciliation経路
+
+公開済み`rpr-mcp`のread-only toolは次です。
+
+- `rpr.get_status`
+- `rpr.list_pathways`
+- `rpr.get_pathway`
+- `rpr.get_evidence`
+- `rpr.list_unresolved`
 
 ## outbound MCP Tool Callを通る責任経路
 
 ```text
 Host ApplicationまたはAgent
   -> MCP Tool Callの提案
-  -> Actor、Authority、Human Gate、Pathway State
+  -> Actor、declared Authority、Pathway State、Responsibility Routing
   -> 許可されたMCP ServerとToolのbinding
   -> 設定されたTransportでtools/call
   -> Tool Result
   -> 必要な場合は独立readback
-  -> completed | write_status_unknown | repair | reconcile | human gate
+  -> completed | write_status_unknown | repair | reconcile | bounded human gate | hold
 ```
 
-JSON-RPCの成功応答は、MCP Serverが結果を返した証拠です。しかし、それだけで外部の変更が正しく成立した証拠にはなりません。変更を伴うToolでは、統合側が独立かつ権威あるreadback sourceを用意する必要があります。
+JSON-RPCの成功応答は、MCP Serverが結果を返したEvidenceです。しかし、それだけで外部の変更が正しく成立したEvidenceにはなりません。変更を伴うToolでは、統合側が独立かつ権威あるreadback sourceを用意する必要があります。
 
 ## 結果が分からないとき
 
-RPRは、次のように扱いを分けます。
+RPRは次のように扱いを分けます。
 
 | 観測できたこと | RPRでの扱い |
 |---|---|
@@ -56,20 +64,19 @@ RPRは、次のように扱いを分けます。
 | 成功応答はあるが、必須readbackを取得できない | `write_status_unknown` |
 | 独立readbackで外部作用を確認できた | Readback Evidenceを伴う成功 |
 
-Client Processが再起動した、またはTransportがtimeoutしたという理由だけで、未解決Callを再送してはいけません。
+Client Processが再起動した、またはTransportがtimeoutしたという理由だけで、未解決Callを再送してはいけません。また、結果が不明というだけで自動的にHuman Gateへ変換してはいけません。Responsibility Routingは、reconciliation holdや、明示的にeligibleかつauthorizedな別routeへ未解決effectを保持できます。
 
-## 未公開の読み取り専用RPR MCP Server Preview
+## Post-`0.1.0a5` Responsibility Routing source preview
 
-現在のSource Treeには、既存のRPR SQLite Pathway Storeを参照するPhase 1の読み取り専用stdio MCP Serverがあります。このSource Previewは、それ自体では新しいPackage Releaseを意味しません。
+現行repository sourceは次のread-only toolを追加しています。
 
-Editable installしたSourceから起動します。
+- `rpr.get_route_visibility`
 
-```bash
-python -m pip install -e .
-rpr-mcp --database ./rpr.sqlite3
-```
+`rpr.get_route_visibility(pathway_id)`は、current state、限定的なcompatibility route、保存済みdeclared route、Human Return point、Residual Owner、`authority_inferred: false`を返します。
 
-現在のSource Previewが公開するToolは次に限定しています。
+このToolはreceiverを選択せず、Authorityを付与せず、承認・実行・reconciliation・resume・state mutationも行いません。Receiver capability、Evidence transfer、successful transport、route selectionはAuthorityを生成しません。
+
+現行sourceのread-only tool setは次です。
 
 - `rpr.get_status`
 - `rpr.list_pathways`
@@ -78,9 +85,25 @@ rpr-mcp --database ./rpr.sqlite3
 - `rpr.get_evidence`
 - `rpr.list_unresolved`
 
-`rpr.get_route_visibility(pathway_id)`は、Responsibility Routingを読み取り専用で確認するためのinspection surfaceです。現在state、既存semanticsから確定している限定的なcompatibility route、保存済みdeclared route、Human Return point、Residual Owner、および`authority_inferred: false`を返せます。このToolはreceiverを選択せず、Authorityを付与せず、承認・実行・reconciliation・resume・state mutationも行いません。
+このsource-preview追加は、package公開前にfresh release candidateとexact-head validationを必要とします。
 
-Serverは既存SQLite Fileを`mode=ro`で開きます。承認、実行、状態遷移、照合、修復、再開を行うMCP Toolは持ちません。Status応答にはDatabaseのFilesystem Pathを含めません。
+## Read-only serverの起動
+
+公開済み`0.1.0a5`では:
+
+```bash
+python -m pip install responsibility-pathway-runtime==0.1.0a5
+rpr-mcp --database ./rpr.sqlite3
+```
+
+現行source previewでは:
+
+```bash
+python -m pip install -e .
+rpr-mcp --database ./rpr.sqlite3
+```
+
+Serverは既存SQLite Fileを`mode=ro`で開きます。承認、実行、状態遷移、reconciliation、修復、再開、Authority grantを行うMCP Toolは持ちません。Status応答にはDatabaseのFilesystem Pathを含めません。
 
 Local MCP Client設定例:
 
@@ -91,22 +114,20 @@ Local MCP Client設定例:
 }
 ```
 
-> **信頼境界:** 読み取り専用でも、情報が非機密になるわけではありません。Pathway Definition、Route Metadata、保持Evidenceには運用情報が含まれる場合があります。Databaseを読むOS権限を既に持つ、信頼されたLocal MCP Clientだけで使ってください。認証、認可、Tenant分離、Redaction Gatewayの代替ではありません。
+> **信頼境界:** Read-onlyでも情報が非機密になるわけではありません。Pathway Definition、Route Metadata、保持Evidenceには運用情報が含まれる場合があります。Databaseを読むOS権限を既に持つ、信頼されたLocal MCP Clientだけで使ってください。認証、認可、Tenant分離、Redaction Gatewayの代替ではありません。
 
 ## 検証済み範囲と未検証範囲
 
-公開済みPublic Alphaの検証は、確認環境内のoutbound Local MCP subprocess / stdio経路、Fault Injection、Restart後の継続、Duplicate Dispatch防止を対象とします。
+公開済みPublic Alphaの検証は、確認環境内のoutbound Local MCP subprocess / stdio経路、read-only MCP inspection、Fault Injection、Restart後の継続、Duplicate Dispatch防止を対象とします。
 
-読み取り専用Server Previewでは、次のTestを追加しています。
+Post-release route visibility source previewでは次を追加しています。
 
-- SQLiteをread-onlyで開き、write statementを拒否すること
-- MCP initialize、`tools/list`、`tools/call`
-- 空、一覧、個別、Route Visibility、Evidence、未解決Pathwayの結果
-- Route VisibilityがAuthorityを推論しないこと
-- malformed JSON-RPCと不正Argument
-- structured Tool Errorと存在しないPathway ID
-- stdoutにJSON-RPC Message以外を出さないこと
-- 存在しないDatabaseと非RPR Databaseの拒否
+- Responsibility Routing inspectionがstateを変更しないこと
+- persisted declared routeのreadback
+- narrow state-to-route compatibility mapping
+- `authority_inferred: false`
+- invalid receiverとAuthority non-propagation
+- malformed requestとmissing pathway ID
 
 次は環境ごとの評価が必要です。
 
@@ -118,23 +139,25 @@ Local MCP Client設定例:
 
 ## 統合側が担うこと
 
-RPRは、任意のMCP ServerやClientが信頼できると自動判定しません。統合Applicationと運用者は、次を設計・運用します。
+RPRは、任意のMCP Server、Client、route receiverが信頼できる／authorizedであると自動判定しません。統合Applicationと運用者は次を設計・運用します。
 
 - MCP Peerの選定と認証
+- receiver eligibilityとdelegation source-of-truth
 - Credential、Database File、環境変数の保護
 - Process、Network、Filesystem、Tool Permissionの制限
-- outboundのどのToolにHuman Gateを要求するか
+- outboundのどのToolにbounded Human Gateを要求するか
 - 重要な外部作用を確認する独立readback
 - Repair、Reconciliation、Resume、Residual Owner
 - RPRを通らない別経路の実行を防ぐこと
 - 信頼されていないMCP ClientからPathway、Route、Evidenceを読ませないこと
 
-## まだ提供していないもの
+## MCP mutationとしてまだ提供していないもの
 
-Source Previewは、変更を伴うRPR操作を公開しません。`rpr.request_human_gate`、`rpr.approve`、`rpr.execute`、`rpr.reconcile`、`rpr.resume`などは将来の設計候補であり、現在の機能ではありません。
+現行sourceは、変更を伴うRPR MCP操作を公開しません。`rpr.request_human_gate`、`rpr.approve`、`rpr.execute`、`rpr.reconcile`、`rpr.resume`などは現在のcapabilityではありません。
 
 関連文書:
 
 - [製品範囲と構成](product-scope-architecture.md)
+- [Responsibility Routing migration](responsibility-routing-migration.md)
 - [セキュリティ・統合・API境界](security-integration-api.md)
 - [検証・Release・既知制約・UAT](verification-release-uat.md)

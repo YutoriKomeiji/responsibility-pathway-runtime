@@ -1,6 +1,6 @@
 # RPR Formal Assurance Layer
 
-This Lean 4 package models selected RPR runtime invariants. It is independent from the Python runtime and is not required to deploy the Python package, but it is part of the public verification surface.
+This Lean 4 package models selected RPR runtime state-transition invariants. It is independent from the Python runtime and is not required to deploy the Python package, but it is part of the public verification surface.
 
 ## Pinned environment
 
@@ -36,6 +36,20 @@ The repository test suite compares this Lean transition relation with:
 
 These checks establish parity for the explicit state and transition model. They do not prove all runtime behavior.
 
+## Responsibility Routing boundary
+
+Responsibility Routing metadata and receiver-selection semantics are currently verified by the Python model, persistence/inspection tests, MCP read-only visibility tests, and product-level negative tests. They are **not** represented as Lean proofs in this package.
+
+In particular, this formal layer does not prove:
+
+- receiver eligibility;
+- delegation scope correctness;
+- Authority non-propagation through evidence or route transfer;
+- Residual Owner preservation across arbitrary organizational redesign;
+- absence of False Autonomy, Proxy Return, False Escalation, or Nominal Human Return outside the explicitly tested runtime paths.
+
+A successful Lean build therefore must not be described as formal proof of Responsibility Routing as a whole.
+
 ## Non-claims
 
 This package does not prove:
@@ -43,6 +57,7 @@ This package does not prove:
 - authentication or authorization correctness outside the abstract model;
 - executor behavior, external readback, or network effects;
 - temporal or distributed-system properties;
+- full Python runtime correctness;
 - production safety, legal compliance, or regulatory certification.
 
 Formal verification evidence remains separate from release authorization.

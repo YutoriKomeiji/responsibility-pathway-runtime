@@ -76,8 +76,9 @@ def test_unknown_write_cannot_be_marked_completed_by_generic_transition():
         runtime.transition("p-runtime", PathwayState.COMPLETED, actor="agent", reason="guess")
 
 
-def test_default_rpe_unavailable_fails_to_human_gate():
+def test_default_rpe_unavailable_fails_closed_to_hold_without_human_assumption():
     runtime = ResponsibilityPathwayRuntime()
     result = runtime.register(definition(), idempotency_key="idem-3")
-    assert result.state is PathwayState.HUMAN_GATE
+    assert result.decision.value == "hold"
+    assert result.state is PathwayState.HELD
     assert "rpe_unavailable" in result.reason_codes

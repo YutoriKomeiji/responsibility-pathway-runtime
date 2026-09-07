@@ -29,7 +29,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Pages relevance check / Pages関連差分確認
+    runs-on: ubuntu-latest
+    outputs:
+      run_heavy: ${{ steps.relevance.outputs.run_heavy }}
+    steps:
+      - name: Checkout history for delta classification
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Decide whether this event changed Pages/runtime inputs
+        id: relevance
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" != "pull_request" || "$ACTION" != "synchronize" || -z "${BEFORE:-}" || -z "${AFTER:-}" ]]; then
+            echo "run_heavy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$BEFORE" "$AFTER")"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -Eq '^(src/|site/|pyproject\.toml$|\.github/workflows/pages\.yml$)'; then
+            echo "run_heavy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_heavy=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build-and-verify:
+    needs: changes
+    if: needs.changes.outputs.run_heavy == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -68,12 +102,27 @@ jobs:
 
           payload = json.loads(Path("demo-result.json").read_text(encoding="utf-8"))
           assert payload["ok"] is True, payload
-          result = payload["result"]["reconciled"]
-          assert result["state_before"] == "write_status_unknown", result
-          assert result["state"] == "completed", result
-          assert result["dispatch_count"] == 1, result
-          assert result["duplicate_dispatch_prevented"] is True, result
-          assert result["evidence_valid"] is True, result
+          result = payload["result"]
+          registered = result["registered"]
+          ambiguous = result["ambiguous"]
+          reconciled = result["reconciled"]
+
+          assert registered["state"] == "human_gate", registered
+          assert registered["route_visibility"]["compatibility_route"] == "bounded_human_return", registered
+          assert registered["route_visibility"]["authority_inferred"] is False, registered
+
+          assert ambiguous["state"] == "write_status_unknown", ambiguous
+          assert ambiguous["route_visibility"]["compatibility_route"] == "hold_for_reconciliation", ambiguous
+          assert ambiguous["route_visibility"]["authority_inferred"] is False, ambiguous
+          assert ambiguous["dispatch_count"] == 1, ambiguous
+
+          assert reconciled["state_before"] == "write_status_unknown", reconciled
+          assert reconciled["state"] == "completed", reconciled
+          assert reconciled["route_visibility"]["compatibility_route"] is None, reconciled
+          assert reconciled["route_visibility"]["authority_inferred"] is False, reconciled
+          assert reconciled["dispatch_count"] == 1, reconciled
+          assert reconciled["duplicate_dispatch_prevented"] is True, reconciled
+          assert reconciled["evidence_valid"] is True, reconciled
           PY
       - name: Assemble Pages artifact
         run: |
@@ -89,7 +138,7 @@ jobs:
         run: |
           npm install --no-save playwright@1.54.1
           npx playwright install --with-deps chromium
-      - name: Verify the real wheel inside Chromium and Pyodide
+      - name: Verify the real wheel and Responsibility Routing in English and Japanese Chromium demos
         env:
           EXPECTED_PACKAGE_STATUS: RPR ${{ env.RPR_VERSION }}
         run: |
@@ -99,23 +148,27 @@ jobs:
           node <<'JS'
           const { chromium } = require('playwright');
 
-          (async () => {
-            const browser = await chromium.launch({ headless: true });
+          async function verifyDemo(browser, spec) {
             const page = await browser.newPage();
             const browserLog = [];
             page.on('console', message => {
-              const line = `[browser:${message.type()}] ${message.text()}`;
+              const line = `[browser:${spec.path}:${message.type()}] ${message.text()}`;
               browserLog.push(line);
               console.log(line);
             });
             page.on('pageerror', error => {
-              const line = `[browser:error] ${error.stack || error.message}`;
+              const line = `[browser:${spec.path}:error] ${error.stack || error.message}`;
               browserLog.push(line);
               console.error(line);
             });
 
             try {
-              await page.goto('http://127.0.0.1:8000/demo.html', { waitUntil: 'domcontentloaded' });
+              await page.goto(`http://127.0.0.1:8000/${spec.path}`, { waitUntil: 'domcontentloaded' });
+              const semanticText = await page.textContent('body');
+              for (const anchor of ['bounded_human_return', 'hold_for_reconciliation', 'authority_inferred: false']) {
+                if (!semanticText.includes(anchor)) throw new Error(`${spec.path} missing semantic anchor ${anchor}`);
+              }
+
               await page.click('#load-runtime');
               await page.waitForFunction(
                 () => {
@@ -134,7 +187,7 @@ jobs:
                 package: document.querySelector('#package-status')?.textContent,
                 output: document.querySelector('#output')?.textContent,
               }));
-              console.log(`[browser:startup] ${JSON.stringify(startup)}`);
+              console.log(`[browser:${spec.path}:startup] ${JSON.stringify(startup)}`);
               if (startup.runtimeReady !== 'true') throw new Error(`runtime startup failed: ${JSON.stringify(startup)}`);
               if (startup.package !== process.env.EXPECTED_PACKAGE_STATUS) throw new Error(`unexpected package status: ${JSON.stringify(startup)}`);
 
@@ -146,6 +199,7 @@ jobs:
               );
               const result = await page.evaluate(() => ({
                 state: document.querySelector('#current-state')?.textContent,
+                route: document.querySelector('#route-status')?.textContent,
                 dispatchCount: document.querySelector('#dispatch-count')?.textContent,
                 evidence: document.querySelector('#evidence-status')?.textContent,
                 output: document.querySelector('#output')?.textContent,
@@ -153,26 +207,55 @@ jobs:
               }));
               if (result.demoOk !== 'true') throw new Error(JSON.stringify(result));
               if (result.state !== 'completed') throw new Error(JSON.stringify(result));
+              if (result.route !== 'none') throw new Error(JSON.stringify(result));
               if (result.dispatchCount !== '1') throw new Error(JSON.stringify(result));
-              if (result.evidence !== '検証済み') throw new Error(JSON.stringify(result));
+              if (result.evidence !== spec.expectedEvidence) throw new Error(JSON.stringify(result));
+
               const payload = JSON.parse(result.output);
+              if (payload.ok !== true) throw new Error(result.output);
+              const registered = payload.result.registered;
+              const ambiguous = payload.result.ambiguous;
               const reconciled = payload.result.reconciled;
+
+              if (registered.state !== 'human_gate') throw new Error(result.output);
+              if (registered.route_visibility.compatibility_route !== 'bounded_human_return') throw new Error(result.output);
+              if (registered.route_visibility.authority_inferred !== false) throw new Error(result.output);
+
+              if (ambiguous.state !== 'write_status_unknown') throw new Error(result.output);
+              if (ambiguous.route_visibility.compatibility_route !== 'hold_for_reconciliation') throw new Error(result.output);
+              if (ambiguous.route_visibility.authority_inferred !== false) throw new Error(result.output);
+              if (ambiguous.dispatch_count !== 1) throw new Error(result.output);
+
               if (reconciled.state_before !== 'write_status_unknown') throw new Error(result.output);
+              if (reconciled.state !== 'completed') throw new Error(result.output);
+              if (reconciled.route_visibility.compatibility_route !== null) throw new Error(result.output);
+              if (reconciled.route_visibility.authority_inferred !== false) throw new Error(result.output);
               if (reconciled.duplicate_dispatch_prevented !== true) throw new Error(result.output);
               if (reconciled.evidence_valid !== true) throw new Error(result.output);
-              console.log(JSON.stringify(result));
+              console.log(`[browser:${spec.path}:result] ${JSON.stringify(result)}`);
             } catch (error) {
               const snapshot = await page.evaluate(() => ({
                 htmlDataset: { ...document.documentElement.dataset },
                 python: document.querySelector('#python-status')?.textContent,
                 package: document.querySelector('#package-status')?.textContent,
                 state: document.querySelector('#current-state')?.textContent,
+                route: document.querySelector('#route-status')?.textContent,
                 output: document.querySelector('#output')?.textContent,
                 summary: document.querySelector('#summary')?.textContent,
               })).catch(() => ({ unavailable: true }));
-              console.error(`[browser:snapshot] ${JSON.stringify(snapshot)}`);
-              console.error(`[browser:log] ${JSON.stringify(browserLog)}`);
+              console.error(`[browser:${spec.path}:snapshot] ${JSON.stringify(snapshot)}`);
+              console.error(`[browser:${spec.path}:log] ${JSON.stringify(browserLog)}`);
               throw error;
+            } finally {
+              await page.close();
+            }
+          }
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            try {
+              await verifyDemo(browser, { path: 'demo.html', expectedEvidence: '検証済み' });
+              await verifyDemo(browser, { path: 'demo-en.html', expectedEvidence: 'verified' });
             } finally {
               await browser.close();
             }
@@ -197,8 +280,10 @@ jobs:
           path: site
 
   deploy:
-    if: github.event_name != 'pull_request'
-    needs: build-and-verify
+    if: github.event_name != 'pull_request' && needs.changes.outputs.run_heavy == 'true'
+    needs:
+      - changes
+      - build-and-verify
     runs-on: ubuntu-latest
     permissions:
       pages: write

@@ -1,8 +1,8 @@
 # Production-Grade Demo: Governed Supplier Payment Release
 
-> Public alpha scenario for Responsibility Pathway Runtime `0.1.0a2`.
+> Executable integration scenario for the current RPR repository source. Published package baseline: `0.1.0a5`; current source may include post-`0.1.0a5` Responsibility Routing work that is not part of the published wheel.
 >
-> This is not a toy counter, mock approval button, or simulated success-only walkthrough. It is an executable integration scenario designed to exercise persistent state, Human Gate return, external-write ambiguity, independent readback, restart continuity, repair, and reconciliation using the actual RPR runtime interfaces included in the frozen candidate.
+> This is not a simulated success-only walkthrough. It exercises persistent state, configured Human Gate approval, external-write ambiguity, independent readback, runtime recreation over durable SQLite state, reconciliation, and duplicate-dispatch prevention using the actual RPR runtime interfaces. The payment provider is a deterministic local integration fixture.
 
 ## Business scenario
 
@@ -10,131 +10,124 @@ A finance automation service receives an approved supplier invoice and proposes 
 
 The host application must preserve:
 
-- the proposed action and declared authority;
+- the proposed action and declared Authority;
 - the identity of the operation and each execution attempt;
-- the Human Gate decision that permits dispatch;
-- the external request and bounded response evidence;
+- the configured bounded Human Gate decision that permits dispatch;
+- the external request and bounded response Evidence;
 - independent readback from the payment-status endpoint;
 - an explicit unresolved state when the write result is ambiguous;
-- restart-safe recovery without duplicate dispatch;
-- reconciliation, repair, resume, and residual ownership.
+- restart/recreation-safe recovery without duplicate dispatch;
+- reconciliation, repair/resume boundaries, and Residual Owner.
 
-## Why this is a real demo
+`Fail closed` does not mean `send to a human`. In the current Responsibility Routing model, unresolved effects may be held for reconciliation; Human Return remains a bounded route used when human-held Authority is actually required.
 
-The scenario uses the same product paths covered by the frozen candidate tests:
+## What the demo really executes
 
-- persistent pathway and execution-attempt stores;
+The current demo uses:
+
+- `ResponsibilityPathwayRuntime`;
+- persistent SQLite pathway and execution-attempt stores;
 - authorized runtime transitions;
 - allow-listed HTTP execution;
 - idempotency identity and duplicate-dispatch prevention;
 - `write_status_unknown` fail-closed handling;
 - independent readback before completion;
-- Human Gate return and resume;
-- process restart during unresolved execution;
-- reconciliation and explicit repair decisions;
-- operational diagnostics and retained evidence.
+- configured Human Gate approval;
+- reconstruction of a new runtime object over the same durable stores;
+- runtime-integrated reconciliation;
+- evidence-chain verification.
 
-The external payment service is represented by a deterministic local integration fixture so the demo can reproduce normal completion, remote rejection, timeout after acceptance, unavailable readback, and restart conditions without contacting a real financial system. The fixture is an integration test double, but the RPR runtime, persistence, state transitions, executor path, diagnostics, and recovery behavior are real product code.
+The external payment service is represented by a deterministic localhost fixture so the demo can reproduce authorized completion, timeout after acceptance, unavailable readback, and human rejection without contacting a real financial system. The fixture is a test double; RPR runtime, persistence, transitions, executor path, and reconciliation are product code.
+
+This command-line demo does **not** currently prove an OS-process kill/restart boundary by itself. Process-level interruption/restart behavior is covered elsewhere in the repository test matrix; this demo specifically recreates runtime/store objects against durable SQLite state. Do not describe runtime recreation as a subprocess restart.
 
 ## Roles and responsibility boundary
 
 | Role | Responsibility |
 |---|---|
-| Host finance application | Authentication, invoice validity, credentials, network policy, payment-domain authorization, bypass prevention |
-| Human approver | Final payment authorization and exceptional reconciliation decisions |
-| RPR | Pathway state, execution-attempt continuity, evidence retention, stop/repair/resume boundaries |
+| Host finance application | Authentication, invoice validity, credentials, network policy, payment-domain authorization, bypass prevention, receiver eligibility/delegation source-of-truth |
+| Human approver | Payment authorization where the configured bounded Human Gate requires human-held Authority |
+| RPR | Pathway state, execution-attempt continuity, Evidence retention, reconciliation/repair/resume boundaries, route metadata where configured |
 | Payment API fixture | Deterministic external-effect and readback behavior for reproducible integration testing |
 | Operator | Environment configuration, backup, diagnostics, incident handling, retained customer data |
 
-RPR does not determine whether the invoice is legally payable, authenticate the approver, protect credentials, or guarantee exactly-once behavior across arbitrary remote systems.
+RPR does not determine whether the invoice is legally payable, authenticate the approver, create organizational Authority, or guarantee exactly-once behavior across arbitrary remote systems. Evidence transfer and receiver capability do not create Authority.
 
 ## Demonstration paths
 
 ### Path A — Authorized completion
 
 1. Register the payment pathway.
-2. Return to Human Gate before dispatch.
+2. Enter the configured Human Gate before dispatch.
 3. Record explicit approval.
-4. Dispatch once with a stable idempotency identity.
+4. Dispatch once with stable idempotency identity.
 5. Read payment status independently.
 6. Complete only after readback confirms the intended payment.
-7. Print the retained pathway, attempt, authority, and evidence records.
 
-Expected result: completed pathway with readback evidence and one external dispatch.
+Expected result: completed pathway with verified readback and one external dispatch.
 
 ### Path B — Timeout after remote acceptance
 
-1. The fixture accepts the payment and persists the external effect.
+1. The fixture accepts the payment and records the external effect.
 2. The connection fails before RPR receives a conclusive response.
 3. RPR records `write_status_unknown` rather than success or safe retry.
-4. The process is terminated and restarted.
-5. RPR restores the unresolved attempt and prevents blind redispatch.
+4. A new runtime is constructed over the same SQLite stores.
+5. Re-execution returns the persisted unresolved attempt rather than redispatching.
 6. Reconciliation queries the independent status endpoint.
-7. The operator records the reconciliation outcome and resumes or repairs under an explicit authority decision.
+7. The verified observation closes the pathway without a second payment dispatch.
 
-Expected result: no duplicate payment, visible ambiguity, retained attempt continuity, explicit resolution evidence.
+Expected result: one dispatch, visible ambiguity, durable attempt continuity, and explicit reconciliation Evidence.
 
 ### Path C — Readback unavailable
 
 1. Dispatch receives an accepted response.
 2. Independent readback is unavailable.
-3. Completion remains blocked.
-4. Diagnostics expose the unresolved pathway and required operator action.
-5. A later readback or approved repair route resolves the state.
+3. Completion remains blocked as `write_status_unknown`.
+4. Runtime recreation does not trigger blind redispatch.
+5. Reconciliation remains unresolved until sufficient Evidence exists.
 
 Expected result: accepted is not treated as verified completion.
 
 ### Path D — Human rejection
 
 1. Register the proposed payment.
-2. Return to Human Gate.
-3. Record rejection with reason and authority identity.
+2. Enter the configured Human Gate.
+3. Record rejection with reason and Authority identity.
 4. Confirm that no external dispatch occurred.
 
-Expected result: terminated or held pathway with zero external effects.
+Expected result: denied pathway with zero external effects.
 
-## Required demo package
+## Actual repository contents
 
-The public repository export must contain:
+The current public repository contains:
 
 ```text
 examples/production-grade-demo/
 ├── README.md
+├── README.ja.md
 ├── payment_service.py
 ├── run_demo.py
-├── scenarios/
-│   ├── authorized-completion.json
-│   ├── timeout-after-acceptance.json
-│   ├── readback-unavailable.json
-│   └── human-rejection.json
-├── expected/
-│   ├── authorized-completion.json
-│   ├── timeout-after-acceptance.json
-│   ├── readback-unavailable.json
-│   └── human-rejection.json
 └── tests/
     └── test_demo_scenarios.py
 ```
 
-The scripts must call the shipped RPR package; they must not reimplement the pathway state machine inside the demo.
+There are no separate `scenarios/` or `expected/` directories in the current implementation. Scenario selection and assertions are encoded in `run_demo.py` and `tests/test_demo_scenarios.py`. Documentation must not imply nonexistent artifacts.
 
-## Acceptance criteria
+The scripts call the installed/importable RPR package interfaces; they do not reimplement the pathway state machine inside the demo.
 
-The demo is release-eligible only when all of the following pass in a clean environment:
+## Automated acceptance currently present
 
-- installs from the frozen wheel rather than the RPP source tree;
-- runs without network access outside localhost;
-- uses temporary directories unless an explicit state directory is supplied;
-- produces deterministic machine-readable results;
-- proves only one dispatch in the timeout-after-acceptance scenario;
-- survives a real subprocess restart;
-- exposes unresolved work through the product diagnostics path;
-- contains no real credentials, endpoints, personal data, or internal repository links;
-- has automated tests that compare retained state and evidence with expected outputs;
-- documents which elements are product behavior and which are deterministic external fixtures.
+`tests/test_demo_scenarios.py` checks:
+
+- authorized completion uses one dispatch and produces valid Evidence;
+- timeout-after-acceptance becomes `write_status_unknown`, survives runtime recreation, reconciles, and still uses one dispatch;
+- unavailable readback does not complete;
+- human rejection produces zero external effects.
+
+Release-level clean-wheel install, full test execution, artifact reproducibility, formal checks, browser/Pyodide verification, and exact-head CI are separate product gates and must not be inferred from this demo test alone.
 
 ## Quality and claim boundary
 
-Passing this demo verifies the declared scenario in the tested environment. It does not establish production readiness for a real payment system, financial regulatory compliance, credential security, universal exactly-once delivery, or suitability for a specific organization.
+Passing this demo verifies these declared scenarios in the tested environment. It does not establish production readiness for a real payment system, financial regulatory compliance, credential security, universal exactly-once delivery, correct organizational delegation, or suitability for a specific organization.
 
-A real deployment must supply its own authenticated authorization source, credential isolation, network controls, independent external readback, operational ownership, and incident procedures.
+A real deployment must supply its own authenticated authorization source, receiver eligibility/delegation source-of-truth, credential isolation, network controls, independent external readback, operational ownership, and incident procedures.
