@@ -117,8 +117,8 @@ class PathwayDefinition:
     resume_authority: str
     human_return_point: str
     residual_owner: str
-    responsibility_route: ResponsibilityRoute | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+    responsibility_route: ResponsibilityRoute | None = None
 
     def to_dict(self) -> dict[str, Any]:
         value = asdict(self)
@@ -147,8 +147,8 @@ class PathwayDefinition:
             resume_authority=str(value["resume_authority"]),
             human_return_point=str(value["human_return_point"]),
             residual_owner=str(value["residual_owner"]),
-            responsibility_route=None if route_value is None else ResponsibilityRoute.from_dict(route_value),
             metadata=dict(value.get("metadata", {})),
+            responsibility_route=None if route_value is None else ResponsibilityRoute.from_dict(route_value),
         )
 
 
