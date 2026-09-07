@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MIT
 # Language: Python
 # Purpose: Run the same real-RPR demonstration under CPython CI and browser-hosted Pyodide.
-# Boundary: The RPR runtime, SQLite stores, attempt ledger, evidence chain, and reconciliation are real.
+# Boundary: The RPR runtime, SQLite stores, attempt ledger, evidence chain, reconciliation,
+#           and read-only Responsibility Routing inspection are real.
 #           Only the external payment provider is represented by a deterministic in-process adapter.
 from __future__ import annotations
 
@@ -25,6 +26,9 @@ from rpr import (
     SQLiteExecutionAttemptLedger,
     SQLiteStore,
 )
+from rpr.mcp_read_model import SQLiteReadModel
+from rpr.mcp_server import ReadOnlyRprMcpServer
+from rpr.mcp_stable_snapshot import STABLE_PROTOCOL_VERSION
 from rpr.rpe import AllowAllDevelopmentEvaluator
 
 STATE_DIR = Path("/tmp/rpr-browser-demo")
@@ -75,6 +79,48 @@ def _runtime() -> ResponsibilityPathwayRuntime:
         rpe=AllowAllDevelopmentEvaluator(),
         attempt_ledger=SQLiteExecutionAttemptLedger(ATTEMPT_DB),
     )
+
+
+def _route_visibility_via_mcp() -> dict[str, Any]:
+    """Read routing state through the public read-only MCP tool contract."""
+
+    read_model = SQLiteReadModel(PATHWAY_DB)
+    server = ReadOnlyRprMcpServer(read_model)
+    try:
+        initialized = server.handle(
+            {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": STABLE_PROTOCOL_VERSION,
+                    "capabilities": {},
+                    "clientInfo": {"name": "browser-demo", "version": "1"},
+                },
+            }
+        )
+        if initialized is None:
+            raise RuntimeError("MCP initialize returned no response")
+        server.handle({"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}})
+        response = server.handle(
+            {
+                "jsonrpc": "2.0",
+                "id": 2,
+                "method": "tools/call",
+                "params": {
+                    "name": "rpr.get_route_visibility",
+                    "arguments": {"pathway_id": PATHWAY_ID},
+                },
+            }
+        )
+        if response is None:
+            raise RuntimeError("MCP route visibility returned no response")
+        result = response["result"]
+        if result.get("isError"):
+            raise RuntimeError(f"MCP route visibility failed: {result['structuredContent']}")
+        return dict(result["structuredContent"])
+    finally:
+        read_model.close()
 
 
 class TimeoutAfterAcceptanceExecutor:
@@ -139,6 +185,7 @@ def register_demo() -> dict[str, Any]:
         "decision": registration.decision.value,
         "replayed": registration.replayed,
         "schema_version": runtime.store.schema_version,
+        "route_visibility": _route_visibility_via_mcp(),
         "evidence_valid": runtime.verify_evidence(PATHWAY_ID).valid,
         "events": runtime.store.events(PATHWAY_ID),
         "provider": dict(_external_provider),
@@ -164,6 +211,7 @@ def approve_and_execute() -> dict[str, Any]:
         "step": "ambiguous_write_persisted",
         "result_status": result.status.value,
         "state": runtime.store.get_state(PATHWAY_ID).value,
+        "route_visibility": _route_visibility_via_mcp(),
         "dispatch_count": _external_provider["dispatch_count"],
         "evidence_valid": runtime.verify_evidence(PATHWAY_ID).valid,
         "events": runtime.store.events(PATHWAY_ID),
@@ -186,6 +234,7 @@ def restart_and_reconcile() -> dict[str, Any]:
         "state_before": before,
         "reconciliation_status": reconciled.status.value,
         "state": after,
+        "route_visibility": _route_visibility_via_mcp(),
         "dispatch_count": _external_provider["dispatch_count"],
         "duplicate_dispatch_prevented": _external_provider["dispatch_count"] == 1,
         "evidence_valid": restarted.verify_evidence(PATHWAY_ID).valid,

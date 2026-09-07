@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Run the real RPR wheel in your browser and inspect how responsibility is preserved when an external effect becomes uncertain.">
+  <title>RPR Live Demo | Responsibility Pathway Runtime</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+  <script src="demo-en.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">RPR</span><span>Responsibility Pathway Runtime</span></a>
+    <nav aria-label="Demo navigation"><a href="index.html">Product</a><a href="demo.html" lang="ja">日本語</a><a href="https://github.com/YutoriKomeiji/responsibility-pathway-runtime">GitHub</a></nav>
+  </header>
+  <main id="main">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Public Alpha source preview · real RPR wheel · browser Python · SQLite · Responsibility Routing</p>
+        <h1>Run the real RPR runtime in your browser.</h1>
+        <p class="lead">An API call is accepted, but the response disappears. Instead of retrying blindly, RPR persists the uncertainty, preserves the responsibility path, and reconciles the external state after restart.</p>
+        <p>This demo loads a CI-built RPR wheel into Pyodide. The RPR runtime, SQLite persistence, attempt history, evidence chain, reconciliation flow, and read-only <code>rpr.get_route_visibility</code> MCP inspection are real.</p>
+        <div class="notice"><strong>Demo boundary:</strong> only the external payment provider is simulated. No real API, credentials, payments, or user data are used. Route visibility does not create Authority and does not authorize approval, execution, reconciliation, or resume.</div>
+        <div class="actions"><button class="button primary" id="load-runtime" type="button">Load RPR</button><button class="button secondary" id="run-all" type="button" disabled>Run full demo</button><button class="button secondary" id="reset" type="button" disabled>Reset</button></div>
+      </div>
+      <aside class="status-card" aria-live="polite">
+        <div class="status-row"><span>Python</span><strong id="python-status">not started</strong></div>
+        <div class="status-row"><span>RPR</span><strong id="package-status">not loaded</strong></div>
+        <div class="status-row"><span>Current state</span><strong id="current-state">not registered</strong></div>
+        <div class="status-row"><span>Responsibility Route</span><strong id="route-status">none</strong></div>
+        <div class="status-row"><span>External dispatches</span><strong id="dispatch-count">0</strong></div>
+        <div class="status-row"><span>Evidence chain</span><strong id="evidence-status">not generated</strong></div>
+      </aside>
+    </section>
+
+    <section aria-labelledby="steps-title">
+      <p class="eyebrow">Scenario</p>
+      <h2 id="steps-title">Preserve responsibility after the effect becomes uncertain</h2>
+      <div class="grid">
+        <article class="card"><h3>1. Register the responsibility pathway</h3><p>RPR records who may approve and execute, where unresolved work can return, and who remains the Residual Owner. A high-impact action first enters <code>human_gate</code>, visible as <code>bounded_human_return</code>.</p><button class="button secondary demo-step" data-function="register_demo" type="button" disabled>Register pathway</button></article>
+        <article class="card"><h3>2. Create an ambiguous external effect</h3><p>After approval, the provider is called once. The provider applies the effect, but the response is lost. RPR persists <code>write_status_unknown</code>, visible as <code>hold_for_reconciliation</code>.</p><button class="button secondary demo-step" data-function="approve_and_execute" type="button" disabled>Create uncertain result</button></article>
+        <article class="card"><h3>3. Restart and reconcile</h3><p>A fresh runtime reopens the same SQLite state, checks the provider, and completes without re-dispatching the operation. Completed state is not assigned an unreviewed compatibility route.</p><button class="button secondary demo-step" data-function="restart_and_reconcile" type="button" disabled>Restart and reconcile</button></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="result-title">
+      <p class="eyebrow">Live result</p>
+      <h2 id="result-title">Inspect state, route, and evidence together</h2>
+      <div id="summary" class="card"><p>Load RPR to see the current runtime state, Responsibility Route, dispatch count, and evidence-chain verification.</p></div>
+      <pre aria-live="polite"><code id="output">No result yet.</code></pre>
+    </section>
+
+    <section>
+      <p class="eyebrow">Responsibility Routing</p>
+      <h2>Route visibility is an observation surface, not an Authority transfer</h2>
+      <div class="grid">
+        <article class="card"><h3>Human Return is one bounded route</h3><p><code>bounded_human_return</code> represents cases that really need a human decision or human-held Authority. It is not the universal destination for every non-autonomous case.</p></article>
+        <article class="card"><h3>Unknown effects stay in reconciliation</h3><p><code>write_status_unknown</code> is not silently converted into success, failure, or a retry. The unresolved effect remains visible as <code>hold_for_reconciliation</code>.</p></article>
+        <article class="card"><h3>Evidence transfer ≠ Authority transfer</h3><p><code>rpr.get_route_visibility</code> is read-only. A receiver name, capability, evidence item, tool success, or route display does not create new Authority.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Scope</p>
+      <h2>What is real and what is simulated</h2>
+      <div class="grid">
+        <article class="card"><h3>Real in this demo</h3><p>CI-built RPR wheel, Python Runtime API, transition checks, SQLite persistence, attempt history, evidence chain, restart readback, reconciliation, and read-only MCP route visibility.</p></article>
+        <article class="card"><h3>Simulated</h3><p>Only the external payment provider is replaced by a deterministic in-process adapter. Applied state and dispatch count are tracked separately from RPR.</p></article>
+        <article class="card"><h3>Not demonstrated here</h3><p>External OS subprocess MCP, secrets, real payments, external service authentication, and Lean 4 builds are not run in the browser. Formal assets remain verified in the repository and CI.</p></article>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><p>Responsibility Pathway Runtime · MIT License · real RPR runtime / simulated external provider only</p></footer>
+</body>
+</html>
