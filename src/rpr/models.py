@@ -124,7 +124,9 @@ class PathwayDefinition:
         value = asdict(self)
         value["action_class"] = self.action_class.value
         value["environment_trust"] = self.environment_trust.value
-        if self.responsibility_route is not None:
+        if self.responsibility_route is None:
+            value.pop("responsibility_route", None)
+        else:
             value["responsibility_route"] = self.responsibility_route.to_dict()
         return value
 
@@ -166,7 +168,6 @@ class InspectionResult:
     degradation_mode: str
     next_required_authority: str | None = None
     next_required_action: str | None = None
-    responsibility_route_available: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -177,5 +178,4 @@ class InspectionResult:
             "degradation_mode": self.degradation_mode,
             "next_required_authority": self.next_required_authority,
             "next_required_action": self.next_required_action,
-            "responsibility_route_available": self.responsibility_route_available,
         }
