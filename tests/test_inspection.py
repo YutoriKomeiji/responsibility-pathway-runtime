@@ -71,7 +71,7 @@ def test_observe_only_identifies_execution_actor_as_next_handler():
     assert result.next_required_action == "execute_bounded_action"
 
 
-def test_approval_required_without_authority_fails_closed():
+def test_approval_required_without_authority_holds_for_definition_repair():
     result = inspect_pathway(
         pathway(
             action_class=ActionClass.REVERSIBLE_EXTERNAL,
@@ -79,15 +79,16 @@ def test_approval_required_without_authority_fails_closed():
         )
     )
     assert not result.valid
-    assert result.decision is RuntimeDecision.HUMAN_GATE
+    assert result.decision is RuntimeDecision.HOLD
     assert "approval_authority_missing" in {item.code for item in result.findings}
     assert result.next_required_authority == "owner"
     assert result.next_required_action == "correct_pathway_definition"
 
 
-def test_missing_repair_owner_is_invalid():
+def test_missing_repair_owner_is_invalid_and_does_not_create_human_gate():
     result = inspect_pathway(pathway(repair_owner=""))
     assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
     assert "repair_owner_missing" in {item.code for item in result.findings}
     assert result.next_required_authority == "owner"
 
@@ -95,7 +96,15 @@ def test_missing_repair_owner_is_invalid():
 def test_high_impact_requires_separate_stop_authority():
     result = inspect_pathway(pathway(stop_authority="agent"))
     assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
     assert "stop_execution_authority_not_separated" in {item.code for item in result.findings}
+
+
+def test_high_impact_requires_concrete_human_return_point():
+    result = inspect_pathway(pathway(human_return_point=""))
+    assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
+    assert "high_impact_human_return_point_missing" in {item.code for item in result.findings}
 
 
 def test_adversarial_environment_identifies_stop_authority_review():
@@ -125,13 +134,14 @@ def test_additive_responsibility_route_does_not_replace_human_gate_semantics():
     assert result.decision is RuntimeDecision.HUMAN_GATE
 
 
-def test_responsibility_route_rejects_ineligible_receiver():
+def test_responsibility_route_rejects_ineligible_receiver_without_false_escalation():
     result = inspect_pathway(
         pathway(
             responsibility_route=route(receiver_eligibility=ReceiverEligibility.INELIGIBLE),
         )
     )
     assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
     assert "route_receiver_ineligible" in {item.code for item in result.findings}
 
 
@@ -142,6 +152,7 @@ def test_responsibility_route_preserves_residual_owner():
         )
     )
     assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
     assert "route_residual_owner_mismatch" in {item.code for item in result.findings}
 
 
@@ -152,4 +163,68 @@ def test_responsibility_route_requires_bounded_next_actions():
         )
     )
     assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
     assert "route_allowed_next_actions_missing" in {item.code for item in result.findings}
+
+
+def test_responsibility_route_rejects_blank_next_action():
+    result = inspect_pathway(
+        pathway(
+            responsibility_route=route(allowed_next_actions=("readback", " ")),
+        )
+    )
+    assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
+    assert "route_allowed_next_actions_blank" in {item.code for item in result.findings}
+
+
+def test_responsibility_route_rejects_blank_required_field():
+    result = inspect_pathway(
+        pathway(
+            responsibility_route=route(delegation_scope=""),
+        )
+    )
+    assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
+    assert "route_delegation_scope_missing" in {item.code for item in result.findings}
+
+
+def test_receiver_requiring_reevaluation_holds_without_invalidating_record():
+    result = inspect_pathway(
+        pathway(
+            action_class=ActionClass.REVERSIBLE_EXTERNAL,
+            responsibility_route=route(receiver_eligibility=ReceiverEligibility.REQUIRES_REEVALUATION),
+        )
+    )
+    assert result.valid
+    assert result.decision is RuntimeDecision.HOLD
+    assert result.degradation_mode == "route_reevaluation_required"
+    assert result.next_required_authority == "owner"
+    assert result.next_required_action == "reevaluate_responsibility_route"
+    assert "route_receiver_requires_reevaluation" in {item.code for item in result.findings}
+
+
+def test_bounded_human_return_requires_concrete_return_point():
+    result = inspect_pathway(
+        pathway(
+            action_class=ActionClass.REVERSIBLE_EXTERNAL,
+            human_return_point="",
+            responsibility_route=route(route_class=ResponsibilityRouteClass.BOUNDED_HUMAN_RETURN),
+        )
+    )
+    assert not result.valid
+    assert result.decision is RuntimeDecision.HOLD
+    assert "bounded_human_return_point_missing" in {item.code for item in result.findings}
+
+
+def test_non_human_route_does_not_require_legacy_human_return_point():
+    result = inspect_pathway(
+        pathway(
+            action_class=ActionClass.REVERSIBLE_EXTERNAL,
+            human_return_point="",
+            responsibility_route=route(),
+        )
+    )
+    assert result.valid
+    assert result.decision is RuntimeDecision.ALLOW
+    assert result.human_return_available is False
