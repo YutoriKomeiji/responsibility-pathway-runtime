@@ -80,7 +80,7 @@ jobs:
 
   reproducible-artifacts:
     name: Reproducible artifact verification / 配布物再現性検証
-    needs: preflight
+    needs: runtime-package-validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -150,7 +150,7 @@ jobs:
 
   formal-validation:
     name: Lean 4 and cross-model validation / Lean 4・モデル整合検証
-    needs: preflight
+    needs: runtime-package-validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -178,7 +178,10 @@ jobs:
 
   release-gate-placeholder:
     name: Release gate declaration / Release Gate宣言
-    needs: preflight
+    needs:
+      - runtime-package-validation
+      - reproducible-artifacts
+      - formal-validation
     runs-on: ubuntu-latest
     steps:
       - name: Confirm final release remains human-approved
