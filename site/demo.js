@@ -13,6 +13,7 @@ Boundary: The external provider is simulated in Python; no credentials or user d
   const pythonStatus = document.getElementById("python-status");
   const packageStatus = document.getElementById("package-status");
   const currentState = document.getElementById("current-state");
+  const routeStatus = document.getElementById("route-status");
   const dispatchCount = document.getElementById("dispatch-count");
   const evidenceStatus = document.getElementById("evidence-status");
   const summary = document.getElementById("summary");
@@ -52,16 +53,21 @@ Boundary: The external provider is simulated in Python; no credentials or user d
     const result = latestResult(payload);
     if (!result) return;
     const state = result.state || result.state_before || "unknown";
+    const route = result.route_visibility?.compatibility_route ?? "none";
+    const authorityInferred = result.route_visibility?.authority_inferred;
     const count = result.dispatch_count ?? result.provider?.dispatch_count ?? 0;
     const valid = result.evidence_valid;
     currentState.textContent = state;
+    routeStatus.textContent = route;
     dispatchCount.textContent = String(count);
     evidenceStatus.textContent = valid === true ? "検証済み" : (valid === false ? "不整合" : "未検証");
     document.documentElement.dataset.demoState = state;
+    document.documentElement.dataset.route = route;
     document.documentElement.dataset.dispatchCount = String(count);
     document.documentElement.dataset.evidenceValid = String(valid === true);
     summary.innerHTML = `
       <h3>現在の状態: <code>${state}</code></h3>
+      <p>Responsibility Route: <strong><code>${route}</code></strong>${authorityInferred === false ? "（この表示からAuthorityは生成されません）" : ""}</p>
       <p>外部サービスへの実行は<strong>${count}回</strong>です。証拠チェーンは<strong>${valid === true ? "検証済み" : "未確定"}</strong>です。</p>
       ${result.duplicate_dispatch_prevented === true ? "<p><strong>再起動後も同じ操作を再送していません。</strong></p>" : ""}
     `;
