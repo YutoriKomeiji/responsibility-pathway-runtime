@@ -1,8 +1,8 @@
 <!--
 Document Title: RPR 検証・Release・UAT
 Document Type: Public Product Guide
-Status: Public Alpha with Post-Release Source Preview
-Version: 0.1.0a5
+Status: Public Alpha
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: Japanese
 Body Language: Japanese
@@ -14,21 +14,21 @@ Body Language: Japanese
 
 | 項目 | 値 |
 |---|---|
-| Version | `0.1.0a5` |
+| Version | `0.1.0a6` |
 | Channel | PyPI・GitHub Prereleaseで公開中のPublic Alpha |
-| Tag | `v0.1.0a5` |
-| Freeze ID | `RPR-CF-2026-08-02-01` |
-| Product commit | `release-manifest.json`に記録 |
+| Tag | `v0.1.0a6` |
+| Release commit | `9f71a34f5d7eb0e25359ccf31d0c6d85570203d8` |
+| Publish workflow | `34087946734` — success |
 | Final rehearsal profile | Linux / Python 3.11、加えてBOM修整のbounded Windows field evidence |
 | License | [`MIT License`](../../LICENSE) |
 
-Repository sourceにはpost-`0.1.0a5` Responsibility Routing workが含まれる場合があります。`main`に存在するだけではpackage releaseへ昇格しません。次releaseにはfresh candidate、exact-head validation、明示的Human Gate approvalが必要です。
+Repository sourceには次release向けworkが含まれる場合があります。`main`に存在するだけではpackage releaseへ昇格しません。次releaseにはfresh candidate、exact-head validation、明示的Human Gate approvalが必要です。
 
-## 公開済み`0.1.0a5` Evidenceが示す範囲
+## 公開済み`0.1.0a6` Evidenceが示す範囲
 
-Published evidence setは、pathway transition、persistent state、execution-attempt continuity、configured Human Gate・repair route、対応adapter path、fault injection、restart、backup/restore、diagnostics、removal、package installation、reproducible artifactを対象とします。
+Published evidence setは、pathway transition、persistent state、execution-attempt continuity、configured Human Gate・repair route、Responsibility Routing、対応adapter path、fault injection、restart、backup/restore、diagnostics、removal、package installation、reproducible artifactを対象とします。
 
-MCPについては、確認環境内のLocal subprocess / stdio経路、JSON-RPC framing、Server / Tool Binding、read-only MCP inspection、Fault Injection、結果不明の保持、Restart後の継続、Duplicate Dispatch防止を対象とします。Remote MCPやHosted MCP Service全般の互換性を示すものではありません。
+MCPについては、確認環境内のLocal subprocess / stdio経路、JSON-RPC framing、Server / Tool Binding、read-only MCP inspection、read-only route visibility、Fault Injection、結果不明の保持、Restart後の継続、Duplicate Dispatch防止を対象とします。Remote MCPやHosted MCP Service全般の互換性を示すものではありません。
 
 | Evidence statement | 示すこと | 示さないこと |
 |---|---|---|
@@ -40,11 +40,9 @@ MCPについては、確認環境内のLocal subprocess / stdio経路、JSON-RPC
 
 Verification documentationは観測結果と試験結果を記録するものです。MIT Licenseを変更せず、warranty、support obligation、certification、legal assuranceを追加しません。
 
-## Post-`0.1.0a5` Responsibility Routing verification target
+## `0.1.0a6`に含まれるResponsibility Routing検証
 
-現行source-previewのRouting workは、release promotion前にunit testだけでなく製品品質全体で検証します。
-
-必要Evidenceには次を含みます。
+Release-level Evidenceには次が含まれます。
 
 - route serializationとlegacy compatibility
 - receiver eligibility validation
@@ -52,14 +50,23 @@ Verification documentationは観測結果と試験結果を記録するもので
 - `REQUIRES_REEVALUATION` hold behavior
 - Evidence、capability、route selection、transport successからAuthorityを推論しないこと
 - Residual Owner preservation
-- persistence/restart後のroute visibility
+- persistence/runtime recreation後のroute visibility
 - ambiguous write -> `hold_for_reconciliation` visibility
 - duplicate dispatchなしのreconciliation
 - read-only MCP route visibilityと`authority_inferred: false`
 - English / Japanese browser/demo assertion
 - claim/test registry bindingとexact-head CI
 
-Unit suiteがGREENなだけでは不十分です。
+Release candidateは公開前に、standalone suite 477件、production-grade demo、clean wheel installとCLI check、Lean / JSON / Python parity、reproducible artifact verification、EN/JA browser/Pyodide E2Eを通過しました。
+
+## 公開artifact Evidence
+
+| Artifact | SHA256 |
+|---|---|
+| `responsibility_pathway_runtime-0.1.0a6-py3-none-any.whl` | `3db42d6d1289e2a1f1a20afc8d181a7bc433dcbb8e7ea87416415192a6ca6cb2` |
+| `responsibility_pathway_runtime-0.1.0a6.tar.gz` | `0690b9ea23831ea5dc24578accecb68fccc7a0737bbf71facdd09be629f0874f` |
+
+PyPIはTrusted Publishing経路で両artifactを受理し、public readbackで`0.1.0a6` pageとfile metadataを確認しました。公開時にdigital attestationも生成されています。
 
 ## Known limitations
 
@@ -67,14 +74,14 @@ Unit suiteがGREENなだけでは不十分です。
 |---|---|
 | Customer environment | 事前検証されていない |
 | Platform | bounded field case以外のWindows、macOS、追加Linux、container、別Python profileにはfield evidenceが必要 |
-| MCP | Local subprocess / stdioとlocal read-only inspectionは検証済み。Remote MCP、Hosted Service、企業Identity、Service固有readbackはintegration固有testが必要 |
-| Responsibility Routing | 現行sourceはbounded route metadata/visibilityを実装。receiver eligibilityとorganizational delegation source-of-truthはintegrator-owned。release-level routing assuranceはfresh exact-head validation待ち |
+| MCP | Local subprocess / stdio、local read-only inspection、read-only route visibilityは検証済み。Remote MCP、Hosted Service、企業Identity、Service固有readbackはintegration固有testが必要 |
+| Responsibility Routing | bounded route metadata/visibilityは公開済み。receiver eligibilityとorganizational delegation source-of-truthはintegrator-owned |
 | Enterprise integration | Proxy、TLS、identity、credential、remote serviceにはintegration固有testが必要 |
 | Remote effect | 任意systemに対するexactly-onceを保証しない |
 | Legal / security | Legal interpretation、organizational Authority生成、security certificationを提供しない |
 | Formal Evidence | Leanが検証するのはselected state-transition invariantであり、receiver eligibilityやResponsibility Routing delegation semantics全体ではない |
 | Compatibility | Alpha interfaceとmigration behaviorは変更される場合がある |
-| MCP Server role | 公開済み`0.1.0a5`はread-only `rpr-mcp`を含み、mutating pathway operationは公開しない。現行sourceは`rpr.get_route_visibility`をpreviewする。 |
+| MCP Server role | 公開済み`0.1.0a6`はread-only `rpr-mcp`と`rpr.get_route_visibility`を含み、mutating pathway operationは公開しない。 |
 
 ## Minimum UAT plan
 
@@ -110,7 +117,7 @@ MCP統合では次も確認します。
 
 ## Reporting result
 
-Expected / actual behavior、reproduction step、sanitized log、environment、RPR version、Freeze ID、artifact digest、adapter、readback source、必要ならroute classification / receiver eligibility、real external effectの有無を記録します。
+Expected / actual behavior、reproduction step、sanitized log、environment、RPR version、release/tag identity、artifact digest、adapter、readback source、必要ならroute classification / receiver eligibility、real external effectの有無を記録します。
 
 MCPでは、Transport、Server実装とVersion、Protocol Version、Tool Name、Schema Digest、認証構成、障害時にDispatchを否定できたかも記録します。
 
@@ -120,4 +127,4 @@ MCPでは、Transport、Server実装とVersion、Protocol Version、Tool Name、
 
 Tag、GitHub Release、binary publication、claim promotion、release declarationは、正確なcandidate HEADがsource、unit、component、integration、system/E2E、persistence/restart、package-install、formal-scope、secret/internal-reference、bilingual documentation、manifest/digest、claim/evidence checkを通過し、指定されたhuman approvalを得た後に実施します。
 
-Frozen candidateがvalidation後に変わった場合、旧Evidenceを持ち越さず、修復済み`main`からfresh candidateを再構築します。
+Frozen candidateがvalidation後に変わった場合、旧Evidenceを持ち越さず、`main`からfresh candidateを再構築します。
