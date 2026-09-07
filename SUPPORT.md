@@ -7,7 +7,7 @@ Responsibility Pathway Runtime is actively developed and may be used within docu
 ## Open a public Issue for
 
 - installation or packaging failures;
-- unexpected pathway, attempt, retry, restart, repair, resume, or reconciliation behavior;
+- unexpected pathway, attempt, retry, restart, repair, resume, reconciliation, or Responsibility Routing behavior;
 - HTTP, MCP, proxy, TLS, identity, or service-integration findings that do not expose secrets;
 - platform reports for Windows, macOS, Linux distributions, containers, and supported Python versions;
 - documentation, example, API, or operational usability problems;
@@ -21,11 +21,15 @@ Include the RPR version and Freeze ID where available, operating system, Python 
 
 When a request may have reached an external system but the result is unknown, do not repeatedly retry merely to reproduce the issue. Preserve the pathway, attempt, idempotency identifier, timestamps, logs, and independent readback evidence. Report the state as unresolved.
 
+An unresolved effect does not automatically imply a Human Gate. Preserve an explicit Responsibility Route: for example reconciliation hold, bounded Human Return, another eligible receiver operating inside declared delegation, or stop-and-preserve-residue. If receiver eligibility or Authority is not established, hold rather than guessing a destination.
+
 ## Current use posture
 
-RPR's documented runtime, persistence, Human Gate, restart/reconciliation, repair/resume, evidence, readback, and bounded MCP surfaces are intended to be tried in real bounded integrations.
+RPR's documented runtime, persistence, Responsibility Routing, bounded Human Gate, restart/reconciliation, repair/resume, evidence, readback, and bounded MCP surfaces are intended to be tried in real bounded integrations.
 
 Deployment-specific authentication, authorization, credential isolation, network/TLS policy, tenant isolation, bypass prevention, and external-system correctness remain integrator-owned unless a future RPR surface explicitly provides them.
+
+RPR preserves declared Authority boundaries; it does not create Authority from evidence transfer, receiver capability, tool success, transport success, or route selection.
 
 That boundary means `not provided by RPR`, not `all real use is forbidden`.
 
