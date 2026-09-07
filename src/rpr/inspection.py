@@ -152,5 +152,4 @@ def inspect_pathway(pathway: PathwayDefinition) -> InspectionResult:
         degradation_mode=degradation,
         next_required_authority=next_authority,
         next_required_action=next_action,
-        responsibility_route_available=pathway.responsibility_route is not None,
     )
