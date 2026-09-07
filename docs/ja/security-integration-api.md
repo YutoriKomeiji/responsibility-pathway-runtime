@@ -1,9 +1,9 @@
 <!--
 Document Title: RPR Security・Integration・API境界
 Document Type: Public Product Guide
-Status: Public Alpha Candidate
-Version: 0.1.0a2
-Freeze ID: RPR-CF-2026-08-01-02
+Status: Public Alpha
+Version: 0.1.0a5
+Freeze ID: RPR-CF-2026-08-02-01
 Header Language: Japanese
 Body Language: Japanese
 -->
@@ -16,41 +16,52 @@ RPRはMITライセンスのcontrol・evidence componentであり、完全なsecu
 
 | Domain | 他のDomainから暗黙に推定してはいけないもの |
 |---|---|
-| Human / institutional authority | Host applicationが示すidentityやauthorization |
+| Human / institutional Authority | Host applicationが示すidentityやauthorization |
+| Receiver capability | Receiver eligibilityやdelegated Authority |
+| Evidence transfer | Authority transferやownership transfer |
 | Host application | RPR stateやremote effectの正しさ |
 | RPR state / evidence store | Adapterやexternal serviceの信頼性 |
 | Adapter process | Independent readbackやbusiness authorization |
 | Credential store | 特定business actionの実行許可 |
 | Remote system | Callbackやlocal execution resultの正しさ |
 | Independent readback source | Proposed actionやpolicyの妥当性 |
-| Optional RPE service | Execution successやcompletion evidence |
+| Optional RPE service | Execution success、completion Evidence、または自動的に妥当なhuman destination |
 
-Adapter return valueは、自動的に独立readbackにはなりません。
+Adapter return valueは自動的に独立readbackにはなりません。Successful transportやroute selectionもAuthorityではありません。
 
 ## Integration contract
 
 | 項目 | Integrationが定義するもの |
 |---|---|
 | Action surface | Accepted action・actor schema |
-| Authority | AuthorizationとHuman Gate要件 |
+| Authority | Authorization、delegation source-of-truth、bounded Human Gate要件 |
+| Responsibility Routing | Receiver eligibility、route class、unresolved payload、bounded next actions、closure/reevaluation condition、Residual Owner |
 | Identity | Stable operation・idempotency identity |
 | State | Permitted transitionとfailure handling |
 | Dispatch | Timeout、cancellation、retry behavior |
 | Evidence | Authoritative readback sourceとmatching rule |
-| Ambiguity | `write_status_unknown`、repair、reconciliation handling |
+| Ambiguity | `write_status_unknown`、hold、repair、reconciliation handling |
 | Ownership | Repair、resume、incident、residual-effect owner |
 | Data | Classification、retention、export、deletion rule |
 | Observability | Monitoring、alerting、incident route |
+
+## Fail-closed routing rule
+
+`Fail closed`は`send to a human`を意味しません。
+
+Missing evaluator、malformed contract、invalid route、ineligible receiver、unresolved external effectからhuman destinationを推論してはいけません。Eligible receiverと必要Authorityが確立されるまでneutral holdが正しい場合があります。
+
+明示的にconfiguredされたbounded Human Gateが必要な場合、Human Returnは正当なrouteとして維持されます。Evidence transfer、receiver capability、confidence、tool success、successful transport、recovered state、route selectionはAuthorityを生成しません。
 
 ## Host security controls
 
 RPRは、authenticated user/service、least-privilege credential、network policy、endpoint・command allow-list、protected persistence、log redaction、supply-chain control、monitoring、bypass preventionを備えたhost architecture内へ配置します。
 
-Host applicationは、同じ重大operationに対してpathway admissionやevidence handlingを迂回するparallel execution pathを公開してはいけません。
+Host applicationは、同じ重大operationに対してpathway admission、route eligibility、Authority check、Evidence handlingを迂回するparallel execution pathを公開してはいけません。
 
 ## API stability
 
-`0.1.0a2`はPublic Alphaです。Versionをpinし、serialized state、CLI behavior、adapter configuration、migration procedureをupgrade前に検証してください。Stable release前には非互換修正が入る場合があります。
+`0.1.0a5`は現在の公開Public Alphaです。Versionをpinし、serialized state、CLI behavior、adapter configuration、migration procedureをupgrade前に検証してください。Repository sourceには`0.1.0a5`公開後のResponsibility Routing workが含まれる場合があり、fresh candidateの再構築・検証・承認までは公開packageのcontractではありません。Stable release前には非互換修正が入る場合があります。
 
 ## Credentialsと脆弱性報告
 
