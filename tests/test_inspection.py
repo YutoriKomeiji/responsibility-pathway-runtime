@@ -1,13 +1,39 @@
 # Copyright (c) 2026 Akihisa Ono
 # SPDX-License-Identifier: MIT
 from rpr.inspection import inspect_pathway
-from rpr.models import ActionClass, EnvironmentTrust, PathwayDefinition, RuntimeDecision
+from rpr.models import (
+    ActionClass,
+    EnvironmentTrust,
+    PathwayDefinition,
+    ReceiverEligibility,
+    ResponsibilityRoute,
+    ResponsibilityRouteClass,
+    RuntimeDecision,
+)
 
 
 def pathway(**overrides):
     values = dict(pathway_id="p-1", action_name="send_email", action_class=ActionClass.HIGH_IMPACT, environment_trust=EnvironmentTrust.TRUSTED_INTERNAL, decision_owner="owner", approval_authority="approver", execution_actor="agent", stop_authority="operator", evidence_owner="audit", repair_owner="support", resume_authority="manager", human_return_point="before_send", residual_owner="owner")
     values.update(overrides)
     return PathwayDefinition(**values)
+
+
+def route(**overrides):
+    values = dict(
+        route_class=ResponsibilityRouteClass.AI_RESOLVE_WITHIN_DELEGATION,
+        source_holder="agent-a",
+        destination="agent-b",
+        receiver_eligibility=ReceiverEligibility.ELIGIBLE,
+        authority_class="delegated_runtime",
+        delegation_scope="readback-only reconciliation",
+        unresolved_payload=("external_effect",),
+        allowed_next_actions=("readback", "reconcile"),
+        closure_condition="effect state verified",
+        reevaluation_condition="tool or authority context changes",
+        residual_owner="owner",
+    )
+    values.update(overrides)
+    return ResponsibilityRoute(**values)
 
 
 def test_high_impact_pathway_routes_to_human_gate():
@@ -90,3 +116,41 @@ def test_inspection_serialization_includes_next_operational_step():
     value = inspect_pathway(pathway()).to_dict()
     assert value["next_required_authority"] == "approver"
     assert value["next_required_action"] == "perform_explicit_human_review"
+    assert value["responsibility_route_available"] is False
+
+
+def test_additive_responsibility_route_is_visible_without_replacing_human_gate_semantics():
+    result = inspect_pathway(pathway(responsibility_route=route()))
+    assert result.valid
+    assert result.responsibility_route_available is True
+    assert result.decision is RuntimeDecision.HUMAN_GATE
+
+
+def test_responsibility_route_rejects_ineligible_receiver():
+    result = inspect_pathway(
+        pathway(
+            responsibility_route=route(receiver_eligibility=ReceiverEligibility.INELIGIBLE),
+        )
+    )
+    assert not result.valid
+    assert "route_receiver_ineligible" in {item.code for item in result.findings}
+
+
+def test_responsibility_route_preserves_residual_owner():
+    result = inspect_pathway(
+        pathway(
+            responsibility_route=route(residual_owner="other-owner"),
+        )
+    )
+    assert not result.valid
+    assert "route_residual_owner_mismatch" in {item.code for item in result.findings}
+
+
+def test_responsibility_route_requires_bounded_next_actions():
+    result = inspect_pathway(
+        pathway(
+            responsibility_route=route(allowed_next_actions=()),
+        )
+    )
+    assert not result.valid
+    assert "route_allowed_next_actions_missing" in {item.code for item in result.findings}
