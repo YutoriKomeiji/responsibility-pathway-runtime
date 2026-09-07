@@ -13,19 +13,23 @@
   "blocker_issue": null,
   "candidate": {
     "version": "0.1.0a6",
-    "state": "release-candidate",
+    "state": "release-approved",
     "source_base": "0.1.0a5",
     "repair_main_commit": "13bea0ae7d67c9507db7d8a1983dea1c57803a5c",
+    "candidate_merge_commit": "b6e75fca5ef6fde1c5a359664463a213d1a70716",
+    "candidate_exact_head": "10e1d45a545c743019475bda5e536d757c3a377d",
     "reason": "Responsibility Routing semantics and visibility after repository-wide product-quality repair",
-    "release_approved": false,
-    "publication_blocked": true,
-    "exact_head_validation": "pending-candidate-head",
-    "artifact_evidence": "pending-candidate-head",
-    "independent_candidate_audit": "pending"
+    "release_approved": true,
+    "publication_blocked": false,
+    "exact_head_validation": "passed",
+    "artifact_evidence": "retained",
+    "independent_candidate_audit": "passed",
+    "release_authorization": "Master Human Gate approved 2026-09-07",
+    "publication_status": "pending-tag-release-pypi-readback"
   },
   "source_preview": {
-    "status": "repair_integrated_candidate_prepared",
-    "release_promoted": false,
+    "status": "release_authorized_candidate_merged",
+    "release_promoted": true,
     "issue": 45,
     "repair_pr": 46,
     "repair_main_commit": "13bea0ae7d67c9507db7d8a1983dea1c57803a5c",
@@ -52,27 +56,40 @@
       "pages_run": 132,
       "result": "passed"
     },
+    "candidate_validation": {
+      "public_export_run": 331,
+      "pages_run": 133,
+      "result": "passed",
+      "standalone_tests": 477,
+      "production_demo_tests": 4,
+      "wheel_sha256": "99098c30f681ebde36f6843aab5816268405f488a7dd034f0013afedd9e076f9",
+      "sdist_sha256": "f8732ccb502d97785d140f45a43e11272c5788ceb9f3d9d0ea11efec2655ebdf",
+      "byte_for_byte_reproducible": true,
+      "artifact_id": 10004019879
+    },
     "blocked_by": [
-      "fresh 0.1.0a6 candidate exact-head full CI",
-      "fresh candidate artifact evidence",
-      "independent candidate audit/readback",
-      "explicit release Human Gate"
+      "create exact tag v0.1.0a6 at the approved release commit",
+      "publish GitHub prerelease from that tag",
+      "verify release: published starts the Trusted Publisher workflow",
+      "complete PyPI publication and public readback",
+      "synchronize public-current product surfaces after publication readback"
     ]
   },
   "human_gate": {
     "required_for": [
-      "release tags after 0.1.0a5",
-      "GitHub Releases after 0.1.0a5",
-      "binary publication after 0.1.0a5",
+      "release tags after 0.1.0a6",
+      "GitHub Releases after 0.1.0a6",
+      "binary publication after 0.1.0a6",
       "production-ready claim"
     ],
+    "last_satisfied_for": "0.1.0a6 Public Alpha release, GitHub prerelease, and PyPI publication",
     "residual_owner": "authorized release owner"
   },
   "verified_profile": {
     "operating_system": "Linux",
     "python": "3.11",
     "scope": "standalone locally executable public-alpha validation",
-    "verification_run_id": 30726958037
+    "verification_run_id": 34082088581
   },
   "verified_capabilities": [
     "authorized pathway lifecycle transitions",
@@ -99,9 +116,8 @@
     "formal proof of Responsibility Routing receiver eligibility or delegation semantics"
   ],
   "open_release_gates": [
-    "complete fresh exact-head 0.1.0a6 candidate validation and artifact retention",
-    "complete independent candidate audit/readback",
-    "obtain explicit Human Gate approval before any 0.1.0a6 tag, GitHub Release, or binary publication",
+    "complete exact-tag GitHub prerelease and Trusted Publisher publication for 0.1.0a6",
+    "verify public PyPI readback before promoting 0.1.0a6 to published-current",
     "retain Human Gate for any production-ready or enterprise-ready claim",
     "retain customer-equivalent external-environment validation as incomplete"
   ]
