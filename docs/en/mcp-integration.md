@@ -60,7 +60,7 @@ An unresolved call must not be retried merely because the client process restart
 
 ## Unreleased read-only RPR MCP server preview
 
-The current source tree contains a Phase 1 read-only stdio MCP server for inspecting an existing RPR SQLite pathway store. This source preview is **not included in the published PyPI `0.1.0a2` package** and has not yet been promoted as a new package release.
+The current source tree contains a Phase 1 read-only stdio MCP server for inspecting an existing RPR SQLite pathway store. This source preview is not a new package release and does not change the published package boundary by itself.
 
 Start it from an editable source installation:
 
@@ -69,13 +69,16 @@ python -m pip install -e .
 rpr-mcp --database ./rpr.sqlite3
 ```
 
-The preview exposes only:
+The current source preview exposes only:
 
 - `rpr.get_status`
 - `rpr.list_pathways`
 - `rpr.get_pathway`
+- `rpr.get_route_visibility`
 - `rpr.get_evidence`
 - `rpr.list_unresolved`
+
+`rpr.get_route_visibility(pathway_id)` is a read-only Responsibility Routing inspection surface. It can expose the current state, the narrow compatibility route classification already justified by RPR semantics, a persisted declared route when present, the Human Return point, the Residual Owner, and an explicit `authority_inferred: false` marker. The tool does not select a receiver, grant Authority, approve work, execute work, reconcile effects, resume execution, or mutate pathway state.
 
 The server opens the existing SQLite file with `mode=ro`. It has no MCP tool for approval, execution, transition, reconciliation, repair, or resume. Status output does not disclose the database filesystem path.
 
@@ -88,7 +91,7 @@ Example local MCP client configuration:
 }
 ```
 
-> **Trust boundary:** Read-only does not mean non-sensitive. Pathway definitions and retained evidence may contain operational information. Run the preview only for a trusted local MCP client under operating-system permissions that already allow reading the database. It is not an authentication, authorization, tenant-isolation, or redaction gateway.
+> **Trust boundary:** Read-only does not mean non-sensitive. Pathway definitions, route metadata, and retained evidence may contain operational information. Run the preview only for a trusted local MCP client under operating-system permissions that already allow reading the database. It is not an authentication, authorization, tenant-isolation, or redaction gateway.
 
 ## Verified and unverified scope
 
@@ -98,7 +101,8 @@ The read-only server preview adds tests for:
 
 - read-only SQLite opening and rejection of write statements;
 - MCP initialization, `tools/list`, and `tools/call`;
-- empty, listed, individual, evidence, and unresolved-pathway results;
+- empty, listed, individual, route-visibility, evidence, and unresolved-pathway results;
+- route visibility that does not infer Authority;
 - malformed JSON-RPC and invalid arguments;
 - structured tool errors and missing pathway IDs;
 - stdout containing JSON-RPC messages only;
@@ -123,7 +127,7 @@ RPR does not discover that an arbitrary MCP server or client is trustworthy. The
 - supplying authoritative independent readback for consequential effects;
 - defining repair, reconciliation, resume, and residual ownership;
 - preventing alternate execution paths that bypass RPR;
-- preventing untrusted MCP clients from reading pathway and evidence data.
+- preventing untrusted MCP clients from reading pathway, route, and evidence data.
 
 ## Still not implemented
 
