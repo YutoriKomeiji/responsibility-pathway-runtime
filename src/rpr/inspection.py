@@ -102,7 +102,6 @@ def inspect_pathway(pathway: PathwayDefinition) -> InspectionResult:
         "evidence_owner": pathway.evidence_owner,
         "repair_owner": pathway.repair_owner,
         "resume_authority": pathway.resume_authority,
-        "human_return_point": pathway.human_return_point,
         "residual_owner": pathway.residual_owner,
     }
     for name, value in required.items():
@@ -119,6 +118,15 @@ def inspect_pathway(pathway: PathwayDefinition) -> InspectionResult:
     if approval_needed and not (pathway.approval_authority or "").strip():
         findings.append(ValidationFinding("approval_authority_missing", "This action class requires an approval authority", "error"))
 
+    if pathway.action_class is ActionClass.HIGH_IMPACT and not pathway.human_return_point.strip():
+        findings.append(
+            ValidationFinding(
+                "high_impact_human_return_point_missing",
+                "A high-impact Human Gate requires a concrete human return point",
+                "error",
+            )
+        )
+
     if pathway.action_class is ActionClass.HIGH_IMPACT and pathway.stop_authority == pathway.execution_actor:
         findings.append(ValidationFinding("stop_execution_authority_not_separated", "High-impact actions should separate stop authority from execution actor", "error"))
 
@@ -126,11 +134,20 @@ def inspect_pathway(pathway: PathwayDefinition) -> InspectionResult:
         findings.append(ValidationFinding("untrusted_environment", "Untrusted environments require an explicit human gate before external mutation", "warning"))
 
     errors = [item for item in findings if item.severity == "error"]
+    route_requires_reevaluation = any(
+        item.code == "route_receiver_requires_reevaluation" for item in findings
+    )
     next_authority: str | None
     next_action: str | None
     if errors:
-        decision, degradation = RuntimeDecision.HUMAN_GATE, "stop_and_await"
+        # An invalid pathway or invalid receiver is not, by itself, a valid Human
+        # Return. Hold the pathway until its definition is repaired so that a
+        # missing/invalid route cannot become false escalation.
+        decision, degradation = RuntimeDecision.HOLD, "invalid_pathway_definition"
         next_authority, next_action = pathway.decision_owner or None, "correct_pathway_definition"
+    elif route_requires_reevaluation:
+        decision, degradation = RuntimeDecision.HOLD, "route_reevaluation_required"
+        next_authority, next_action = pathway.decision_owner, "reevaluate_responsibility_route"
     elif pathway.environment_trust is EnvironmentTrust.ADVERSARIAL:
         decision, degradation = RuntimeDecision.HOLD, "safe_only"
         next_authority, next_action = pathway.stop_authority, "review_adversarial_environment"
