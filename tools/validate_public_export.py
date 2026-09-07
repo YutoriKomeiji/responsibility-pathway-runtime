@@ -31,12 +31,59 @@ REQUIRED_PATHS = (
     "docs/en/product-scope-architecture.md", "docs/ja/product-scope-architecture.md",
     "docs/en/security-integration-api.md", "docs/ja/security-integration-api.md",
     "docs/en/verification-release-uat.md", "docs/ja/verification-release-uat.md",
-    "site/index.html", "site/ja.html", "site/styles.css", "site/app.js",
+    "docs/en/mcp-integration.md", "docs/ja/mcp-integration.md",
+    "docs/en/responsibility-routing-migration.md", "docs/ja/responsibility-routing-migration.md",
+    "docs/en/support-maturity.md", "docs/ja/support-maturity.md",
+    "site/index.html", "site/ja.html", "site/demo.html", "site/demo-en.html",
+    "site/styles.css", "site/app.js",
     "examples/production-grade-demo/README.md", "examples/production-grade-demo/README.ja.md",
     ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/bug-report.yml",
     ".github/ISSUE_TEMPLATE/environment-report.yml", ".github/ISSUE_TEMPLATE/integration-request.yml",
     ".github/ISSUE_TEMPLATE/documentation.yml", ".github/pull_request_template.md",
     ".github/workflows/public-export-quality.yml", ".github/workflows/deploy-pages.yml",
+)
+
+BILINGUAL_PAIRS = (
+    ("docs/en/README.md", "docs/ja/README.md"),
+    ("docs/en/claim-boundary-promotion.md", "docs/ja/claim-boundary-promotion.md"),
+    ("docs/en/eu-ai-act-article-50.md", "docs/ja/eu-ai-act-article-50.md"),
+    ("docs/en/install-operations-recovery.md", "docs/ja/install-operations-recovery.md"),
+    ("docs/en/mcp-integration.md", "docs/ja/mcp-integration.md"),
+    ("docs/en/product-governance.md", "docs/ja/product-governance.md"),
+    ("docs/en/product-scope-architecture.md", "docs/ja/product-scope-architecture.md"),
+    ("docs/en/quick-start.md", "docs/ja/quick-start.md"),
+    ("docs/en/responsibility-routing-migration.md", "docs/ja/responsibility-routing-migration.md"),
+    ("docs/en/security-integration-api.md", "docs/ja/security-integration-api.md"),
+    ("docs/en/support-maturity.md", "docs/ja/support-maturity.md"),
+    ("docs/en/verification-release-uat.md", "docs/ja/verification-release-uat.md"),
+    ("examples/production-grade-demo/README.md", "examples/production-grade-demo/README.ja.md"),
+    ("site/index.html", "site/ja.html"),
+    ("site/demo-en.html", "site/demo.html"),
+)
+
+ACTIVE_VERSIONED_DOCS = (
+    "docs/en/README.md", "docs/ja/README.md",
+    "docs/en/install-operations-recovery.md", "docs/ja/install-operations-recovery.md",
+    "docs/en/mcp-integration.md", "docs/ja/mcp-integration.md",
+    "docs/en/product-scope-architecture.md", "docs/ja/product-scope-architecture.md",
+    "docs/en/security-integration-api.md", "docs/ja/security-integration-api.md",
+    "docs/en/verification-release-uat.md", "docs/ja/verification-release-uat.md",
+)
+
+ROUTING_REQUIRED_FILES = (
+    "README.md",
+    "docs/en/README.md", "docs/ja/README.md",
+    "docs/en/mcp-integration.md", "docs/ja/mcp-integration.md",
+    "docs/en/responsibility-routing-migration.md", "docs/ja/responsibility-routing-migration.md",
+    "site/index.html", "site/ja.html",
+    "site/demo-en.html", "site/demo.html",
+)
+
+ROUTE_TOOL_REQUIRED_FILES = (
+    "README.md",
+    "docs/en/README.md", "docs/ja/README.md",
+    "docs/en/mcp-integration.md", "docs/ja/mcp-integration.md",
+    "site/demo-en.html", "site/demo.html",
 )
 
 TEXT_SUFFIXES = {".md", ".html", ".css", ".js", ".json", ".yml", ".yaml", ".toml", ".py", ".lean"}
@@ -145,6 +192,62 @@ def validate_status_files() -> int:
     elif status.get("freeze_id") != release.get("freeze_id"):
         fail("status and release freeze IDs differ / statusとreleaseのfreeze ID不一致")
         errors += 1
+
+    if isinstance(published_version, str) and published_version:
+        for relative in ACTIVE_VERSIONED_DOCS:
+            path = ROOT / relative
+            if not path.is_file():
+                continue
+            text = path.read_text(encoding="utf-8")
+            version_match = re.search(r"(?m)^Version:\s*([^\s]+)\s*$", text)
+            if version_match and version_match.group(1) != published_version:
+                fail(
+                    f"active document version differs from published product / 公開中document version不一致: "
+                    f"{relative}={version_match.group(1)} published={published_version}"
+                )
+                errors += 1
+    return errors
+
+
+def validate_bilingual_and_routing_surfaces() -> int:
+    errors = 0
+    for english, japanese in BILINGUAL_PAIRS:
+        en_path, ja_path = ROOT / english, ROOT / japanese
+        if not en_path.is_file() or not ja_path.is_file():
+            fail(f"active bilingual pair incomplete / 日英active pair不足: {english} <-> {japanese}")
+            errors += 1
+            continue
+        en_text = en_path.read_text(encoding="utf-8")
+        ja_text = ja_path.read_text(encoding="utf-8")
+        for anchor in ("Responsibility Routing", "rpr.get_route_visibility"):
+            if (anchor in en_text) != (anchor in ja_text):
+                fail(
+                    f"bilingual semantic anchor differs / 日英semantic anchor不一致: "
+                    f"{anchor}: {english} <-> {japanese}"
+                )
+                errors += 1
+
+    for relative in ROUTING_REQUIRED_FILES:
+        path = ROOT / relative
+        if path.is_file() and "Responsibility Routing" not in path.read_text(encoding="utf-8"):
+            fail(f"Responsibility Routing missing from active product surface / active surfaceにRouting不足: {relative}")
+            errors += 1
+
+    for relative in ROUTE_TOOL_REQUIRED_FILES:
+        path = ROOT / relative
+        if path.is_file() and "rpr.get_route_visibility" not in path.read_text(encoding="utf-8"):
+            fail(f"route visibility tool missing from active product surface / route tool不足: {relative}")
+            errors += 1
+
+    for relative in ("site/demo-en.html", "site/demo.html"):
+        path = ROOT / relative
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        for anchor in ("bounded_human_return", "hold_for_reconciliation", "authority_inferred"):
+            if anchor not in text:
+                fail(f"browser demo routing evidence anchor missing / demo route anchor不足: {relative}: {anchor}")
+                errors += 1
     return errors
 
 
@@ -157,6 +260,7 @@ def main() -> int:
     if not errors:
         try:
             errors += validate_status_files()
+            errors += validate_bilingual_and_routing_surfaces()
         except (OSError, json.JSONDecodeError, tomllib.TOMLDecodeError) as exc:
             fail(f"invalid status metadata / status metadata不正: {exc}")
             errors += 1
