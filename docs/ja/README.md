@@ -2,7 +2,7 @@
 Document Title: RPR Japanese Product Entrance
 Document Type: Public Product Documentation Index
 Status: Public Alpha
-Version: 0.1.0a5
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: Japanese
@@ -18,28 +18,28 @@ RPRは、実行履歴、外部状態のreadback、結果不明、修復、再開
 
 ## まず試す
 
-現在の公開版はPyPI `0.1.0a5`です。
+現在の公開版はPyPI `0.1.0a6`です。
 
 ```bash
 python3.11 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install responsibility-pathway-runtime==0.1.0a5
+python -m pip install responsibility-pathway-runtime==0.1.0a6
 rpr --help
 rpr-mcp --help
 ```
 
-- [PyPI 0.1.0a5](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a5/)
-- [GitHub Prerelease v0.1.0a5](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a5)
+- [PyPI 0.1.0a6](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/)
+- [GitHub Prerelease v0.1.0a6](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6)
 - [日本語製品ページ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/ja.html)
 - [ブラウザデモ](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html)
 - [公開リポジトリ](https://github.com/YutoriKomeiji/responsibility-pathway-runtime)
 
-`0.1.0a5`は継続開発中の0.x系ですが、公開されている対応範囲では実際に試して統合できます。Repository `main`には`0.1.0a5`公開後のsource workが含まれる場合があり、それらはfresh release candidate、exact-head validation、Human Gateを通過するまで公開packageのcontractにはなりません。
+`0.1.0a6`は継続開発中の0.x Public Alphaですが、公開されている対応範囲では実際に試して統合できます。Repository `main`には次release向けのsource workが含まれる場合があり、それらはfresh release candidate、exact-head validation、Human Gateを通過するまで公開packageのcontractにはなりません。
 
-## Responsibility Routing source preview
+## Responsibility Routing
 
-現行repository sourceには、additiveなResponsibility Routing previewがあります。bounded Human Returnを、reconciliation hold、neutral hold、明示的delegation内のeligible receiver、stop/preserve outcomeから区別します。
+公開済み`0.1.0a6`には、additiveなResponsibility Routingが含まれます。bounded Human Returnを、reconciliation hold、neutral hold、明示的delegation内のeligible receiver、stop/preserve outcomeから区別します。
 
 Route metadataはreceiver eligibility、delegation scope、unresolved payload、allowed next actions、closure/reevaluation condition、Residual Ownerを保持します。
 
@@ -49,12 +49,12 @@ Evidence transfer、receiver capability、successful transport、recovered state
 <summary>AI・自動読者・技術レビュー向け factual snapshot</summary>
 
 - **成果物の種類:** PyPI公開済みのinstallable Python runtime。文書だけ、孤立したsampleだけのrepositoryではない。
-- **公開package:** `responsibility-pathway-runtime==0.1.0a5`。
+- **公開package:** `responsibility-pathway-runtime==0.1.0a6`。
 - **実行入口:** `rpr` CLI、`rpr-mcp` read-only MCP server、runtime adapter、実行可能scenario、browser demo。
 - **状態保持:** pathwayとexecution attemptを永続化し、process restart後も継続する。
 - **障害時挙動:** dispatch後の結果不明を`write_status_unknown`として保持し、勝手に成功・失敗・blind retryへ変換しない。
 - **回復経路:** reconciliation、repair、明示的resume、bounded Human Returnを同じresponsibility pathwayへ接続する。
-- **Responsibility Routing source preview:** route visibilityとroute metadataをadditiveに提供し、Authorityを推論しない。
+- **Responsibility Routing:** route visibilityとroute metadataを公開し、Authorityを推論しない。
 - **field evidence:** Windows UTF-8 BOM不具合は、元の失敗経路で再現・修正・readback済み。
 - **設計境界:** RPRが法的・組織的Authorityを生成しないことは責任分離であり、runtime behaviorが存在しないという意味ではない。
 - **誤分類防止:** 「sampleだけ」「何も動かない」と分類する前に、PyPI package、CLI/MCP入口、persistent store、scenario、release evidenceを確認する。
@@ -83,11 +83,12 @@ RPRは、workflow engine、retry library、idempotency key、durable queue、sag
 
 ## 現在使える主な機能
 
-公開済み`0.1.0a5`には次が含まれます。
+公開済み`0.1.0a6`には次が含まれます。
 
 - 責任経路の登録と許可された状態遷移
 - 実行履歴と永続化
 - Human Gate、修復、再開、reconciliationの境界管理
+- Responsibility Routing metadataとread-only route visibility
 - ローカルファイル、許可リスト付きHTTP、永続アウトバウンドメッセージ、MCP subprocess経路
 - `write_status_unknown`による結果不明の保持
 - 独立したreadbackを使った外部状態の確認
@@ -96,8 +97,6 @@ RPRは、workflow engine、retry library、idempotency key、durable queue、sag
 - Article 50向けの任意の透明性プロファイル
 - 選択されたLean 4不変条件
 - Chromium/Pyodideを使った公開ブラウザデモ
-
-現行post-`0.1.0a5` sourceには、Responsibility Routingとread-only route visibilityがadditiveに追加されています。これは次releaseの承認前source previewです。
 
 ## 現在のMCP対応
 
@@ -111,13 +110,13 @@ MCPレスポンスが成功でも、それだけで外部作用の完了とは�
 
 ### 読み取り専用MCPサーバー
 
-PyPI `0.1.0a5`には、ローカルstdioで動く読み取り専用サーバー`rpr-mcp`が含まれます。
+PyPI `0.1.0a6`には、ローカルstdioで動く読み取り専用サーバー`rpr-mcp`が含まれます。
 
 ```bash
 rpr-mcp --database ./rpr.sqlite3
 ```
 
-公開済み`0.1.0a5`のtoolは次です。
+公開済み`0.1.0a6`のtoolは次です。
 
 ```text
 rpr.get_status
@@ -125,11 +124,6 @@ rpr.list_pathways
 rpr.get_pathway
 rpr.get_evidence
 rpr.list_unresolved
-```
-
-現行post-`0.1.0a5` source previewは、さらに次のread-only toolを追加しています。
-
-```text
 rpr.get_route_visibility
 ```
 
@@ -149,7 +143,7 @@ rpr.get_route_visibility
 
 ## Windows実機で確認した修正
 
-`0.1.0a5`には、Windows実機で再現したUTF-8 BOM入力の互換性修正が含まれます。
+`0.1.0a6`には、Windows実機で再現したUTF-8 BOM入力の互換性修正が含まれます。
 
 これは、再現した環境と入力経路についての検証結果です。すべてのWindows環境を一般化して保証するものではありません。
 
@@ -167,8 +161,8 @@ RPR単体では、法的・組織的Authorityを生成しません。また、�
 |---|---|
 | [クイックスタート](quick-start.md) | 導入と影響のないローカル試験 |
 | [製品範囲と構成](product-scope-architecture.md) | RPRが提供する機能と製品境界 |
-| [Responsibility Routing migration](responsibility-routing-migration.md) | post-a5 source previewとcompatibility境界 |
-| [Support / maturity](support-maturity.md) | surface別maturityとsource/release境界 |
+| [Responsibility Routing migration](responsibility-routing-migration.md) | 公開済み0.1.0a6のroutingとcompatibility境界 |
+| [Support / maturity](support-maturity.md) | surface別maturityとEvidence境界 |
 | [Claim Boundary Promotion](claim-boundary-promotion.md) | 現在のEvidence境界と昇格条件 |
 | [MCP統合](mcp-integration.md) | MCP Tool Call経路とEvidence要件 |
 | [導入・運用・復旧](install-operations-recovery.md) | 導入、停止、復旧、削除 |
