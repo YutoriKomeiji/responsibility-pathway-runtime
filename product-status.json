@@ -1,7 +1,7 @@
 {
   "schema_version": "1.2",
   "product": "Responsibility Pathway Runtime",
-  "version": "0.1.0a5",
+  "version": "0.1.0a6",
   "release_channel": "public-alpha",
   "previous_freeze_id": "RPR-CF-2026-08-01-02",
   "freeze_id": "RPR-CF-2026-08-02-01",
@@ -13,11 +13,12 @@
   "blocker_issue": null,
   "candidate": {
     "version": "0.1.0a6",
-    "state": "release-approved",
+    "state": "published",
     "source_base": "0.1.0a5",
     "repair_main_commit": "13bea0ae7d67c9507db7d8a1983dea1c57803a5c",
     "candidate_merge_commit": "b6e75fca5ef6fde1c5a359664463a213d1a70716",
     "candidate_exact_head": "10e1d45a545c743019475bda5e536d757c3a377d",
+    "release_commit": "9f71a34f5d7eb0e25359ccf31d0c6d85570203d8",
     "reason": "Responsibility Routing semantics and visibility after repository-wide product-quality repair",
     "release_approved": true,
     "publication_blocked": false,
@@ -25,10 +26,22 @@
     "artifact_evidence": "retained",
     "independent_candidate_audit": "passed",
     "release_authorization": "Master Human Gate approved 2026-09-07",
-    "publication_status": "pending-tag-release-pypi-readback"
+    "publication_status": "published-and-publicly-read-back"
+  },
+  "release_evidence": {
+    "tag": "v0.1.0a6",
+    "tag_commit": "9f71a34f5d7eb0e25359ccf31d0c6d85570203d8",
+    "github_prerelease": "https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6",
+    "pypi": "https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/",
+    "publish_workflow_run": 34087946734,
+    "publish_result": "success",
+    "wheel_sha256": "3db42d6d1289e2a1f1a20afc8d181a7bc433dcbb8e7ea87416415192a6ca6cb2",
+    "sdist_sha256": "0690b9ea23831ea5dc24578accecb68fccc7a0737bbf71facdd09be629f0874f",
+    "trusted_publishing": true,
+    "public_readback": "confirmed-by-human-gate-2026-09-07"
   },
   "source_preview": {
-    "status": "release_authorized_candidate_merged",
+    "status": "responsibility-routing-published-in-0.1.0a6",
     "release_promoted": true,
     "issue": 45,
     "repair_pr": 46,
@@ -67,13 +80,7 @@
       "byte_for_byte_reproducible": true,
       "artifact_id": 10004019879
     },
-    "blocked_by": [
-      "create exact tag v0.1.0a6 at the approved release commit",
-      "publish GitHub prerelease from that tag",
-      "verify release: published starts the Trusted Publisher workflow",
-      "complete PyPI publication and public readback",
-      "synchronize public-current product surfaces after publication readback"
-    ]
+    "blocked_by": []
   },
   "human_gate": {
     "required_for": [
@@ -95,6 +102,7 @@
     "authorized pathway lifecycle transitions",
     "persistent pathway and execution-attempt continuity",
     "Human Gate, repair, resume, and reconciliation boundaries",
+    "Responsibility Routing and read-only route visibility",
     "local-file, allow-listed HTTP, durable outbound-message, and MCP subprocess paths",
     "fail-closed ambiguous-write handling",
     "restart and duplicate-dispatch prevention",
@@ -116,8 +124,7 @@
     "formal proof of Responsibility Routing receiver eligibility or delegation semantics"
   ],
   "open_release_gates": [
-    "complete exact-tag GitHub prerelease and Trusted Publisher publication for 0.1.0a6",
-    "verify public PyPI readback before promoting 0.1.0a6 to published-current",
+    "retain Human Gate for any later tag, GitHub Release, or binary publication",
     "retain Human Gate for any production-ready or enterprise-ready claim",
     "retain customer-equivalent external-environment validation as incomplete"
   ]
