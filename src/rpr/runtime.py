@@ -60,7 +60,7 @@ class ResponsibilityPathwayRuntime:
         try:
             rpe_result = self.rpe.evaluate(action_request)
         except RpeContractError as exc:
-            rpe_result_decision = RuntimeDecision.HUMAN_GATE
+            rpe_result_decision = RuntimeDecision.HOLD
             rpe_reason_codes = ("rpe_contract_error", type(exc).__name__)
             rpe_raw: dict[str, Any] = {"error": str(exc)}
         else:
