@@ -2,7 +2,93 @@
 # SPDX-License-Identifier: MIT
 from __future__ import annotations
 
-from .models import ActionClass, EnvironmentTrust, InspectionResult, PathwayDefinition, RuntimeDecision, ValidationFinding
+from .models import (
+    ActionClass,
+    EnvironmentTrust,
+    InspectionResult,
+    PathwayDefinition,
+    ReceiverEligibility,
+    ResponsibilityRouteClass,
+    RuntimeDecision,
+    ValidationFinding,
+)
+
+
+def _inspect_responsibility_route(pathway: PathwayDefinition) -> list[ValidationFinding]:
+    route = pathway.responsibility_route
+    if route is None:
+        return []
+
+    findings: list[ValidationFinding] = []
+    required = {
+        "route_source_holder": route.source_holder,
+        "route_destination": route.destination,
+        "route_authority_class": route.authority_class,
+        "route_delegation_scope": route.delegation_scope,
+        "route_closure_condition": route.closure_condition,
+        "route_reevaluation_condition": route.reevaluation_condition,
+        "route_residual_owner": route.residual_owner,
+    }
+    for name, value in required.items():
+        if not value.strip():
+            findings.append(ValidationFinding(f"{name}_missing", f"{name} is required", "error"))
+
+    if not route.allowed_next_actions:
+        findings.append(
+            ValidationFinding(
+                "route_allowed_next_actions_missing",
+                "A responsibility route must bound at least one allowed next action",
+                "error",
+            )
+        )
+    elif any(not action.strip() for action in route.allowed_next_actions):
+        findings.append(
+            ValidationFinding(
+                "route_allowed_next_actions_blank",
+                "Responsibility route actions must be non-empty",
+                "error",
+            )
+        )
+
+    if route.residual_owner != pathway.residual_owner:
+        findings.append(
+            ValidationFinding(
+                "route_residual_owner_mismatch",
+                "Responsibility routing must preserve the pathway residual owner unless ownership is explicitly redesigned",
+                "error",
+            )
+        )
+
+    if route.receiver_eligibility is ReceiverEligibility.INELIGIBLE:
+        findings.append(
+            ValidationFinding(
+                "route_receiver_ineligible",
+                "An ineligible receiver cannot be selected as the active responsibility route destination",
+                "error",
+            )
+        )
+    elif route.receiver_eligibility is ReceiverEligibility.REQUIRES_REEVALUATION:
+        findings.append(
+            ValidationFinding(
+                "route_receiver_requires_reevaluation",
+                "Receiver eligibility must be reevaluated before the route is relied on",
+                "warning",
+            )
+        )
+
+    if (
+        route.route_class is ResponsibilityRouteClass.BOUNDED_HUMAN_RETURN
+        and not pathway.human_return_point.strip()
+    ):
+        findings.append(
+            ValidationFinding(
+                "bounded_human_return_point_missing",
+                "A bounded human-return route requires a concrete human return point",
+                "error",
+            )
+        )
+
+    return findings
 
 
 def inspect_pathway(pathway: PathwayDefinition) -> InspectionResult:
@@ -22,6 +108,8 @@ def inspect_pathway(pathway: PathwayDefinition) -> InspectionResult:
     for name, value in required.items():
         if not value.strip():
             findings.append(ValidationFinding(f"{name}_missing", f"{name} is required", "error"))
+
+    findings.extend(_inspect_responsibility_route(pathway))
 
     approval_needed = pathway.action_class in {
         ActionClass.APPROVAL_REQUIRED,
@@ -64,4 +152,5 @@ def inspect_pathway(pathway: PathwayDefinition) -> InspectionResult:
         degradation_mode=degradation,
         next_required_authority=next_authority,
         next_required_action=next_action,
+        responsibility_route_available=pathway.responsibility_route is not None,
     )
