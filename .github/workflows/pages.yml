@@ -29,7 +29,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Pages relevance check / Pages関連差分確認
+    runs-on: ubuntu-latest
+    outputs:
+      run_heavy: ${{ steps.relevance.outputs.run_heavy }}
+    steps:
+      - name: Checkout history for delta classification
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Decide whether this event changed Pages/runtime inputs
+        id: relevance
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" != "pull_request" || "$ACTION" != "synchronize" || -z "${BEFORE:-}" || -z "${AFTER:-}" ]]; then
+            echo "run_heavy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$BEFORE" "$AFTER")"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -Eq '^(src/|site/|pyproject\.toml$|\.github/workflows/pages\.yml$)'; then
+            echo "run_heavy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_heavy=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build-and-verify:
+    needs: changes
+    if: needs.changes.outputs.run_heavy == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -246,8 +280,10 @@ jobs:
           path: site
 
   deploy:
-    if: github.event_name != 'pull_request'
-    needs: build-and-verify
+    if: github.event_name != 'pull_request' && needs.changes.outputs.run_heavy == 'true'
+    needs:
+      - changes
+      - build-and-verify
     runs-on: ubuntu-latest
     permissions:
       pages: write
