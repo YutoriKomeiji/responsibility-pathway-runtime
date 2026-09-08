@@ -1,8 +1,8 @@
 <!--
 Document Title: RPR MCP Integration Japanese Guide
 Document Type: Public Product Guide
-Status: Public Alpha with Post-Release Source Preview
-Version: 0.1.0a5
+Status: Public Alpha
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: Japanese
@@ -10,11 +10,11 @@ Body Language: Japanese
 
 # MCP統合
 
-Responsibility Pathway Runtime（RPR）は、統合ApplicationからMCP Serverへ送るTool Callを責任経路の中で管理できます。公開済みPublic Alpha `0.1.0a5`には、local read-only `rpr-mcp` inspection serverも含まれます。現行repository sourceには、`0.1.0a5`公開後のResponsibility Routing visibilityが追加されていますが、これは公開済み`0.1.0a5` packageには含まれません。
+Responsibility Pathway Runtime（RPR）は、統合ApplicationからMCP Serverへ送るTool Callを責任経路の中で管理できます。公開済みPublic Alpha `0.1.0a6`には、local read-only `rpr-mcp` inspection serverとread-only Responsibility Routing visibilityが含まれます。
 
-> **公開Releaseの境界:** PyPI `0.1.0a5`はoutbound MCP Callを統治し、local read-only RPR MCP inspection serverを含みます。Post-releaseの`rpr.get_route_visibility`と、変更系RPR MCP Toolは含みません。
+> **公開Releaseの境界:** PyPI `0.1.0a6`はoutbound MCP Callを統治し、local read-only RPR MCP inspection serverと`rpr.get_route_visibility`を含みます。変更系RPR MCP Toolは含みません。
 
-## 公開済み`0.1.0a5`でできること
+## 公開済み`0.1.0a6`でできること
 
 公開済みのoutbound MCP経路には次が実装されています。
 
@@ -27,12 +27,14 @@ Responsibility Pathway Runtime（RPR）は、統合ApplicationからMCP Server�
 - 不明なTool Callを`write_status_unknown`として保持
 - 変更を伴うToolについて、完了前に独立readbackを要求できる構造
 - Restart後も未解決Callを黙って再送しないreconciliation経路
+- `authority_inferred: false`を伴うread-only Responsibility Routing visibility
 
 公開済み`rpr-mcp`のread-only toolは次です。
 
 - `rpr.get_status`
 - `rpr.list_pathways`
 - `rpr.get_pathway`
+- `rpr.get_route_visibility`
 - `rpr.get_evidence`
 - `rpr.list_unresolved`
 
@@ -66,9 +68,9 @@ RPRは次のように扱いを分けます。
 
 Client Processが再起動した、またはTransportがtimeoutしたという理由だけで、未解決Callを再送してはいけません。また、結果が不明というだけで自動的にHuman Gateへ変換してはいけません。Responsibility Routingは、reconciliation holdや、明示的にeligibleかつauthorizedな別routeへ未解決effectを保持できます。
 
-## Post-`0.1.0a5` Responsibility Routing source preview
+## Responsibility Routing visibility
 
-現行repository sourceは次のread-only toolを追加しています。
+公開済み`0.1.0a6`には次のread-only toolが含まれます。
 
 - `rpr.get_route_visibility`
 
@@ -76,27 +78,14 @@ Client Processが再起動した、またはTransportがtimeoutしたという�
 
 このToolはreceiverを選択せず、Authorityを付与せず、承認・実行・reconciliation・resume・state mutationも行いません。Receiver capability、Evidence transfer、successful transport、route selectionはAuthorityを生成しません。
 
-現行sourceのread-only tool setは次です。
-
-- `rpr.get_status`
-- `rpr.list_pathways`
-- `rpr.get_pathway`
-- `rpr.get_route_visibility`
-- `rpr.get_evidence`
-- `rpr.list_unresolved`
-
-このsource-preview追加は、package公開前にfresh release candidateとexact-head validationを必要とします。
-
 ## Read-only serverの起動
 
-公開済み`0.1.0a5`では:
-
 ```bash
-python -m pip install responsibility-pathway-runtime==0.1.0a5
+python -m pip install responsibility-pathway-runtime==0.1.0a6
 rpr-mcp --database ./rpr.sqlite3
 ```
 
-現行source previewでは:
+未公開repository sourceを試す場合:
 
 ```bash
 python -m pip install -e .
@@ -118,9 +107,9 @@ Local MCP Client設定例:
 
 ## 検証済み範囲と未検証範囲
 
-公開済みPublic Alphaの検証は、確認環境内のoutbound Local MCP subprocess / stdio経路、read-only MCP inspection、Fault Injection、Restart後の継続、Duplicate Dispatch防止を対象とします。
+公開済みPublic Alphaの検証は、確認環境内のoutbound Local MCP subprocess / stdio経路、read-only MCP inspection、Responsibility Routing visibility、Fault Injection、Restart後の継続、Duplicate Dispatch防止を対象とします。
 
-Post-release route visibility source previewでは次を追加しています。
+Route visibilityのEvidenceには次が含まれます。
 
 - Responsibility Routing inspectionがstateを変更しないこと
 - persisted declared routeのreadback
@@ -153,7 +142,7 @@ RPRは、任意のMCP Server、Client、route receiverが信頼できる／autho
 
 ## MCP mutationとしてまだ提供していないもの
 
-現行sourceは、変更を伴うRPR MCP操作を公開しません。`rpr.request_human_gate`、`rpr.approve`、`rpr.execute`、`rpr.reconcile`、`rpr.resume`などは現在のcapabilityではありません。
+公開済み`0.1.0a6`は、変更を伴うRPR MCP操作を公開しません。`rpr.request_human_gate`、`rpr.approve`、`rpr.execute`、`rpr.reconcile`、`rpr.resume`などは現在のcapabilityではありません。
 
 関連文書:
 

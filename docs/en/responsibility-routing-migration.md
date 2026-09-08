@@ -1,6 +1,6 @@
 # Responsibility Routing compatibility baseline
 
-Status: implemented source-preview compatibility baseline. The currently published PyPI line remains `0.1.0a5`; this document does not itself publish a new release.
+Status: implemented and published in Public Alpha `0.1.0a6`.
 
 ## Purpose
 
@@ -14,9 +14,9 @@ A responsibility-bearing transition is valid only when the selected route preser
 
 Evidence transfer does not create Authority. Receiver capability, model confidence, agent consensus, tool success, route visibility, recovered checkpoint state, or receipt of a handoff does not silently extend delegation.
 
-## Implemented source-level route vocabulary
+## Published route vocabulary
 
-`ResponsibilityRouteClass` currently defines:
+`ResponsibilityRouteClass` defines:
 
 - `CONTINUE_AUTONOMOUSLY`
 - `AI_RESOLVE_WITHIN_DELEGATION`
@@ -24,9 +24,9 @@ Evidence transfer does not create Authority. Receiver capability, model confiden
 - `BOUNDED_HUMAN_RETURN`
 - `STOP_AND_PRESERVE_RESIDUE`
 
-These values exist in the source model, but they are not a promise that every class is already selected automatically by runtime dispatch logic. The first compatibility cycle intentionally classifies only states whose mapping is already justified by existing RPR semantics.
+These values are published in the `0.1.0a6` source/package model, but they are not a promise that every class is automatically selected by runtime dispatch logic. The compatibility cycle intentionally classifies only states whose mapping is justified by existing RPR semantics.
 
-## Implemented route record
+## Route record
 
 `ResponsibilityRoute` can retain:
 
@@ -45,9 +45,9 @@ These values exist in the source model, but they are not a promise that every cl
 
 The record is attached additively to `PathwayDefinition`. When no route is supplied, the legacy serialized definition shape is preserved. Existing SQLite schema version 1 remains unchanged because the optional route is stored inside the existing definition JSON.
 
-The route types are not currently promoted through the top-level `rpr` Python export surface. The externally documented source-preview inspection contract is the separate read-only MCP tool described below.
+The route types are not currently promoted through the top-level `rpr` Python export surface. The externally documented inspection contract is the separate read-only MCP tool described below.
 
-## Implemented compatibility mapping
+## Compatibility mapping
 
 Only two current-state mappings are automatic:
 
@@ -108,7 +108,7 @@ Independent readback / reconciliation remains responsible for classifying the ex
 
 ## Read-only route visibility
 
-The source preview includes `rpr.get_route_visibility(pathway_id)` in the local read-only MCP server. The result can expose:
+Published `0.1.0a6` includes `rpr.get_route_visibility(pathway_id)` in the local read-only MCP server. The result can expose:
 
 - current state;
 - justified compatibility route, when one exists;
@@ -133,14 +133,14 @@ The compatibility slice is covered through multiple layers:
 - unit tests for route serialization, legacy positional/wire compatibility, route validation, Authority non-propagation, and compatibility mapping;
 - component tests for SQLite persistence and route visibility;
 - MCP integration tests for the separate read-only route tool and database byte invariance;
-- runtime/product tests for fail-closed RPE fallback, high-impact Human Gate preservation, ambiguous writes, restart, reconciliation, and duplicate-dispatch prevention;
+- runtime/product tests for fail-closed RPE fallback, high-impact Human Gate preservation, ambiguous writes, restart/runtime recreation, reconciliation, and duplicate-dispatch prevention;
 - browser/Pyodide tests for the route-visible live demo;
 - package build, clean-install, structural/bilingual, reproducibility, and formal state-model checks in CI.
 
-Lean 4 currently verifies selected pathway state-machine invariants. Route metadata, receiver eligibility, and Responsibility Routing selection semantics are not yet formally proved by the Lean layer.
+Lean 4 currently verifies selected pathway state-machine invariants. Route metadata, receiver eligibility, and Responsibility Routing selection semantics are not formally proved by the Lean layer.
 
 ## Compatibility and release boundary
 
 This migration does not destructively rename Human Gate or `human_return_point`, does not change SQLite schema version 1, does not add mutating MCP tools, and does not claim that AI bears legal or institutional accountability.
 
-Source integration is not the same as binary publication. The currently published package remains `0.1.0a5` until a separately approved release promotion is completed and read back.
+Responsibility Routing and read-only route visibility are part of published `0.1.0a6`. Later source changes remain outside the published package contract until a separately approved release promotion is validated and publicly read back.

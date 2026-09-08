@@ -2,7 +2,7 @@
 Document Title: RPR Security・Integration・API境界
 Document Type: Public Product Guide
 Status: Public Alpha
-Version: 0.1.0a5
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: Japanese
 Body Language: Japanese
@@ -61,7 +61,7 @@ Host applicationは、同じ重大operationに対してpathway admission、route
 
 ## API stability
 
-`0.1.0a5`は現在の公開Public Alphaです。Versionをpinし、serialized state、CLI behavior、adapter configuration、migration procedureをupgrade前に検証してください。Repository sourceには`0.1.0a5`公開後のResponsibility Routing workが含まれる場合があり、fresh candidateの再構築・検証・承認までは公開packageのcontractではありません。Stable release前には非互換修正が入る場合があります。
+`0.1.0a6`は現在の公開Public Alphaです。Versionをpinし、serialized state、CLI behavior、adapter configuration、migration procedureをupgrade前に検証してください。Repository sourceには次release向けworkが含まれる場合があり、fresh candidateの再構築・検証・承認までは公開packageのcontractではありません。Stable release前には非互換修正が入る場合があります。
 
 ## Credentialsと脆弱性報告
 

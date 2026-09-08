@@ -2,7 +2,7 @@
 Document Title: RPR Security Integration and API Boundary
 Document Type: Public Product Guide
 Status: Public Alpha
-Version: 0.1.0a5
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
@@ -61,7 +61,7 @@ The host application must not expose a parallel execution path that skips requir
 
 ## API stability
 
-`0.1.0a5` is the current published public alpha. Pin the version and test serialized state, CLI behavior, adapter configuration, and migration procedures before upgrading. Repository source may contain post-`0.1.0a5` Responsibility Routing work that is not part of the published package until a later release is rebuilt and approved. Incompatible corrections may occur before a stable release.
+`0.1.0a6` is the current published public alpha. Pin the version and test serialized state, CLI behavior, adapter configuration, and migration procedures before upgrading. Repository source may contain later work that is not part of the published package until a later release is rebuilt and approved. Incompatible corrections may occur before a stable release.
 
 ## Credentials and vulnerability reports
 

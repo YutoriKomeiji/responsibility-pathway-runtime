@@ -1,8 +1,8 @@
 <!--
 Document Title: RPR MCP Integration
 Document Type: Public Product Guide
-Status: Public Alpha with Post-Release Source Preview
-Version: 0.1.0a5
+Status: Public Alpha
+Version: 0.1.0a6
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
@@ -10,11 +10,11 @@ Body Language: English
 
 # MCP integration
 
-Responsibility Pathway Runtime (RPR) can govern outbound Model Context Protocol (MCP) tool calls made by a host application. Published Public Alpha `0.1.0a5` also includes a local read-only `rpr-mcp` inspection server. Current repository source adds post-`0.1.0a5` Responsibility Routing visibility that is not part of the published `0.1.0a5` package.
+Responsibility Pathway Runtime (RPR) can govern outbound Model Context Protocol (MCP) tool calls made by a host application. Published Public Alpha `0.1.0a6` includes a local read-only `rpr-mcp` inspection server and read-only Responsibility Routing visibility.
 
-> **Published-release boundary:** PyPI `0.1.0a5` governs outbound MCP calls and includes the local read-only RPR MCP inspection server. It does not include the post-release `rpr.get_route_visibility` tool or any mutating RPR MCP tool.
+> **Published-release boundary:** PyPI `0.1.0a6` governs outbound MCP calls and includes the local read-only RPR MCP inspection server plus `rpr.get_route_visibility`. It does not include any mutating RPR MCP tool.
 
-## What is implemented in published `0.1.0a5`
+## What is implemented in published `0.1.0a6`
 
 The published outbound MCP path includes:
 
@@ -26,13 +26,15 @@ The published outbound MCP path includes:
 - separation of failures known to occur before dispatch from failures that may have happened after dispatch;
 - fail-closed handling of ambiguous tool calls as `write_status_unknown`;
 - optional independent readback before a mutating effect is treated as complete;
-- restart and reconciliation paths that do not silently repeat an unresolved call.
+- restart and reconciliation paths that do not silently repeat an unresolved call;
+- read-only Responsibility Routing visibility with `authority_inferred: false`.
 
 Published `rpr-mcp` exposes only:
 
 - `rpr.get_status`
 - `rpr.list_pathways`
 - `rpr.get_pathway`
+- `rpr.get_route_visibility`
 - `rpr.get_evidence`
 - `rpr.list_unresolved`
 
@@ -66,9 +68,9 @@ RPR distinguishes between:
 
 An unresolved call must not be retried merely because the client process restarted or the transport timed out. It also must not be converted automatically into Human Gate merely because the outcome is uncertain. Responsibility Routing may preserve the unresolved effect under a reconciliation hold or another explicitly eligible and authorized route.
 
-## Post-`0.1.0a5` Responsibility Routing source preview
+## Responsibility Routing visibility
 
-Current repository source adds the read-only tool:
+Published `0.1.0a6` includes the read-only tool:
 
 - `rpr.get_route_visibility`
 
@@ -76,27 +78,14 @@ Current repository source adds the read-only tool:
 
 The tool does not select a receiver, grant Authority, approve work, execute work, reconcile effects, resume execution, or mutate pathway state. Receiver capability, evidence transfer, successful transport, and route selection do not create Authority.
 
-The current source read-only tool set is therefore:
-
-- `rpr.get_status`
-- `rpr.list_pathways`
-- `rpr.get_pathway`
-- `rpr.get_route_visibility`
-- `rpr.get_evidence`
-- `rpr.list_unresolved`
-
-This source-preview addition requires a fresh release candidate and exact-head validation before package publication.
-
 ## Running the read-only server
 
-For published `0.1.0a5`:
-
 ```bash
-python -m pip install responsibility-pathway-runtime==0.1.0a5
+python -m pip install responsibility-pathway-runtime==0.1.0a6
 rpr-mcp --database ./rpr.sqlite3
 ```
 
-For the current source preview:
+For unreleased repository source:
 
 ```bash
 python -m pip install -e .
@@ -118,9 +107,9 @@ Example local MCP client configuration:
 
 ## Verified and unverified scope
 
-Published public-alpha verification includes local outbound MCP subprocess and stdio paths, read-only MCP inspection, fault injection, restart continuity, and duplicate-dispatch prevention in the tested environment.
+Published public-alpha verification includes local outbound MCP subprocess and stdio paths, read-only MCP inspection, Responsibility Routing visibility, fault injection, restart continuity, and duplicate-dispatch prevention in the tested environment.
 
-The post-release route-visibility source preview adds tests for:
+The route-visibility evidence includes tests for:
 
 - Responsibility Routing inspection without state mutation;
 - persisted declared route readback;
@@ -153,7 +142,7 @@ RPR does not discover that an arbitrary MCP server, client, or route receiver is
 
 ## Not implemented as MCP mutations
 
-Current source does not expose mutating RPR MCP operations. Tools such as `rpr.request_human_gate`, `rpr.approve`, `rpr.execute`, `rpr.reconcile`, or `rpr.resume` are not current capabilities.
+Published `0.1.0a6` does not expose mutating RPR MCP operations. Tools such as `rpr.request_human_gate`, `rpr.approve`, `rpr.execute`, `rpr.reconcile`, or `rpr.resume` are not current capabilities.
 
 See also:
 
