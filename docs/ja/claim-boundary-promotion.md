@@ -9,9 +9,9 @@ RPRは次を分離します。
 
 ## Current Evidence Boundary
 
-RPR `0.1.0a5`は現在の公開Public Alphaであり、runtime、persistence、restart/reconciliation、MCP、packaging、browser/Pyodide、bounded Windows field evidence、bounded formal-evidence surfaceを公開しています。これらが支えるのは公開済みalpha claimまでです。
+RPR `0.1.0a6`は現在の公開Public Alphaです。公開済みsurfaceには、bounded Responsibility Routing、route visibility、runtime/persistence/restart/reconciliation、MCP、packaging、browser/Pyodide、bounded Windows field evidence、bounded formal-evidence surfaceが含まれます。これらが支えるのは、現行product documentationで明示された公開済みalpha claimまでです。
 
-現行repository sourceにはpost-`0.1.0a5` Responsibility Routing workも含まれます。Source実装やlocal testだけではreleased package claimへ昇格しません。次releaseにはexact-head product-quality validationと明示的Human Gate approvalが必要です。
+`0.1.0a6`の公開は、production / enterprise readiness、あらゆる組織経路の自動妥当化、法的/compliance Authority、universal exactly-once、implementation-wide formal conformanceを意味しません。今後のsource変更も、別途validationとpromotionが完了するまではreleased claimになりません。
 
 ## Promotion Criteria
 
@@ -19,7 +19,7 @@ RPR `0.1.0a5`は現在の公開Public Alphaであり、runtime、persistence、r
 |---|---|
 | production / enterprise readiness未主張 | sustained workload / soak evidence、対応deployment profile、supervisor/restart/upgrade/rollback evidence、operational monitoring/SLO evidence、review済みsecurity control |
 | customer environment validationが限定的 | proxy/TLS/identity/credential/network/OS/container/MCP client profileごとの再現可能なfield evidence |
-| Responsibility Routing release assurance pending | unit/component/integration/system E2E、restart/persistence、browser EN/JA route assertion、claim/test traceability、exact-head package/CI evidence、release Human Gate |
+| Responsibility Routingは文書化されたPublic Alpha contract内でのみrelease済み | 宣言済みreceiver/delegation profileに対するより広いintegration evidence、route-level operational evidence、claim/test traceability、exact-head package/CI evidence、拡張claimに対する明示的promotion review |
 | broad exactly-once未主張 | 対象system側のtransaction/idempotency contractと、主張対象integration profileに対する独立かつ権威あるreadback |
 | ledgerはtamper-evidentまで | 独立検証可能なsigning/attestation、external immutabilityまたはtimestamping、主張する場合のkey/trust governance |
 | implementation-wide formal conformance未主張 | model-to-runtime refinement/conformance relationと、主張対象runtime surfaceの再現可能Evidence |

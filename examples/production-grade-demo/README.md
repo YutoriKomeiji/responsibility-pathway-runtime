@@ -1,6 +1,6 @@
 # Production-Grade Demo: Governed Supplier Payment Release
 
-> Executable integration scenario for the current RPR repository source. Published package baseline: `0.1.0a5`; current source may include post-`0.1.0a5` Responsibility Routing work that is not part of the published wheel.
+> Executable integration scenario for the current RPR repository source. Published package baseline: `0.1.0a6`; Responsibility Routing and read-only route visibility are part of that published Public Alpha. Repository source may contain later work that is not part of the published package until a later exact-head release promotion.
 >
 > This is not a simulated success-only walkthrough. It exercises persistent state, configured Human Gate approval, external-write ambiguity, independent readback, runtime recreation over durable SQLite state, reconciliation, and duplicate-dispatch prevention using the actual RPR runtime interfaces. The payment provider is a deterministic local integration fixture.
 

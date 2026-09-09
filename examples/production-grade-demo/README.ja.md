@@ -1,6 +1,6 @@
 # 本番級デモ：統治された仕入先支払実行
 
-> 現行RPR repository source向けの実行可能integration scenarioです。公開package baselineは`0.1.0a5`で、現行sourceには公開wheelへまだ含まれていないpost-`0.1.0a5` Responsibility Routing workが含まれる場合があります。
+> 現行RPR repository source向けの実行可能integration scenarioです。公開package baselineは`0.1.0a6`で、Responsibility Routingとread-only route visibilityはこの公開済みPublic Alphaに含まれます。Repository sourceには、後続のexact-head release promotionまでは公開packageに含まれない追加workが存在する場合があります。
 >
 > 成功だけを見せるsimulated walkthroughではありません。実RPR interfaceを使い、persistent state、configured Human Gate approval、external write ambiguity、independent readback、durable SQLite state上でのruntime recreation、reconciliation、duplicate-dispatch preventionを確認します。Payment providerだけは決定論的local integration fixtureです。
 

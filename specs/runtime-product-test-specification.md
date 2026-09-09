@@ -1,272 +1,169 @@
 # RPR Runtime Product Test Specification
 
-Status: Active source-preview test basis
-Version: 0.2
+Status: Active product/release test basis
+Version: 0.3
+Lifecycle: `CURRENT`
 Product target: Responsibility Pathway Runtime (RPR)
-Published baseline: `0.1.0a5`
+Published baseline: `0.1.0a6`
 Release boundary: This specification does not authorize a tag, package release, production-readiness claim, or Authority transfer.
 
 ## 1. Purpose
 
-This specification defines the evidence required before current RPR source may be promoted as a new public-alpha release candidate.
+This specification defines the evidence required to validate current RPR source and to promote any later Public Alpha candidate. It also defines post-release reconciliation checks required before a version/public-surface transition may be treated as closed.
 
-A product change is not complete because a function returns the expected value or because a local unit suite is green. RPR must preserve a coherent responsibility pathway across admission, declared Authority, Responsibility Routing, dispatch, persistence, failure, restart, readback, reconciliation, repair/resume, Evidence, Residual Owner, public interfaces, documentation, and release artifacts.
+A product change is not complete because a function returns the expected value, local tests are green, or publication succeeds. RPR must preserve a coherent responsibility pathway across admission, declared Authority, Responsibility Routing, dispatch, persistence, failure, restart, readback, reconciliation, repair/resume, Evidence, Residual Owner, public interfaces, examples, documentation, release artifacts, and current-state lifecycle surfaces.
 
-The required product-quality path is:
+Required quality path:
 
 ```text
 requirement/design
   -> source
-  -> unit
-  -> component
-  -> integration
-  -> system/E2E
+  -> unit/component/integration/system
   -> persistence/restart
-  -> public API/MCP/CLI
+  -> public API/MCP/CLI/examples
   -> EN/JA docs/site/demo
   -> claim/test/evidence registry
   -> CI drift checks
   -> exact-head release validation
   -> Human Gate
+  -> publication/readback
+  -> post-release reconciliation
+  -> current-surface closure
 ```
-
-Any missing stage blocks release promotion.
 
 ## 2. Product claims under test
 
-RPR source is intended to support these bounded claims when the corresponding evidence passes:
+Within declared boundaries, evidence may support:
 
-1. External actions are admitted only through declared pathway state and Authority.
-2. Explicit configured Human Gate approval prevents dispatch where human-held Authority is required.
-3. Generic fail-closed conditions do not manufacture a human receiver.
-4. Responsibility Routing preserves receiver eligibility, delegation scope, unresolved payload, allowed next actions, closure/reevaluation conditions, and Residual Owner where a route is declared.
-5. Evidence transfer, capability, confidence, route selection, transport success, or recovered state do not create Authority.
-6. Dispatch attempts are durably recorded without creating false evidence for actions rejected before dispatch.
-7. Completed or unresolved attempts are not silently re-dispatched.
-8. Executor or transport success is not treated as proof of consequential external effect without the required readback.
-9. Unknown external effect remains unknown until sufficient reconciliation Evidence is available.
-10. Restart does not erase pathway, attempt, Evidence, or declared route metadata.
-11. Reconciliation keeps attempt, pathway, Evidence, and routing semantics coherent without redispatch.
-12. Repair readiness does not create resume Authority.
-13. JSON, generated Python, and Lean 4 agree on the selected canonical state-transition model.
-14. Lean evidence is not described as formal proof of Responsibility Routing receiver eligibility/delegation semantics.
-15. Built artifacts can be installed and exercised in clean supported environments.
-16. Public API/MCP/CLI, EN/JA documentation, site/demo, claim registry, and release identity agree with the exact candidate head.
+1. external actions are admitted only through declared pathway state and Authority;
+2. explicit configured Human Gate blocks dispatch where human-held Authority is required;
+3. generic fail-closed conditions do not manufacture a human receiver;
+4. Responsibility Routing preserves receiver eligibility, delegation scope, unresolved payload, allowed next actions, closure/reevaluation conditions, and Residual Owner;
+5. Evidence transfer, capability, confidence, route selection, transport success, or recovered state do not create Authority;
+6. rejected pre-dispatch actions do not leave false possible-mutation evidence;
+7. completed or unresolved attempts are not silently redispatched;
+8. executor/transport success is not proof of consequential external effect without required readback;
+9. unknown external effect remains unknown until sufficient reconciliation Evidence exists;
+10. restart/runtime recreation does not erase pathway, attempt, Evidence, or declared-route metadata;
+11. reconciliation restores coherent attempt/pathway/Evidence/routing state without redispatch;
+12. repair readiness does not create resume Authority;
+13. selected JSON/Python/Lean state-transition representations agree;
+14. Lean evidence is not described as proof of receiver eligibility/delegation semantics;
+15. built artifacts can be installed/exercised in clean declared environments;
+16. public API/MCP/CLI/examples, EN/JA docs/site/demo, claim registry, and release identity agree with the exact tested lineage;
+17. post-release current surfaces no longer describe a superseded published version or released feature as source preview.
 
-The suite MUST NOT be presented as proof of legal compliance, full system safety, complete formal verification, production identity assurance, distributed-system correctness, universal exactly-once delivery, or correctness of organizational delegation.
+The suite is not proof of legal compliance, full system safety, production identity assurance, distributed-system correctness, universal exactly-once delivery, complete formal verification, or correctness of arbitrary organizational delegation.
 
 ## 3. System under test
 
-The product test boundary includes:
+The product boundary includes runtime/state/Authority enforcement, SQLite pathway and attempt persistence, `ResponsibilityRoute` / receiver eligibility / compatibility routing / route visibility, RPE fail-closed adapters, supplied executors/reconcilers, Evidence, repair/resume/stop/abort/Residual Owner transitions, CLI/read-only MCP surfaces, browser/Pyodide demo, selected formal model parity, active EN/JA docs, examples, claim/test/assurance registries, status/release metadata, and wheel/sdist build/install surfaces.
 
-- `ResponsibilityPathwayRuntime`;
-- `SQLiteStore`;
-- `SQLiteExecutionAttemptLedger`;
-- state transition and Authority enforcement;
-- `ResponsibilityRoute`, receiver eligibility, inspection, compatibility routing, and route visibility;
-- RPE adapters and fail-closed contract handling;
-- supplied executors and reconciliation strategies;
-- readback and reconciliation;
-- Evidence generation, redaction, persistence, verification;
-- repair, resume, stop, abort, and Residual Owner transitions;
-- CLI and read-only MCP surfaces;
-- browser/Pyodide demo surface;
-- canonical JSON model, generated Python transition table, and selected Lean 4 model;
-- active English/Japanese documentation and product site;
-- claim/test/assurance registries and release metadata;
-- wheel/source distribution build and install surfaces.
-
-External identity providers, distributed databases, cloud gateways, production credentials, arbitrary third-party MCP services, organizational delegation truth, and legal authority remain outside the current product boundary unless represented by explicit bounded test fixtures.
+External identity providers, production credentials, arbitrary third-party MCP services, organizational delegation truth, distributed remote transaction guarantees, and legal authority remain outside unless a dedicated bounded profile explicitly includes them.
 
 ## 4. Test principles
 
-### 4.1 Fail closed without destination invention
+- **Fail closed without destination invention.** Missing/invalid/unavailable controls do not imply allow and do not imply Human Gate without a justified receiver.
+- **Authority does not propagate.** Evidence/capability/confidence/route/tool/transport/recovered state do not create Authority.
+- **Receiver eligibility is explicit.** Ineligible or reevaluation-required receivers remain held.
+- **Residual Owner is preserved.** Routing does not silently replace unresolved-residue ownership.
+- **No false dispatch Evidence.** Rejection before executor invocation does not leave possible-mutation evidence.
+- **No unverified completion.** Required readback remains required after transport/executor success.
+- **Unknown remains unknown.** Timeout/disconnect/crash after possible dispatch stays unresolved until reconciliation.
+- **Replay remains authorized.** Duplicate-dispatch prevention does not bypass current actor/state/Authority checks.
+- **State/attempt/Evidence/route coherence.** Classification or repair leaves durable and visible surfaces mutually coherent.
+- **Restart language is precise.** Runtime recreation is not called OS-process restart without process-level evidence.
+- **Exact-head acceptance.** Changed candidates must be rebuilt/revalidated.
+- **Publication is not closure.** Successful upload/tag/release/readback does not close a transition while active surfaces still represent the old current state.
 
-Missing evaluator, unavailable RPE, contract mismatch, invalid route, unsupported state, invalid Evidence, and ambiguous execution outcome MUST NOT become implicit allow.
+## 5. Required levels
 
-They also MUST NOT become `HUMAN_GATE` merely because the runtime needs to stop. Human Return is a bounded Responsibility Route. When no eligible receiver or Authority is established, neutral `HOLD` is valid.
-
-### 4.2 Authority does not propagate from evidence or capability
-
-Evidence transfer, receiver capability, model confidence, route selection, tool success, transport receipt, or recovered state MUST NOT create or enlarge Authority.
-
-### 4.3 Receiver eligibility is explicit
-
-An ineligible receiver MUST NOT be selected as an active route destination. `REQUIRES_REEVALUATION` MUST hold until reevaluation occurs.
-
-### 4.4 Residual Owner is preserved
-
-Routing MUST NOT silently replace or clear the pathway Residual Owner. An ownership redesign requires an explicit authorized change outside the implicit route transfer.
-
-### 4.5 No false dispatch Evidence
-
-A request rejected before the executor is called MUST NOT leave a durable attempt implying possible external mutation.
-
-### 4.6 No unverified completion
-
-A successful executor return without the required verified readback MUST NOT move the pathway to `completed`.
-
-### 4.7 Unknown remains unknown
-
-Timeout, disconnect, crash, or incomplete persistence after possible dispatch MUST result in explicit unresolved state until reconciliation establishes otherwise.
-
-### 4.8 Replay is authorized
-
-Duplicate-dispatch prevention MUST NOT bypass pathway access or actor authorization.
-
-### 4.9 State, attempt, Evidence, and route coherence
-
-Any operation that classifies or repairs an attempt MUST leave pathway state, attempt record, Evidence trail, and externally visible route semantics mutually coherent.
-
-### 4.10 Real restart semantics are named precisely
-
-A test that constructs new runtime/store objects over the same durable database is a **runtime recreation** test. A test that terminates and launches an OS process is a **process restart** test. Documentation and claims MUST NOT substitute one term for the other.
-
-### 4.11 Exact-head acceptance
-
-Release evidence is valid only for the exact source lineage tested. A frozen candidate changed after validation MUST be rebuilt and revalidated rather than inheriting stale evidence.
-
-## 5. Test levels
-
-- **L1 Unit** — serialization, pure validation, compatibility routing, Authority rules, fingerprints, redaction, state transitions.
+- **L1 Unit** — serialization, pure validation, routing, Authority, fingerprints, redaction, state transitions.
 - **L2 Component** — SQLite stores, attempt ledger, route persistence/visibility, Evidence chain, executors, RPE adapters, read-only MCP model.
-- **L3 Integration** — runtime + real SQLite stores + bounded executors/reconcilers/MCP contracts.
-- **L4 Product/System E2E** — admission through approval/hold, dispatch, ambiguity, restart/recreation, reconciliation, route visibility, Evidence, and closure.
+- **L3 Integration** — runtime + durable stores + bounded executors/reconcilers/MCP contracts.
+- **L4 Product/System E2E** — admission through approval/hold, dispatch, ambiguity, restart/recreation, reconciliation, route visibility, Evidence, closure.
 - **L5 Release verification** — full suite, browser EN/JA, build/install, CLI/MCP, JSON/Python/Lean parity, documentation/claim drift audit, artifact identity, exact-head CI.
+- **L6 Post-release reconciliation** — public readback plus current-surface lifecycle audit and retirement/historicalization of superseded state.
 
-A new Public Alpha candidate MUST pass required L1-L5 checks. Environment-only cases remain explicitly blocked/field-evidence items rather than synthetic passes.
+A later Public Alpha candidate must pass applicable L1-L5 before release Human Gate. L6 applies after publication and before `PRODUCT_VERSION_TRANSITION_CLOSED`.
 
-## 6. Required Responsibility Routing catalogue
+## 6. Responsibility Routing catalogue
 
-### RPR-RTE-001 — Route structural validation
+- `RPR-RTE-001` — route structural validation.
+- `RPR-RTE-002` — no false human escalation.
+- `RPR-RTE-003` — reevaluation hold.
+- `RPR-RTE-004` — Authority non-propagation and legacy compatibility.
+- `RPR-RTE-005` — bounded Human Return requirements.
+- `RPR-RTE-006` — Residual Owner preservation.
+- `RPR-RTE-007` — neutral RPE failure.
+- `RPR-RTE-008` — read-only route visibility.
+- `E2E-ROUTE-01` — ambiguous effect -> runtime recreation -> no redispatch -> reconciliation.
+- `E2E-ROUTE-02` — browser English/Japanese route parity.
 
-Valid routes serialize and deserialize. Missing/blank required route fields, blank allowed actions, or missing bounded next actions fail closed.
+Published `0.1.0a6` includes the Responsibility Routing/read-only route-visibility surface these tests bound. Future source changes still require new exact-head evidence before a later release.
 
-### RPR-RTE-002 — No false human escalation
+The authoritative executable bindings remain in `specs/test-id-registry.json`; prose-only IDs do not count as executable Evidence.
 
-An ineligible non-human receiver or generic route-definition error results in neutral `HOLD`, not an invented `HUMAN_GATE`.
+## 7. Cross-surface semantic-drift tests
 
-### RPR-RTE-003 — Reevaluation hold
-
-`ReceiverEligibility.REQUIRES_REEVALUATION` remains held until eligibility is reevaluated. No execution or Human Return is inferred.
-
-### RPR-RTE-004 — Authority non-propagation and legacy compatibility
-
-Route/Evidence transfer does not create Authority. Legacy pathways without declared route metadata remain readable and behavior-compatible within the documented migration boundary.
-
-### RPR-RTE-005 — Bounded Human Return
-
-A `BOUNDED_HUMAN_RETURN` route requires a concrete Human Return point and appropriate configured Authority. Non-human route classes do not require the legacy Human Return field merely to exist.
-
-### RPR-RTE-006 — Residual Owner preservation
-
-Declared route metadata must preserve the pathway Residual Owner unless an explicit authorized redesign occurs. A mismatch fails closed.
-
-### RPR-RTE-007 — Neutral RPE failure
-
-Default RPE unavailable, Python adapter exception, REST unavailability, and contract mismatch produce `HOLD` unless a more restrictive independently justified local condition such as configured high-impact Human Gate applies.
-
-### RPR-RTE-008 — Read-only route visibility
-
-`rpr.get_route_visibility` returns state, narrow compatibility route, declared route where present, Human Return point, Residual Owner, and `authority_inferred: false`. It must not mutate state or expose approval/execution/reconciliation/resume capability.
-
-### E2E-ROUTE-01 — Ambiguous effect -> restart -> reconciliation
-
-Given a declared `HOLD_FOR_RECONCILIATION` route:
-
-1. authorized execution produces `write_status_unknown` after one external dispatch;
-2. route visibility reports `hold_for_reconciliation`, preserves declared route and Residual Owner, and reports `authority_inferred: false`;
-3. a newly constructed runtime over the same SQLite stores observes identical route metadata;
-4. replay does not redispatch;
-5. authorized independent reconciliation closes the effect;
-6. Evidence chain remains valid;
-7. completed state has no unreviewed compatibility route while the declared route record remains inspectable.
-
-### E2E-ROUTE-02 — Browser English/Japanese parity
-
-Both `site/demo.html` and `site/demo-en.html` MUST load the CI-built wheel and assert:
-
-- initial high-impact route: `bounded_human_return`;
-- ambiguous effect route: `hold_for_reconciliation`;
-- `authority_inferred == false` throughout route inspection;
-- exactly one external dispatch;
-- restart/reconciliation reaches `completed`;
-- Evidence remains valid;
-- final compatibility route is absent rather than guessed.
-
-## 7. Existing core runtime catalogue retained
-
-The existing IDs remain required where applicable:
-
-- admission: `RPR-ADM-*`;
-- Authority: `RPR-AUT-*`;
-- pre-dispatch durability: `RPR-PRE-*`;
-- execution/readback: `RPR-EXE-*`;
-- idempotency/replay: `RPR-IDM-*`;
-- crash/restart: `RPR-CRS-*`;
-- reconciliation: `RPR-REC-*`;
-- repair/resume/residual: `RPR-RPR-*`;
-- persistence/concurrency: `RPR-PER-*`;
-- Evidence: `RPR-EVD-*`;
-- RPE integration: `RPR-RPE-*`;
-- formal parity: `RPR-FRM-*`;
-- package/release: `RPR-PKG-*`.
-
-The authoritative file bindings are maintained in `specs/test-id-registry.json`. An ID present only in prose is not treated as executable Evidence.
-
-## 8. Cross-surface semantic-drift tests
-
-Release validation MUST fail when any applicable current surface disagrees with the source semantics.
+Validation must fail when applicable current surfaces disagree with current product/release semantics.
 
 Required checks include:
 
-- active EN/JA document pairs both exist;
-- active product version identifiers match the published baseline/candidate role they describe;
-- post-release source-preview language is explicit where current source exceeds the published package;
-- `Responsibility Routing` appears on required active product surfaces;
-- `rpr.get_route_visibility` is described as post-`0.1.0a5` source preview until actually released;
-- `bounded_human_return`, `hold_for_reconciliation`, and `authority_inferred: false` are asserted by browser demo surfaces;
-- historical release records are not rewritten merely to satisfy current-state checks;
-- formal documentation states that Lean does not prove receiver eligibility/delegation semantics;
-- demo documentation lists only artifacts that actually exist;
+- active EN/JA pairs both exist;
+- current docs identify the published version consistently with `product-status.json`;
+- no active current-facing surface describes a superseded version as the current/published baseline;
+- no released feature is still described as source preview;
+- no unreleased source work is described as released merely because it exists on `main`;
+- `Responsibility Routing` appears on required current surfaces;
+- published `0.1.0a6` route visibility is described as released and read-only;
+- `bounded_human_return`, `hold_for_reconciliation`, and `authority_inferred: false` remain asserted by browser demo surfaces;
+- historical candidate/audit/migration records are kept outside active current docs and are not rewritten into current truth;
+- transitioning surfaces, when present, have an explicit retire/exit condition;
+- authoring-control documents are not indexed as user-facing product guidance;
+- formal docs state the actual proof ceiling;
 - runtime recreation is not mislabeled as OS-process restart;
-- claim/test registries contain current routing claims and executable bindings.
+- claim/test registries contain current routing claims and executable bindings;
+- examples do not advertise an obsolete published package baseline.
+
+## 8. Version-transition regression checks
+
+Known failures become regression inputs.
+
+At minimum, the validator/test path should reject recurrence of:
+
+- active text stating `0.1.0a5` is the current published Public Alpha after `product-status.json` says `0.1.0a6`;
+- active support/maturity text calling Responsibility Routing source preview after it is released;
+- a migration document remaining required/indexed after its transition has completed;
+- release-candidate or pre-public audit records remaining in active product-doc indexes;
+- Japanese/English lifecycle asymmetry;
+- stale examples/specs that retain prior-version current-state claims while README/site are current.
+
+Operational rule:
+
+`KNOWN_FAILURE -> MACHINE_CHECK -> REGRESSION_TEST -> CLOSURE_EVIDENCE`
 
 ## 9. Release acceptance evidence
 
-Before a fresh candidate can enter release Human Gate, retain at minimum:
+Before a later candidate enters release Human Gate, retain exact candidate SHA, CI runs/conclusions, declared Python/OS profiles, exact-run test results, wheel/sdist names/digests, clean-install results, CLI/MCP smoke, browser EN/JA E2E, formal parity/build, semantic-drift validator result, registry validation, independent review/readback, and explicit residual risks.
 
-- exact candidate commit SHA;
-- full CI workflow IDs and conclusions;
-- Python/OS versions for each required job;
-- test count/result produced by that exact run, without copying historical counts forward;
-- wheel/sdist names and digests;
-- clean-install result;
-- CLI and MCP smoke results;
-- browser EN/JA E2E result;
-- JSON/Python/Lean parity result and Lean build result;
-- documentation/semantic-drift validator result;
-- claim/test registry validation;
-- independent review/readback outcome;
-- explicit residual risks and blocked environment-only cases.
+## 10. Post-release reconciliation evidence
 
-## 10. Release stop conditions
+Before `PRODUCT_VERSION_TRANSITION_CLOSED`, retain evidence that:
 
-Release promotion MUST stop if any of the following holds:
+1. published package/tag/release identity was read back;
+2. current README/docs/site/examples/spec/control surfaces were re-audited after publication;
+3. superseded current-state wording was updated;
+4. release-specific historical records were preserved outside active current surfaces;
+5. transitional documents were retired or kept with explicit exit conditions;
+6. EN/JA and other paired surfaces agree materially;
+7. validators can reproduce the known stale-current-state failure class;
+8. unresolved residue has an explicit owner and next permitted action.
 
-- a required L1-L5 layer is missing or failing;
-- a generic fail-closed path still invents a Human Gate;
-- receiver eligibility or Residual Owner can be silently bypassed;
-- Authority can be inferred from Evidence/capability/route/transport;
-- ambiguous effect can be silently completed or redispatched;
-- route state is lost across persistence/restart;
-- EN/JA current surfaces disagree materially;
-- source preview is described as already released;
-- formal claims overstate Lean scope;
-- demo/docs refer to nonexistent artifacts or stronger restart semantics than tested;
-- claim registry is ahead of executable Evidence;
-- exact candidate head differs from the head that produced retained evidence.
+## 11. Stop conditions
 
-## 11. Human Gate
+Release or transition closure stops if a required layer fails; a Human Gate is invented from generic failure; receiver eligibility/Residual Owner/Authority boundaries can be bypassed; ambiguous effects can silently complete/redispatch; route state is lost; active current surfaces disagree; source-preview/released status is inverted; formal scope is overstated; current docs route users to retired surfaces as normal guidance; examples/specs retain an obsolete current baseline; registry state outruns executable Evidence; or retained evidence belongs to a different head.
 
-Passing this specification does not itself publish anything. Tag creation, GitHub Release, PyPI publication, and stronger public claims remain explicit human release decisions after exact-head evidence is reviewed.
+## 12. Human Gate
+
+Passing this specification does not publish anything. Later tags, GitHub Releases, PyPI publication, stronger public claims, and other protected external effects remain explicit human decisions after exact-head evidence is reviewed.

@@ -1,12 +1,12 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "product": "Responsibility Pathway Runtime",
   "record_type": "historical_test_scope_snapshot",
   "status": "historical_keep",
   "snapshot_version": "0.1.0a2",
-  "current_published_version": "0.1.0a5",
+  "published_version_at_record_update": "0.1.0a5",
   "scope": "standalone-public-repository historical export snapshot",
-  "current_source_note": "Do not use the 385-test count as the current source-suite size. Current product-quality status must come from exact-head CI and current claim/test registries.",
+  "current_source_note": "Do not use the 385-test count or the historical published-version field as current product state. Current product-quality status must come from product-status.json, exact-head CI, and current claim/test registries.",
   "canonical_pre_export_validation": {
     "workflow_run": 30711058400,
     "result": "success",
