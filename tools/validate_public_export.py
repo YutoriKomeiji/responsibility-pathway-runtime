@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Language: English comments; user-facing diagnostics are English/Japanese.
+"""Validate bounded public RPR structure, lifecycle, and current-state claims.
 
-Validate the bounded public RPR repository before publicization or release.
-Runtime tests, artifact reproducibility, and final release approval remain separate.
+Runtime tests, artifact reproducibility, release approval, publication, and public
+readback remain separate. This validator specifically turns known public-surface
+version/lifecycle drift into reproducible failures.
 """
 from __future__ import annotations
 
@@ -16,67 +17,71 @@ ROOT = Path(__file__).resolve().parents[1]
 SELF = Path(__file__).resolve()
 PREVIOUS_FREEZE = "RPR-CF-2026-08-01-02"
 
+ACTIVE_DOC_BASENAMES = (
+    "README.md",
+    "claim-boundary-promotion.md",
+    "eu-ai-act-article-50.md",
+    "install-operations-recovery.md",
+    "mcp-integration.md",
+    "product-governance.md",
+    "product-scope-architecture.md",
+    "quick-start.md",
+    "security-integration-api.md",
+    "support-maturity.md",
+    "verification-release-uat.md",
+)
+
 REQUIRED_PATHS = (
     "README.md", "LICENSE", "SECURITY.md", "SUPPORT.md", "CONTRIBUTING.md",
     "CODE_OF_CONDUCT.md", "release-manifest.json", "product-status.json",
     "specs/pathway-state-machine.json", "specs/claim-traceability.json",
     "specs/test-id-registry.json", "specs/runtime-assurance-manifest-v1.json",
     "specs/integration-acceptance-inventory-v1.json",
+    "specs/runtime-claim-assurance-case.md",
+    "specs/runtime-product-test-specification.md",
     "formal/README.md", "formal/lean-toolchain", "formal/lakefile.toml",
     "formal/rprFormal/State.lean", "formal/rprFormal/Invariants.lean",
     "fixtures/lifecycle/previous-candidate-v1.json",
-    "docs/en/README.md", "docs/ja/README.md",
-    "docs/en/quick-start.md", "docs/ja/quick-start.md",
-    "docs/en/install-operations-recovery.md", "docs/ja/install-operations-recovery.md",
-    "docs/en/product-scope-architecture.md", "docs/ja/product-scope-architecture.md",
-    "docs/en/security-integration-api.md", "docs/ja/security-integration-api.md",
-    "docs/en/verification-release-uat.md", "docs/ja/verification-release-uat.md",
-    "docs/en/mcp-integration.md", "docs/ja/mcp-integration.md",
-    "docs/en/responsibility-routing-migration.md", "docs/ja/responsibility-routing-migration.md",
-    "docs/en/support-maturity.md", "docs/ja/support-maturity.md",
+    *(f"docs/en/{name}" for name in ACTIVE_DOC_BASENAMES),
+    *(f"docs/ja/{name}" for name in ACTIVE_DOC_BASENAMES),
+    "examples/production-grade-demo/README.md",
+    "examples/production-grade-demo/README.ja.md",
+    "release-history/README.md",
+    ".github/authoring/rpr-japanese-writing-standard.md",
     "site/index.html", "site/ja.html", "site/demo.html", "site/demo-en.html",
     "site/styles.css", "site/app.js",
-    "examples/production-grade-demo/README.md", "examples/production-grade-demo/README.ja.md",
     ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/bug-report.yml",
     ".github/ISSUE_TEMPLATE/environment-report.yml", ".github/ISSUE_TEMPLATE/integration-request.yml",
     ".github/ISSUE_TEMPLATE/documentation.yml", ".github/pull_request_template.md",
     ".github/workflows/public-export-quality.yml", ".github/workflows/deploy-pages.yml",
 )
 
-BILINGUAL_PAIRS = (
-    ("docs/en/README.md", "docs/ja/README.md"),
-    ("docs/en/claim-boundary-promotion.md", "docs/ja/claim-boundary-promotion.md"),
-    ("docs/en/eu-ai-act-article-50.md", "docs/ja/eu-ai-act-article-50.md"),
-    ("docs/en/install-operations-recovery.md", "docs/ja/install-operations-recovery.md"),
-    ("docs/en/mcp-integration.md", "docs/ja/mcp-integration.md"),
-    ("docs/en/product-governance.md", "docs/ja/product-governance.md"),
-    ("docs/en/product-scope-architecture.md", "docs/ja/product-scope-architecture.md"),
-    ("docs/en/quick-start.md", "docs/ja/quick-start.md"),
-    ("docs/en/responsibility-routing-migration.md", "docs/ja/responsibility-routing-migration.md"),
-    ("docs/en/security-integration-api.md", "docs/ja/security-integration-api.md"),
-    ("docs/en/support-maturity.md", "docs/ja/support-maturity.md"),
-    ("docs/en/verification-release-uat.md", "docs/ja/verification-release-uat.md"),
+BILINGUAL_PAIRS = tuple(
+    (f"docs/en/{name}", f"docs/ja/{name}") for name in ACTIVE_DOC_BASENAMES
+) + (
     ("examples/production-grade-demo/README.md", "examples/production-grade-demo/README.ja.md"),
     ("site/index.html", "site/ja.html"),
     ("site/demo-en.html", "site/demo.html"),
 )
 
-ACTIVE_VERSIONED_DOCS = (
-    "docs/en/README.md", "docs/ja/README.md",
-    "docs/en/install-operations-recovery.md", "docs/ja/install-operations-recovery.md",
-    "docs/en/mcp-integration.md", "docs/ja/mcp-integration.md",
-    "docs/en/product-scope-architecture.md", "docs/ja/product-scope-architecture.md",
-    "docs/en/security-integration-api.md", "docs/ja/security-integration-api.md",
-    "docs/en/verification-release-uat.md", "docs/ja/verification-release-uat.md",
+CURRENT_STATE_SURFACES = (
+    "README.md",
+    *(f"docs/en/{name}" for name in ACTIVE_DOC_BASENAMES),
+    *(f"docs/ja/{name}" for name in ACTIVE_DOC_BASENAMES),
+    "examples/production-grade-demo/README.md",
+    "examples/production-grade-demo/README.ja.md",
+    "specs/runtime-claim-assurance-case.md",
+    "specs/runtime-product-test-specification.md",
+    "site/index.html", "site/ja.html", "site/demo-en.html", "site/demo.html",
 )
 
 ROUTING_REQUIRED_FILES = (
     "README.md",
     "docs/en/README.md", "docs/ja/README.md",
     "docs/en/mcp-integration.md", "docs/ja/mcp-integration.md",
-    "docs/en/responsibility-routing-migration.md", "docs/ja/responsibility-routing-migration.md",
-    "site/index.html", "site/ja.html",
-    "site/demo-en.html", "site/demo.html",
+    "docs/en/support-maturity.md", "docs/ja/support-maturity.md",
+    "examples/production-grade-demo/README.md", "examples/production-grade-demo/README.ja.md",
+    "site/index.html", "site/ja.html", "site/demo-en.html", "site/demo.html",
 )
 
 ROUTE_TOOL_REQUIRED_FILES = (
@@ -104,6 +109,19 @@ SECRET_ASSIGNMENT = re.compile(
     r"(?im)^\s*(?:api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|password)\s*[:=]\s*[\"']?([^\s\"']+)",
 )
 SAFE_SECRET_VALUES = {"", "none", "null", "redacted", "example", "placeholder", "test", "dummy", "changeme", "${secret}", "<secret>"}
+VERSION_TOKEN = re.compile(r"\b0\.\d+\.\d+a\d+\b")
+CURRENT_VERSION_MARKERS = (
+    "current published", "currently published", "current package baseline",
+    "published package baseline", "published baseline", "current public alpha",
+    "current published line", "current published package",
+    "現在の公開", "現在pypiで公開中", "公開package baseline", "公開版は", "公開中の版",
+)
+RETIRED_ACTIVE_REFERENCES = (
+    "responsibility-routing-migration.md",
+    "writing-standard.md",
+    "release-candidate-0.1.0a3.md",
+    "pre-public-audit-0.1.0a2.md",
+)
 
 
 def fail(message: str) -> None:
@@ -124,7 +142,24 @@ def has_likely_secret(text: str) -> bool:
     return False
 
 
-def validate_status_files() -> int:
+def validate_active_doc_inventory() -> int:
+    errors = 0
+    expected = set(ACTIVE_DOC_BASENAMES)
+    for language in ("en", "ja"):
+        directory = ROOT / "docs" / language
+        actual = {path.name for path in directory.glob("*.md") if path.is_file()}
+        missing = sorted(expected - actual)
+        extra = sorted(actual - expected)
+        if missing:
+            fail(f"active {language} docs missing / active docs不足: {missing}")
+            errors += 1
+        if extra:
+            fail(f"historical/control/unknown docs remain in active {language} docs / active docsに余分な文書: {extra}")
+            errors += 1
+    return errors
+
+
+def validate_status_files() -> tuple[int, str | None]:
     errors = 0
     release = json.loads((ROOT / "release-manifest.json").read_text(encoding="utf-8"))
     status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
@@ -156,15 +191,17 @@ def validate_status_files() -> int:
             errors += 1
         if candidate_state == "release-candidate":
             if candidate.get("release_approved") is not False or candidate.get("publication_blocked") is not True:
-                fail("unapproved candidate must be unapproved and publication-blocked / 未承認candidateは未承認かつ公開停止である必要があります")
+                fail("unapproved candidate must be publication-blocked / 未承認candidateは公開停止が必要です")
                 errors += 1
         elif candidate_state == "release-approved":
             if candidate.get("release_approved") is not True or candidate.get("publication_blocked") is not False:
-                fail("approved candidate must be approved and publication-enabled / 承認済candidateは承認済かつ公開可能である必要があります")
+                fail("approved candidate state is inconsistent / 承認済candidate stateが不整合です")
                 errors += 1
-        if not isinstance(published_version, str) or not published_version:
-            fail("published product version is missing / 公開中product versionがありません")
-            errors += 1
+
+    if not isinstance(published_version, str) or not published_version:
+        fail("published product version is missing / 公開中product versionがありません")
+        errors += 1
+        published_version = None
 
     if not isinstance(release_version, str) or not release_version:
         fail("release manifest version is missing / release-manifestのversionがありません")
@@ -193,19 +230,52 @@ def validate_status_files() -> int:
         fail("status and release freeze IDs differ / statusとreleaseのfreeze ID不一致")
         errors += 1
 
-    if isinstance(published_version, str) and published_version:
-        for relative in ACTIVE_VERSIONED_DOCS:
-            path = ROOT / relative
-            if not path.is_file():
-                continue
-            text = path.read_text(encoding="utf-8")
-            version_match = re.search(r"(?m)^Version:\s*([^\s]+)\s*$", text)
-            if version_match and version_match.group(1) != published_version:
-                fail(
-                    f"active document version differs from published product / 公開中document version不一致: "
-                    f"{relative}={version_match.group(1)} published={published_version}"
-                )
+    return errors, published_version
+
+
+def validate_current_state_surfaces(published_version: str | None) -> int:
+    if not published_version:
+        return 0
+    errors = 0
+    for relative in CURRENT_STATE_SURFACES:
+        path = ROOT / relative
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        lower = text.lower()
+
+        version_header = re.search(r"(?m)^Version:\s*([^\s]+)\s*$", text)
+        if version_header and version_header.group(1) != published_version:
+            fail(f"active document Version differs from published product / active Version不一致: {relative}={version_header.group(1)} published={published_version}")
+            errors += 1
+
+        for line_number, line in enumerate(text.splitlines(), start=1):
+            line_lower = line.lower()
+            if any(marker in line_lower for marker in CURRENT_VERSION_MARKERS):
+                versions = VERSION_TOKEN.findall(line)
+                wrong = sorted({version for version in versions if version != published_version})
+                if wrong:
+                    fail(f"stale current/published version claim / stale current version: {relative}:{line_number} {wrong} expected={published_version}")
+                    errors += 1
+
+        for retired in RETIRED_ACTIVE_REFERENCES:
+            if retired in text:
+                fail(f"retired/historical path referenced as active surface / retired参照がactive surfaceに残存: {relative}: {retired}")
                 errors += 1
+
+        if published_version == "0.1.0a6" and "Responsibility Routing" in text and "source preview" in lower:
+            # A generic description of future source preview is acceptable; the known defect is
+            # specifically describing Responsibility Routing itself as unreleased/source-preview.
+            stale_patterns = (
+                r"Responsibility Routing.{0,160}source preview",
+                r"source preview.{0,160}Responsibility Routing",
+                r"Responsibility Routing.{0,240}0\.1\.0a5",
+                r"0\.1\.0a5.{0,240}Responsibility Routing",
+            )
+            if any(re.search(pattern, text, re.IGNORECASE | re.DOTALL) for pattern in stale_patterns):
+                fail(f"released Responsibility Routing described with stale a5/source-preview semantics / Routing release状態drift: {relative}")
+                errors += 1
+
     return errors
 
 
@@ -221,10 +291,7 @@ def validate_bilingual_and_routing_surfaces() -> int:
         ja_text = ja_path.read_text(encoding="utf-8")
         for anchor in ("Responsibility Routing", "rpr.get_route_visibility"):
             if (anchor in en_text) != (anchor in ja_text):
-                fail(
-                    f"bilingual semantic anchor differs / 日英semantic anchor不一致: "
-                    f"{anchor}: {english} <-> {japanese}"
-                )
+                fail(f"bilingual semantic anchor differs / 日英semantic anchor不一致: {anchor}: {english} <-> {japanese}")
                 errors += 1
 
     for relative in ROUTING_REQUIRED_FILES:
@@ -251,18 +318,49 @@ def validate_bilingual_and_routing_surfaces() -> int:
     return errors
 
 
+def validate_historical_and_authoring_boundaries() -> int:
+    errors = 0
+    history = ROOT / "release-history"
+    if not history.is_dir() or not any(path.is_file() for path in history.rglob("*.md")):
+        fail("release-history must contain preserved historical records / release-history履歴がありません")
+        errors += 1
+
+    authoring = ROOT / ".github" / "authoring" / "rpr-japanese-writing-standard.md"
+    if authoring.is_file() and "AUTHORING_CONTROL" not in authoring.read_text(encoding="utf-8"):
+        fail("writing standard must be explicitly classified AUTHORING_CONTROL / writing standard lifecycle不足")
+        errors += 1
+
+    historical_scope = ROOT / "tests" / "public-test-scope.json"
+    if historical_scope.is_file():
+        snapshot = json.loads(historical_scope.read_text(encoding="utf-8"))
+        if snapshot.get("record_type") != "historical_test_scope_snapshot" or snapshot.get("status") != "historical_keep":
+            fail("public-test-scope historical snapshot lost lifecycle classification / historical snapshot分類不正")
+            errors += 1
+        if "current_published_version" in snapshot:
+            fail("historical snapshot uses misleading current_published_version field / historical snapshotにcurrent field残存")
+            errors += 1
+    return errors
+
+
 def main() -> int:
     errors = 0
     for relative in REQUIRED_PATHS:
         if not (ROOT / relative).is_file():
             fail(f"missing required path / 必須path不足: {relative}")
             errors += 1
+
+    errors += validate_active_doc_inventory()
+
+    published_version = None
     if not errors:
         try:
-            errors += validate_status_files()
+            status_errors, published_version = validate_status_files()
+            errors += status_errors
+            errors += validate_current_state_surfaces(published_version)
             errors += validate_bilingual_and_routing_surfaces()
+            errors += validate_historical_and_authoring_boundaries()
         except (OSError, json.JSONDecodeError, tomllib.TOMLDecodeError) as exc:
-            fail(f"invalid status metadata / status metadata不正: {exc}")
+            fail(f"invalid status/lifecycle metadata / status・lifecycle metadata不正: {exc}")
             errors += 1
 
     for path in ROOT.rglob("*"):
@@ -295,7 +393,7 @@ def main() -> int:
     if errors:
         print(f"FAILED / 失敗: {errors} finding(s) / {errors}件")
         return 1
-    print("PASS / 合格: public product structural validation completed")
+    print("PASS / 合格: public product structural, lifecycle, and current-state validation completed")
     return 0
 
 
