@@ -186,7 +186,6 @@ Version age alone does not promote a claim. Promotion requires scoped evidence a
 
 - [Quick Start](docs/en/quick-start.md)
 - [Product, scope, and architecture](docs/en/product-scope-architecture.md)
-- [Responsibility Routing migration](docs/en/responsibility-routing-migration.md)
 - [Support and maturity by surface](docs/en/support-maturity.md)
 - [Claim boundary promotion](docs/en/claim-boundary-promotion.md)
 - [MCP integration](docs/en/mcp-integration.md)
@@ -195,6 +194,8 @@ Version age alone does not promote a claim. Promotion requires scoped evidence a
 - [Security, limitations, integration, and API](docs/en/security-integration-api.md)
 - [Verification, known issues, release notes, and UAT](docs/en/verification-release-uat.md)
 - [Japanese documentation](docs/ja/README.md)
+
+Historical candidate, migration, and pre-public audit records are retained under [release-history](release-history/README.md) and are not current product guidance.
 
 ## License
 
