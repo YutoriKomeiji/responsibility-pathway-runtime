@@ -147,6 +147,6 @@ Published `0.1.0a6` does not expose mutating RPR MCP operations. Tools such as `
 See also:
 
 - [Product scope and architecture](product-scope-architecture.md)
-- [Responsibility Routing migration](responsibility-routing-migration.md)
+- [Support and maturity](support-maturity.md)
 - [Security, integration, and API boundary](security-integration-api.md)
 - [Verification, release notes, known issues, and UAT](verification-release-uat.md)
