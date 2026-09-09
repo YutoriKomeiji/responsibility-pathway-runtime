@@ -9,9 +9,9 @@ RPR distinguishes:
 
 ## Current evidence boundary
 
-RPR `0.1.0a5` is the current published Public Alpha with verified runtime, persistence, restart/reconciliation, MCP, packaging, browser/Pyodide, bounded Windows field evidence, and bounded formal-evidence surfaces. These support the published alpha claims only.
+RPR `0.1.0a6` is the current published Public Alpha. Its released surface includes the bounded Responsibility Routing work, route visibility, runtime/persistence/restart/reconciliation, MCP, packaging, browser/Pyodide, bounded Windows field evidence, and bounded formal-evidence surfaces described by the current product documentation. These support the published alpha claims only.
 
-Current repository source additionally contains post-`0.1.0a5` Responsibility Routing work. Source implementation and local tests do not by themselves promote that work to a released package claim. A later release requires exact-head product-quality validation and explicit Human Gate approval.
+The `0.1.0a6` release does not promote RPR to production/enterprise readiness, universal organizational routing, legal/compliance authority, universal exactly-once behavior, or implementation-wide formal conformance. Future source changes remain unreleased until separately validated and promoted.
 
 ## Promotion criteria
 
@@ -19,7 +19,7 @@ Current repository source additionally contains post-`0.1.0a5` Responsibility Ro
 |---|---|
 | No production/enterprise readiness claim | sustained workload/soak evidence; supported deployment profiles; supervisor/restart/upgrade/rollback evidence; operational monitoring/SLO evidence; reviewed security controls |
 | Limited customer-environment validation | reproducible field evidence for declared proxy/TLS/identity/credential/network/OS/container/MCP-client profiles |
-| Responsibility Routing release assurance pending | unit/component/integration/system E2E, restart/persistence, browser EN/JA route assertions, claim/test traceability, exact-head package/CI evidence, and release Human Gate |
+| Responsibility Routing is released only within the documented Public Alpha contract | broader integration evidence for declared receiver/delegation profiles, route-level operational evidence, claim/test traceability, exact-head package/CI evidence, and explicit promotion review for any expanded claim |
 | No broad exactly-once claim | target-side transactional or idempotency contract plus independent authoritative readback for the claimed integration profile |
 | Tamper-evident ledger only | independently verifiable signing/attestation, external immutability or timestamping, and maintained key/trust governance where claimed |
 | No implementation-wide formal conformance | explicit model-to-runtime refinement/conformance relation and reproducible evidence for the claimed runtime surface |
