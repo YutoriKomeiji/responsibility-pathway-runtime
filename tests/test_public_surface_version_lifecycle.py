@@ -78,15 +78,34 @@ def test_retired_doc_paths_are_not_reintroduced_by_alternate_current_surfaces() 
     assert not findings, "retired current-surface references: " + "; ".join(findings)
 
 
-def test_repository_metadata_files_do_not_regress_current_release_identity() -> None:
+def test_current_repository_metadata_tracks_current_published_identity() -> None:
     status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
     published = status["version"]
-
-    release_manifest = json.loads((ROOT / "release-manifest.json").read_text(encoding="utf-8"))
-    assert release_manifest["version"] == published
 
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert f'version = "{published}"' in pyproject
 
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     assert f"## [{published}]" in changelog
+
+
+def test_frozen_release_manifest_remains_historical_evidence_not_current_identity() -> None:
+    status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
+    published = status["version"]
+    release_manifest = json.loads((ROOT / "release-manifest.json").read_text(encoding="utf-8"))
+
+    frozen_version = release_manifest["version"]
+    assert frozen_version != published
+    assert release_manifest["freeze_id"]
+    assert release_manifest["artifact_source_commit"]
+    assert release_manifest["verification_run_id"]
+
+    artifacts = release_manifest.get("artifacts")
+    assert isinstance(artifacts, list) and artifacts
+    for artifact in artifacts:
+        assert frozen_version in artifact["name"]
+        assert artifact["sha256"]
+
+    # Lifecycle boundary: this manifest is retained evidence for its own frozen
+    # release lineage. It must not be rewritten merely to mirror current state.
+    assert release_manifest["status"]["public_release_approved"] is False
