@@ -161,12 +161,12 @@ RPR単体では、法的・組織的Authorityを生成しません。また、�
 |---|---|
 | [クイックスタート](quick-start.md) | 導入と影響のないローカル試験 |
 | [製品範囲と構成](product-scope-architecture.md) | RPRが提供する機能と製品境界 |
-| [Responsibility Routing migration](responsibility-routing-migration.md) | 公開済み0.1.0a6のroutingとcompatibility境界 |
 | [Support / maturity](support-maturity.md) | surface別maturityとEvidence境界 |
 | [Claim Boundary Promotion](claim-boundary-promotion.md) | 現在のEvidence境界と昇格条件 |
 | [MCP統合](mcp-integration.md) | MCP Tool Call経路とEvidence要件 |
 | [導入・運用・復旧](install-operations-recovery.md) | 導入、停止、復旧、削除 |
 | [セキュリティ・統合・API境界](security-integration-api.md) | 信頼境界と統合側の責務 |
 | [検証・リリース・既知制約・UAT](verification-release-uat.md) | 検証根拠、制約、受入試験 |
-| [日本語ドキュメント執筆基準](writing-standard.md) | 日本語README、製品ページ、デモUIの表記基準 |
 | [English product documentation](../en/README.md) | 英語版ドキュメント |
+
+Release candidate、migration、pre-public audit等は[`release-history/`](../../release-history/README.md)へ履歴Evidenceとして分離しています。執筆基準は`.github/authoring/`のrepository authoring controlであり、current product documentationではありません。
