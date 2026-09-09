@@ -76,3 +76,17 @@ def test_retired_doc_paths_are_not_reintroduced_by_alternate_current_surfaces() 
             if target in text:
                 findings.append(f"{relative} -> {target}")
     assert not findings, "retired current-surface references: " + "; ".join(findings)
+
+
+def test_repository_metadata_files_do_not_regress_current_release_identity() -> None:
+    status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
+    published = status["version"]
+
+    release_manifest = json.loads((ROOT / "release-manifest.json").read_text(encoding="utf-8"))
+    assert release_manifest["version"] == published
+
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert f'version = "{published}"' in pyproject
+
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert f"## [{published}]" in changelog
