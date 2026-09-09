@@ -147,6 +147,6 @@ RPRは、任意のMCP Server、Client、route receiverが信頼できる／autho
 関連文書:
 
 - [製品範囲と構成](product-scope-architecture.md)
-- [Responsibility Routing migration](responsibility-routing-migration.md)
+- [Support / maturity](support-maturity.md)
 - [セキュリティ・統合・API境界](security-integration-api.md)
 - [検証・Release・既知制約・UAT](verification-release-uat.md)
