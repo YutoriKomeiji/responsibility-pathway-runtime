@@ -24,13 +24,14 @@ The documentation explains tested behavior and integration responsibilities; it 
 |---|---|
 | [Quick Start](quick-start.md) | Install the current PyPI public alpha and run a low-impact local rehearsal |
 | [Product scope and architecture](product-scope-architecture.md) | Understand what RPR does, does not do, and where it sits |
-| [Responsibility Routing migration](responsibility-routing-migration.md) | Understand the additive routing model and compatibility boundary published in `0.1.0a6` |
 | [Support and maturity](support-maturity.md) | See per-surface maturity and evidence boundaries |
 | [Claim Boundary Promotion](claim-boundary-promotion.md) | Review evidence-limited and permanent responsibility boundaries |
 | [MCP integration](mcp-integration.md) | Understand the current outbound MCP tool-call and read-only inspection boundaries |
 | [Installation, operation, and recovery](install-operations-recovery.md) | Prepare, operate, stop, restore, and remove an integration |
 | [Security, integration, and API boundary](security-integration-api.md) | Define trust boundaries and host-application obligations |
 | [Verification, release notes, known issues, and UAT](verification-release-uat.md) | Review evidence, limitations, and a minimum acceptance plan |
+
+Release-candidate, migration, and pre-public audit records are preserved separately under [`release-history/`](../../release-history/README.md). They are historical evidence, not current product guidance.
 
 ## Responsibility Routing boundary
 
