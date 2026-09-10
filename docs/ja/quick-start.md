@@ -12,7 +12,7 @@ Body Language: Japanese
 
 RPRは[`MIT License`](../../LICENSE)に基づき、無保証で提供されます。まず使い捨て可能で影響のない環境で試験し、利用環境への適合性は利用者自身で判断してください。
 
-GitHub Prerelease / sourceとPyPI packageは、Public Alpha `0.1.0a6` で揃っています。
+PyPI `0.1.0a6` とGitHub tag `v0.1.0a6` が、対応するPublic Alpha公開artifactです。Repository `main` はその後も開発が継続しており、PyPI packageにはまだ含まれていない変更を含む場合があります。
 
 - [PyPI 0.1.0a6](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/)
 - [GitHub Prerelease v0.1.0a6](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6)
@@ -47,7 +47,7 @@ rpr --help
 rpr-mcp --help
 ```
 
-対応するGitHub `v0.1.0a6` prereleaseのsource確認や開発を行う場合は、公開リポジトリを別途取得します。
+対応するGitHub `v0.1.0a6` release artifactのsource確認や開発を行う場合は、公開リポジトリを別途取得します。
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
@@ -55,6 +55,8 @@ cd responsibility-pathway-runtime
 git checkout v0.1.0a6
 python -m pip install -e .
 ```
+
+Repository `main` を確認・利用する場合は、exact commit SHAを記録し、その挙動やdocumentationがすでにPyPI `0.1.0a6`へ含まれているとはみなさないでください。
 
 Windows UTF-8 BOM修復は`0.1.0a6`に含まれ、再現された環境・入力経路について検証済みです。Responsibility Routingとread-only `rpr.get_route_visibility`も`0.1.0a6`に含まれます。このEvidenceは、すべてのWindows環境やcustomer environmentの一般保証を意味しません。
 
