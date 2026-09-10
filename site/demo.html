@@ -23,6 +23,7 @@
         <p class="lead">APIへ書き込んだ直後に通信が切れ、成功したか分からなくなった。そんな場面で、すぐ再送せず、状態と責任経路を保存し、再起動後に外部の結果を確かめる流れを体験できます。</p>
         <p>このデモでは、GitHub ActionsでRPRのソースから生成したwheelをPyodideへ読み込みます。RPR本体、SQLite、実行履歴、証拠チェーン、照合処理に加え、読み取り専用MCPの<code>rpr.get_route_visibility</code>で現在のResponsibility Routeも実際に確認します。</p>
         <div class="notice"><strong>安全に試すための境界:</strong> 外部の決済サービスだけをテスト用の処理へ置き換えています。実際のAPI、認証情報、利用者データは扱いません。Route表示はAuthorityを生成せず、承認・実行・照合・再開を行う権限にもなりません。</div>
+        <div class="notice"><strong>デモの取得元:</strong> このブラウザデモは、現在のrepository sourceからCIでbuildしたwheelを実行します。PyPI <code>0.1.0a6</code>公開後の開発変更を含む場合があります。公開版そのものを確認する場合は、PyPI <code>0.1.0a6</code>またはGitHub tag <code>v0.1.0a6</code>を使用してください。</div>
         <div class="actions"><button class="button primary" id="load-runtime" type="button">RPRを読み込む</button><button class="button secondary" id="run-all" type="button" disabled>デモをまとめて実行</button><button class="button secondary" id="reset" type="button" disabled>最初からやり直す</button></div>
       </div>
       <aside class="status-card" aria-live="polite">
