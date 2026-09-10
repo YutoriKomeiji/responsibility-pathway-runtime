@@ -241,4 +241,4 @@ Historical candidate, migration, and pre-public audit records are retained under
 
 ## License
 
-RPR is released under the [MIT License](LICENSE). Copyright © 2026 Akihisa Ono.
+RPR is released under the MIT License. Copyright © 2026 Akihisa Ono.
