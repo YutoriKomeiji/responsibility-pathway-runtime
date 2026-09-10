@@ -23,6 +23,7 @@
         <p class="lead">An API call is accepted, but the response disappears. Instead of retrying blindly, RPR persists the uncertainty, preserves the responsibility path, and reconciles the external state after restart.</p>
         <p>This demo loads a CI-built RPR wheel into Pyodide. The RPR runtime, SQLite persistence, attempt history, evidence chain, reconciliation flow, and read-only <code>rpr.get_route_visibility</code> MCP inspection are real.</p>
         <div class="notice"><strong>Demo boundary:</strong> only the external payment provider is simulated. No real API, credentials, payments, or user data are used. Route visibility does not create Authority and does not authorize approval, execution, reconciliation, or resume.</div>
+        <div class="notice"><strong>Demo source:</strong> this browser demo runs a CI-built wheel from the current repository source. It may include development changes made after the published PyPI <code>0.1.0a6</code> release. To inspect the exact published artifact, use PyPI <code>0.1.0a6</code> or GitHub tag <code>v0.1.0a6</code>.</div>
         <div class="actions"><button class="button primary" id="load-runtime" type="button">Load RPR</button><button class="button secondary" id="run-all" type="button" disabled>Run full demo</button><button class="button secondary" id="reset" type="button" disabled>Reset</button></div>
       </div>
       <aside class="status-card" aria-live="polite">
