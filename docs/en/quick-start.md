@@ -12,7 +12,7 @@ Body Language: English
 
 RPR is provided under the [MIT License](../../LICENSE), without warranty. Begin with a disposable, non-consequential rehearsal and decide independently whether the software is suitable for your environment.
 
-GitHub prerelease/source and the PyPI package are aligned at public-alpha `0.1.0a6`.
+PyPI `0.1.0a6` and GitHub tag `v0.1.0a6` are the aligned public-alpha release artifacts. Repository `main` continues development and may contain later changes that are not part of the PyPI package.
 
 - [PyPI package — 0.1.0a6](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/)
 - [GitHub Prerelease — v0.1.0a6](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6)
@@ -47,7 +47,7 @@ rpr --help
 rpr-mcp --help
 ```
 
-For source inspection or development against the matching GitHub prerelease:
+For source inspection or development against the matching GitHub release artifact:
 
 ```bash
 git clone https://github.com/YutoriKomeiji/responsibility-pathway-runtime.git
@@ -55,6 +55,8 @@ cd responsibility-pathway-runtime
 git checkout v0.1.0a6
 python -m pip install -e .
 ```
+
+If you instead inspect or develop against repository `main`, record the exact commit SHA and do not assume that its behavior or documentation is already part of the published PyPI `0.1.0a6` package.
 
 The Windows UTF-8 BOM repair is included in `0.1.0a6` and is verified for the reproduced environment and input path. Responsibility Routing and read-only `rpr.get_route_visibility` are also included in `0.1.0a6`. That evidence does not imply universal Windows or customer-environment verification.
 
