@@ -113,6 +113,8 @@ The distinction is the responsibility state that RPR keeps explicit around conse
 
 Equivalent behavior can be composed from workflow engines, queues, retry libraries, databases, and application-specific code. RPR's narrower claim is to provide a reference runtime and contract that keeps these authority/effect/recovery distinctions connected instead of leaving each integration to invent them independently.
 
+If a host platform or an existing application-specific design already preserves the same responsibility contract across ambiguous effects, readback, repair/resume, routing, and restart boundaries, adding RPR may provide little or no additional value. That is a valid falsification result for a proposed integration, not a failure condition that the project tries to redefine away.
+
 ### Framework-neutral integration evidence
 
 RPR keeps its responsibility boundary separate from surrounding agent/workflow frameworks. The core package does not require LangGraph, OpenAI Agents SDK, or Temporal as runtime dependencies.
