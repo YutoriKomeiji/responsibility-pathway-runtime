@@ -81,6 +81,14 @@ The distinction is the responsibility state that RPR keeps explicit around conse
 
 Equivalent behavior can be composed from workflow engines, queues, retry libraries, databases, and application-specific code. RPR's narrower claim is to provide a reference runtime and contract that keeps these authority/effect/recovery distinctions connected instead of leaving each integration to invent them independently.
 
+### Framework-neutral integration evidence
+
+RPR keeps its responsibility boundary separate from surrounding agent/workflow frameworks. The core package does not require LangGraph, OpenAI Agents SDK, or Temporal as runtime dependencies.
+
+Repository compatibility tests currently exercise the same ambiguous external-write invariant through plain Python, a real LangGraph `StateGraph`, a real OpenAI Agents SDK `FunctionTool`, and Temporal Python SDK's `ActivityEnvironment`. In each bounded probe, a lost response remains `write_status_unknown`, and repeating the same call identity does not blindly redispatch the external action.
+
+This is bounded compatibility evidence, not a claim that every feature, deployment mode, or failure semantics of those frameworks is covered. Temporal is currently tested at the SDK activity boundary, not through a full Temporal service/worker end-to-end deployment.
+
 ## What is available now
 
 Published `0.1.0a6` includes:
