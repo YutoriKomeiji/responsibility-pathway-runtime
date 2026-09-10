@@ -4,13 +4,31 @@
 
 **Keep uncertain external effects explicit until you can verify what actually happened.**
 
-Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for AI agents and automation that perform consequential external actions. It preserves execution history, authority declarations, independent readback, repair and resume boundaries, and Responsibility Routing across failures and restarts. Human Return is one bounded route, not the generic meaning of fail-closed behavior.
+Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for AI agents and automation that perform consequential external actions. It preserves execution history, authority declarations, independent readback, repair and resume boundaries, and Responsibility Routing across failures and restarts.
+
+RPR is not a workflow engine or generic retry framework. It focuses on keeping responsibility state explicit when an external effect is uncertain, so recovery logic does not silently turn ambiguity into success, failure, retry permission, or an unjustified human escalation.
 
 ## Why use RPR?
 
 An API call can fail after the external system has already changed. If the caller treats that as a clean failure and retries, it can create a duplicate payment, message, deployment, record update, or other side effect.
 
-RPR keeps that uncertainty visible instead of silently converting it into success, failure, another dispatch, or an unjustified human escalation.
+For example:
+
+```text
+An agent dispatches a consequential write.
+The connection drops before the response is confirmed.
+
+Did the write fail?
+Did it succeed?
+Is retrying safe?
+
+RPR does not guess.
+It keeps the attempt unresolved, preserves the same responsibility pathway,
+and requires explicit readback, reconciliation, repair, resume, hold,
+or bounded Human Return according to the configured route.
+```
+
+Human Return is one bounded Responsibility Route, not the generic meaning of fail-closed behavior.
 
 RPR can:
 
@@ -37,7 +55,9 @@ rpr-mcp --help
 
 [PyPI — 0.1.0a6](https://pypi.org/project/responsibility-pathway-runtime/0.1.0a6/) · [GitHub Prerelease — v0.1.0a6](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/releases/tag/v0.1.0a6) · [Product site](https://yutorikomeiji.github.io/responsibility-pathway-runtime/) · [Live browser demo](https://yutorikomeiji.github.io/responsibility-pathway-runtime/demo.html) · [日本語](docs/ja/README.md) · [Report an issue](https://github.com/YutoriKomeiji/responsibility-pathway-runtime/issues)
 
-`0.1.0a6` is still an evolving 0.x Public Alpha, but the documented published surfaces can be tried and integrated within their stated boundaries. Repository `main` may contain later source work that is not part of the published package until a later release passes exact-head validation and Human Gate.
+> **Release vs. current source:** PyPI `0.1.0a6` and GitHub tag `v0.1.0a6` are the last published, release-validated artifacts. Repository `main` continues development and may contain later changes that are not part of the PyPI package until a later release passes its own exact-head validation and Human Gate.
+
+`0.1.0a6` is still an evolving 0.x Public Alpha, but the documented published surfaces can be tried and integrated within their stated boundaries.
 
 ### Responsibility Routing in `0.1.0a6`
 
