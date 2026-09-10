@@ -40,6 +40,18 @@ RPR can:
 - represent Responsibility Routing without treating evidence transfer or receiver capability as Authority transfer;
 - avoid silently repeating unresolved effects after a crash.
 
+### When is this actually useful?
+
+RPR is not needed for every agent action. It is most useful when an external action is consequential, may become ambiguous after dispatch, and cannot be safely retried before establishing what happened.
+
+Typical cases include payments, messages, deployments, record updates, and outbound tool calls where a timeout or process crash may happen after the external system has already changed. Read-only work, safely repeatable work, or operations with stronger system-native guarantees may not need RPR.
+
+The expected improvement is deliberately narrow: RPR targets specific failure paths such as blind retry after an ambiguous write, loss of unresolved state across restart, separation of approval from execution history, or unnecessary Human Return. It does not claim a universal percentage improvement in agent safety or reliability.
+
+A counterintuitive effect is that stricter responsibility boundaries can sometimes reduce unnecessary human escalation. By distinguishing reconciliation hold, neutral hold, and bounded Human Return, RPR can preserve machine-processable work until a real human-held decision or Authority is required.
+
+For deeper objections and boundaries, see the [Technical FAQ and common objections](docs/en/technical-faq.md).
+
 ## Quick Start
 
 Current published line: `0.1.0a6`.
@@ -205,6 +217,7 @@ Version age alone does not promote a claim. Promotion requires scoped evidence a
 ## Documentation
 
 - [Quick Start](docs/en/quick-start.md)
+- [Technical FAQ and common objections](docs/en/technical-faq.md)
 - [Product, scope, and architecture](docs/en/product-scope-architecture.md)
 - [Support and maturity by surface](docs/en/support-maturity.md)
 - [Claim boundary promotion](docs/en/claim-boundary-promotion.md)
