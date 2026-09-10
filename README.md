@@ -141,6 +141,10 @@ Published `0.1.0a6` includes:
 - Chromium/Pyodide execution of the CI-built wheel;
 - Windows UTF-8 BOM compatibility repair reproduced on the originally failing path.
 
+### Why Lean 4?
+
+RPR uses Lean 4 as a second evidence layer for selected state-transition invariants: executable tests show how the implementation behaves, while Lean checks whether specific encoded invariants actually follow from the formal model. The plan is to expand formal coverage only where the model and assumptions are stable enough to make the proof meaningful; kernel acceptance is not treated as proof of real-world correctness, receiver eligibility, organizational Authority, or the entire runtime.
+
 ## MCP support
 
 ### Governed outbound MCP calls
