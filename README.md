@@ -8,7 +8,7 @@ Responsibility Pathway Runtime (RPR) is an MIT-licensed Python runtime for AI ag
 
 RPR is not a workflow engine or generic retry framework. It focuses on keeping responsibility state explicit when an external effect is uncertain, so recovery logic does not silently turn ambiguity into success, failure, retry permission, or an unjustified human escalation.
 
-RPR is intentionally the **smallest executable runtime slice** of the broader Responsibility Pathway work. The broader work also studies design, engineering, and operating-layer concerns; this repository does not claim to implement that entire stack. The narrow runtime slice is being exposed first because it can be tested, falsified, and compared against concrete execution boundaries without requiring adoption of the larger architecture.
+RPR is intentionally the **smallest executable runtime slice** of the broader Responsibility Pathway work. The broader work also studies design, engineering, and operating-layer concerns; this repository does not claim to implement that entire stack. The narrow runtime slice is exposed first because it can be tested, falsified, and compared against concrete execution boundaries without requiring adoption of the larger architecture.
 
 ## Why use RPR?
 
@@ -113,7 +113,7 @@ The distinction is the responsibility state that RPR keeps explicit around conse
 
 Equivalent behavior can be composed from workflow engines, queues, retry libraries, databases, and application-specific code. RPR's narrower claim is to provide a reference runtime and contract that keeps these authority/effect/recovery distinctions connected instead of leaving each integration to invent them independently.
 
-If a host platform or an existing application-specific design already preserves the same responsibility contract across ambiguous effects, readback, repair/resume, routing, and restart boundaries, adding RPR may provide little or no additional value. That is a valid falsification result for a proposed integration, not a failure condition that the project tries to redefine away.
+If a host platform or an existing application-specific design already preserves the same responsibility contract across ambiguous effects, readback, repair/resume, routing, and restart boundaries, adding RPR may provide little or no additional value. That is a valid falsification result for a proposed integration, not something this project treats as evidence in RPR's favor.
 
 ### Framework-neutral integration evidence
 
