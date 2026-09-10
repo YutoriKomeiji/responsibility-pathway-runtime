@@ -1,0 +1,41 @@
+name: Cross-runtime responsibility boundary
+
+on:
+  pull_request:
+    paths:
+      - "src/rpr/agent_adapters.py"
+      - "tests/integration/test_cross_runtime_responsibility_boundary.py"
+      - ".github/workflows/cross-runtime-e2e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cross-runtime-e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cross-runtime-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install RPR and integration dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pytest langgraph openai-agents
+      - name: Record resolved framework versions
+        run: |
+          python - <<'PY'
+          from importlib.metadata import version
+          for package in ("responsibility-pathway-runtime", "langgraph", "openai-agents"):
+              print(f"{package}={version(package)}")
+          PY
+      - name: Run cross-runtime responsibility-boundary tests
+        run: |
+          pytest -q tests/integration/test_cross_runtime_responsibility_boundary.py
