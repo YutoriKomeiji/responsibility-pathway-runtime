@@ -22,7 +22,7 @@ ACTIVE_DOC_BASENAMES = (
     "README.md", "claim-boundary-promotion.md", "eu-ai-act-article-50.md",
     "install-operations-recovery.md", "mcp-integration.md", "product-governance.md",
     "product-scope-architecture.md", "quick-start.md", "security-integration-api.md",
-    "support-maturity.md", "verification-release-uat.md",
+    "support-maturity.md", "verification-release-uat.md", "release-version-coherence.md",
 )
 
 REQUIRED_PATHS = (
@@ -140,7 +140,7 @@ def validate_active_doc_inventory() -> int:
     return errors
 
 
-def validate_status_files() -> tuple[int, str | None]:
+def validate_status_files() -> tuple[int, str | None, str | None]:
     errors = 0
     release = json.loads((ROOT / "release-manifest.json").read_text(encoding="utf-8"))
     status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
@@ -195,11 +195,12 @@ def validate_status_files() -> tuple[int, str | None]:
         fail("status and release freeze IDs differ / statusとreleaseのfreeze ID不一致")
         errors += 1
 
-    return errors, published_version
+    active_version = current_version if isinstance(current_version, str) and current_version else None
+    return errors, active_version, published_version
 
 
-def validate_user_current_surfaces(published_version: str | None) -> int:
-    if not published_version:
+def validate_user_current_surfaces(active_version: str | None, published_version: str | None) -> int:
+    if not active_version or not published_version:
         return 0
     errors = 0
     for relative in USER_CURRENT_SURFACES:
@@ -211,8 +212,8 @@ def validate_user_current_surfaces(published_version: str | None) -> int:
 
         if relative.startswith("docs/"):
             header = re.search(r"(?m)^Version:\s*([^\s]+)\s*$", text)
-            if header and header.group(1) != published_version:
-                fail(f"active doc product Version mismatch / active doc Version不一致: {relative}={header.group(1)} expected={published_version}")
+            if header and header.group(1) != active_version:
+                fail(f"active doc product Version mismatch / active doc Version不一致: {relative}={header.group(1)} expected={active_version}")
                 errors += 1
 
         for line_number, line in enumerate(text.splitlines(), start=1):
@@ -318,12 +319,13 @@ def main() -> int:
             errors += 1
     errors += validate_active_doc_inventory()
 
+    active_version = None
     published_version = None
     if not errors:
         try:
-            status_errors, published_version = validate_status_files()
+            status_errors, active_version, published_version = validate_status_files()
             errors += status_errors
-            errors += validate_user_current_surfaces(published_version)
+            errors += validate_user_current_surfaces(active_version, published_version)
             errors += validate_current_control_specs(published_version)
             errors += validate_bilingual_and_routing()
             errors += validate_historical_and_authoring_boundaries()

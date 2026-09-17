@@ -30,6 +30,47 @@ ALTERNATE_CURRENT_SURFACES = (
     ".github/ISSUE_TEMPLATE/integration-request.yml",
 )
 
+# Release preparation is future-version-first: once pyproject.toml is moved to
+# the next candidate version, every active/current-facing version-bearing
+# surface must move with it before GitHub/PyPI publication.
+ACTIVE_VERSION_SURFACES = (
+    "README.md",
+    "README_PYPI.md",
+    "docs/en/README.md",
+    "docs/ja/README.md",
+    "docs/en/verification-release-uat.md",
+    "docs/ja/verification-release-uat.md",
+    "site/index.html",
+    "site/ja.html",
+)
+
+
+def test_active_version_bearing_surfaces_match_project_release_identity() -> None:
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject, flags=re.MULTILINE)
+    assert match, "pyproject.toml project version not found"
+    project_version = match.group(1)
+
+    status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
+    candidate = status.get("candidate")
+    if isinstance(candidate, dict) and candidate.get("state") in {"release-candidate", "release-approved"}:
+        assert candidate.get("version") == project_version
+    else:
+        assert status["version"] == project_version
+
+    findings: list[str] = []
+    for relative in ACTIVE_VERSION_SURFACES:
+        path = ROOT / relative
+        assert path.is_file(), f"missing active version surface: {relative}"
+        text = path.read_text(encoding="utf-8")
+        if project_version not in text:
+            findings.append(relative)
+
+    assert not findings, (
+        "release identity drift: active/current-facing version-bearing surfaces "
+        f"must move to {project_version} before external publication: {findings}"
+    )
+
 
 def test_alternate_current_surfaces_do_not_claim_a_superseded_published_version() -> None:
     status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
