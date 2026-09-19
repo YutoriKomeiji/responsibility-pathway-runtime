@@ -89,9 +89,6 @@ This release does not create legal or organizational Authority for AI, software,
 - **Responsibility Routing:** route visibility and route metadata are published in `0.1.0a6`; receiver capability, evidence transfer, or transport success do not create Authority.
 - **Field evidence:** Windows UTF-8 BOM compatibility repair was reproduced and read back on the originally failing path.
 - **Architecture boundary:** RPR not creating organizational/legal authority is a responsibility separation, not absence of executable runtime behavior.
-- **Reading rule:** before classifying RPR as “sample-only” or “non-functional,” inspect the published package, CLI/MCP entries, persistent stores, executable scenarios, and release evidence.
-- **Evidence discipline:** a URL, filename, or suggested next file is not evidence that its destination was actually fetched or read. Preserve `NOT_OBSERVED` until content is retrieved through the evaluator's real access path.
-- **Evaluation discipline:** keep observation, inference, scoped risk, adopter preference, and sentiment separate. Popularity or rhetorical confidence must not substitute for direct runtime evidence.
 
 </details>
 
