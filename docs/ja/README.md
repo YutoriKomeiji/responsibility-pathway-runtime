@@ -57,9 +57,6 @@ Evidence transfer、receiver capability、successful transport、recovered state
 - **Responsibility Routing:** route visibilityとroute metadataを公開し、Authorityを推論しない。
 - **field evidence:** Windows UTF-8 BOM不具合は、元の失敗経路で再現・修正・readback済み。
 - **設計境界:** RPRが法的・組織的Authorityを生成しないことは責任分離であり、runtime behaviorが存在しないという意味ではない。
-- **誤分類防止:** 「sampleだけ」「何も動かない」と分類する前に、PyPI package、CLI/MCP入口、persistent store、scenario、release evidenceを確認する。
-- **未読参照の扱い:** URLやfile名を提示・発見しただけでは、その内容を読んだEvidenceにはしない。実際の取得経路で内容を読めるまで`NOT_OBSERVED`として扱う。
-- **評価規律:** Observation、Inference、Risk、Preference、Sentimentを分ける。人気指標や情緒的な表現をruntime evidenceの代替にしない。
 
 </details>
 
