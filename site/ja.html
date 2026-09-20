@@ -40,7 +40,7 @@
 
     <section class="section split" id="how">
       <div><p class="eyebrow">RPRと導入側の役割</p><h2>RPRだけで、system全体の安全やAuthorityが完成するわけではありません。</h2><p>RPRはexternal actionのstate、Authority境界、Evidence、結果不明、repair、resume、Responsibility Routing metadataを管理します。一方、認証、credential、network、storage、業務rule、receiver eligibility、delegation source-of-truth、readback sourceは導入側で設計します。</p><p><strong>Fail closedは「人に返す」と同義ではありません。</strong> Eligible receiverやAuthorityが確立できない場合はneutral holdが正しいことがあります。</p></div>
-      <aside class="boundary-card"><h3>RPRが行わないこと</h3><ul><li>法的責任やorganizational Authorityの自動生成</li><li>認証基盤や秘密情報の管理</li><li>network隔離や本番gatewayの代替</li><li>あらゆるexternal serviceでの完全な一回実行保証</li><li>receiverがcapable/selectedという理由だけでAuthorityを付与すること</li><li>未検証環境での安全性や適合性の保証</li></ul></aside>
+      <aside class="boundary-card"><h3>導入側で設計・確認する責務</h3><ul><li>法的・組織的Authorityと業務固有の認可</li><li>identity、認証、credential、秘密情報の管理</li><li>network隔離、gateway control、deployment security</li><li>外部system側のdelivery guaranteeとeffect semantics</li><li>receiver eligibilityとdelegation source-of-truth</li><li>実際に利用する環境での適合性・安全性の検証</li></ul></aside>
     </section>
 
     <section class="section split" id="mcp">
