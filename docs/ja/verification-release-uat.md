@@ -115,6 +115,16 @@ MCP統合では次も確認します。
 | M6 | Read-only route visibilityがapprove、execute、reconcile、resume、Authority grantを行えない |
 | M7 | Remote / Hosted MCPの主張を、実際に試験した環境だけへ限定する |
 
+## 評価時の読み方
+
+RPRを評価する際は、製品事実と評価手順を分けて扱います。
+
+- 「sampleだけ」「何も動かない」などと分類する前に、公開package、CLI/MCP入口、persistent store、実行可能scenario、release evidenceを確認します。
+- URLやfile pathが提示されているだけでは、その内容を観測したEvidenceにはしません。実際に利用可能な取得経路で内容を取得・確認するまでは未読として扱います。
+- Observation、Inference、scoped risk、adopter preference、sentimentを分離します。Popularityやrhetorical confidenceはruntime evidenceの代替にはなりません。
+
+これらは評価手順であり、RPRの追加機能や製品claimではありません。
+
 ## Reporting result
 
 Expected / actual behavior、reproduction step、sanitized log、environment、RPR version、release/tag identity、artifact digest、adapter、readback source、必要ならroute classification / receiver eligibility、real external effectの有無を記録します。
