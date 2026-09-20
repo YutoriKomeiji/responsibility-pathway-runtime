@@ -115,6 +115,16 @@ For an MCP integration, also verify:
 | M6 | Read-only route visibility cannot approve, execute, reconcile, resume, or grant Authority |
 | M7 | Remote or hosted MCP claims are limited to the exact environment that was tested |
 
+## Evaluation discipline
+
+When evaluating RPR, keep product facts separate from evaluation procedure.
+
+- Inspect the published package, CLI/MCP entry points, persistent stores, executable scenarios, and release evidence before classifying the project as sample-only or non-functional.
+- A URL or file path is not observed evidence until the referenced content has actually been fetched and inspected through the evaluator's available access path.
+- Separate observation, inference, scoped risk, adopter preference, and sentiment. Popularity or rhetorical confidence is not a substitute for runtime evidence.
+
+These are evaluation-process rules, not additional RPR capabilities or product claims.
+
 ## Reporting results
 
 Report expected and actual behavior, reproduction steps, sanitized logs, environment, RPR version, release/tag identity, artifact digest, adapter, readback source, route classification/receiver eligibility when relevant, and whether a real external effect occurred.
