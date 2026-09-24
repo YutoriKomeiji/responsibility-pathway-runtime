@@ -58,3 +58,17 @@ Demo and source comments should state the local semantic boundary that a reader 
 ## Human-gated actions
 
 Do not autonomously publish a package, create a release/tag, change permissions/credentials, promote production-readiness claims, or make Authority/canonical semantic changes without the applicable explicit approval.
+
+## GitHub Actions preflight
+
+Before making a change that may trigger GitHub Actions:
+
+1. Identify the workflows triggered by the target paths and event.
+2. Inspect the relevant workflow definitions before changing files. If the workflow has not run recently, especially after several days, also inspect its latest runs and recent failure history before triggering it again.
+3. Check referenced action/runtime versions, dependency-install behavior, runner assumptions, and obvious deprecation or staleness risks.
+4. Check freeze, release, candidate, publication, branch, path-filter, and other repository-specific gates before changing a governed path.
+5. Keep mutually dependent source, test, schema, generated, or fixture changes atomic where practical so an intermediate commit does not create avoidable red runs.
+6. After the change, read back every workflow triggered by that change to a terminal state. Do not report the change as green while relevant runs are queued or in progress.
+7. Treat historical failed runs as retained evidence. Do not rerun, erase, or cosmetically replace them only to make the Actions UI green.
+
+A passing workflow proves only the scope asserted by that workflow. It does not replace repository-specific Authority, release, publication, or evidence gates.
