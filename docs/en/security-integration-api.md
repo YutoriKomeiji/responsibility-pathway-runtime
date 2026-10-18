@@ -53,6 +53,22 @@ A missing evaluator, malformed contract, invalid route, ineligible receiver, or 
 
 Human Return remains valid when an explicitly configured bounded Human Gate is required. Evidence transfer, receiver capability, confidence, tool success, successful transport, recovered state, or route selection do not create Authority.
 
+## HTTP mutation redirect boundary
+
+The reference `HttpMutationExecutor` never follows HTTP redirects for
+state-changing requests, including redirects within an allow-listed origin.
+A 30x reply occurs after the first request may have reached the upstream
+service. It therefore returns a bounded `WRITE_STATUS_UNKNOWN` and requires
+independent readback or reconciliation; it does not attempt another write,
+forward the request's credentials or headers to an unapproved origin, or treat
+a 30x response as proof that no mutation occurred. Integration callers should
+configure the final canonical endpoint directly and avoid relying on redirect
+behavior in a mutation workflow.
+
+This is application-layer redirect containment, not a replacement for DNS
+rebinding defenses, SSRF egress policy, network segmentation, credential
+scoping, or a trusted reverse proxy.
+
 ## Host security controls
 
 RPR should be deployed inside an architecture that provides authenticated users and services, least-privilege credentials, network policy, endpoint and command allow-lists, protected persistence, log redaction, supply-chain controls, monitoring, and bypass prevention.

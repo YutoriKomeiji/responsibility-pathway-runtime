@@ -15,6 +15,11 @@ from rpr import ExecutionRequest, ExecutionStatus, HttpMutationExecutor, JsonFie
 
 class _FaultHandler(BaseHTTPRequestHandler):
     counters: dict[str, int] = {}
+    redirect_target: str = ""
+
+    def do_GET(self):  # noqa: N802
+        type(self).counters[self.path] = type(self).counters.get(self.path, 0) + 1
+        self._send_json(200, {"id": "unexpected-redirect"})
 
     def do_POST(self):  # noqa: N802
         type(self).counters[self.path] = type(self).counters.get(self.path, 0) + 1
@@ -23,6 +28,12 @@ class _FaultHandler(BaseHTTPRequestHandler):
 
         if self.path == "/ok":
             self._send_json(200, {"id": payload["id"]})
+            return
+        if self.path == "/redirect":
+            self.send_response(302)
+            self.send_header("Location", type(self).redirect_target)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
             return
         if self.path == "/server-error":
             self._send_json(503, {"error": "unavailable"})
@@ -71,6 +82,7 @@ class _FaultHandler(BaseHTTPRequestHandler):
 @pytest.fixture
 def fault_server():
     _FaultHandler.counters = {}
+    _FaultHandler.redirect_target = ""
     server = ThreadingHTTPServer(("127.0.0.1", 0), _FaultHandler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -160,3 +172,33 @@ def test_faults_never_become_false_success_or_automatic_replay(
     assert reason_fragment in (first.reason or "")
     assert replay == first
     assert _FaultHandler.counters[path] == 1
+
+
+def test_mutation_redirect_does_not_escape_allowlisted_origin(fault_server):
+    # Both servers are local test fixtures. The second server is deliberately
+    # not in the executor's allowed_origins set.
+    target = ThreadingHTTPServer(("127.0.0.1", 0), _FaultHandler)
+    thread = threading.Thread(target=target.serve_forever, daemon=True)
+    thread.start()
+    origin = f"http://127.0.0.1:{fault_server.server_port}"
+    _FaultHandler.redirect_target = f"http://127.0.0.1:{target.server_port}/unexpected"
+    try:
+        result = _executor(origin).execute(_request(origin, "/redirect", idem="redirect-cross-origin"))
+        assert result.status is ExecutionStatus.WRITE_STATUS_UNKNOWN, result
+        assert result.reason == "http_error_after_dispatch", result
+        assert _FaultHandler.counters["/redirect"] == 1
+        assert _FaultHandler.counters.get("/unexpected", 0) == 0, _FaultHandler.counters
+    finally:
+        target.shutdown()
+        target.server_close()
+        thread.join(timeout=2)
+
+
+def test_mutation_redirect_within_allowlisted_origin_still_requires_reconciliation(fault_server):
+    origin = f"http://127.0.0.1:{fault_server.server_port}"
+    _FaultHandler.redirect_target = f"{origin}/unexpected"
+    result = _executor(origin).execute(_request(origin, "/redirect", idem="redirect-same-origin"))
+    assert result.status is ExecutionStatus.WRITE_STATUS_UNKNOWN, result
+    assert _FaultHandler.counters["/redirect"] == 1
+    assert _FaultHandler.counters.get("/unexpected", 0) == 0, _FaultHandler.counters
+

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from .executor import ExecutionRequest, ExecutionResult, ExecutionStatus, ReadbackEvidence
 
@@ -40,6 +40,17 @@ class JsonFieldReadback:
             {"status_code": status_code, "field": self.response_field, "value": observed},
             None if verified else "readback_value_mismatch",
         )
+
+
+class _DenyMutationRedirects(HTTPRedirectHandler):
+    """Never relay a state-changing request or its headers to a redirect target.
+
+    A redirect response follows an already dispatched mutation: the remote
+    effect remains ambiguous until independently reconciled.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 class HttpMutationExecutor:
@@ -88,19 +99,24 @@ class HttpMutationExecutor:
                 if lower in {"host", "content-length", "transfer-encoding", "connection"}:
                     return ExecutionResult(ExecutionStatus.FAILED, reason=f"forbidden_header:{lower}")
                 headers[str(key)] = str(value)
-            response = urlopen(Request(url, data=payload, headers=headers, method=method), timeout=self.timeout_seconds)
-            body = response.read(self.max_response_bytes + 1)
-            if len(body) > self.max_response_bytes:
-                result = ExecutionResult(ExecutionStatus.WRITE_STATUS_UNKNOWN, reason="response_too_large")
-            else:
-                response_headers = {str(k): str(v) for k, v in response.headers.items()}
-                readback = self.readback.verify(request=request, status_code=response.status, headers=response_headers, body=body)
-                result = ExecutionResult(
-                    ExecutionStatus.SUCCEEDED if readback.verified else ExecutionStatus.WRITE_STATUS_UNKNOWN,
-                    {"status_code": response.status, "response_bytes": len(body)},
-                    readback,
-                    None if readback.verified else readback.reason,
-                )
+            # urllib's default opener can follow 30x redirects to a different
+            # origin without re-applying this executor's allow-list. Use a
+            # per-call non-redirecting opener; retain WRITE_STATUS_UNKNOWN for
+            # the first request because its external effect is not established.
+            opener = build_opener(_DenyMutationRedirects())
+            with opener.open(Request(url, data=payload, headers=headers, method=method), timeout=self.timeout_seconds) as response:
+                body = response.read(self.max_response_bytes + 1)
+                if len(body) > self.max_response_bytes:
+                    result = ExecutionResult(ExecutionStatus.WRITE_STATUS_UNKNOWN, reason="response_too_large")
+                else:
+                    response_headers = {str(k): str(v) for k, v in response.headers.items()}
+                    readback = self.readback.verify(request=request, status_code=response.status, headers=response_headers, body=body)
+                    result = ExecutionResult(
+                        ExecutionStatus.SUCCEEDED if readback.verified else ExecutionStatus.WRITE_STATUS_UNKNOWN,
+                        {"status_code": response.status, "response_bytes": len(body)},
+                        readback,
+                        None if readback.verified else readback.reason,
+                    )
         except HTTPError as exc:
             # A server response proves the request reached the endpoint, but not whether a mutation occurred.
             result = ExecutionResult(ExecutionStatus.WRITE_STATUS_UNKNOWN, {"status_code": exc.code}, reason="http_error_after_dispatch")
