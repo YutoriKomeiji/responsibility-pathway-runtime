@@ -52,6 +52,10 @@ The expected improvement is deliberately narrow: RPR targets specific failure pa
 
 A counterintuitive effect is that stricter responsibility boundaries can sometimes reduce unnecessary human escalation. By distinguishing reconciliation hold, neutral hold, and bounded Human Return, RPR can preserve machine-processable work until a real human-held decision or Authority is required.
 
+## Start with one working result
+
+New to this project? Follow the [first working result guide](docs/first-working-result.md) to install or try the relevant feature, understand what the example demonstrates, and find ways to fork, validate and extend it. No enterprise infrastructure is needed for the introductory path.
+
 ## Quick Start
 
 Current published line: `0.1.0a6`.
