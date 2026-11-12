@@ -97,7 +97,13 @@ def test_pypi_readme_tracks_current_published_package_and_routing_boundary() -> 
     published = status["version"]
     text = (ROOT / "README_PYPI.md").read_text(encoding="utf-8")
 
-    assert f"responsibility-pathway-runtime=={published}" in text
+    candidate = status.get("candidate")
+    package_identity = candidate["version"] if isinstance(candidate, dict) else published
+    assert f"responsibility-pathway-runtime=={package_identity}" in text
+    if isinstance(candidate, dict):
+        assert candidate["state"] in {"release-candidate", "release-approved"}
+        assert candidate["release_approved"] is False or candidate["state"] == "release-approved"
+        assert candidate["publication_blocked"] is True or candidate["state"] == "release-approved"
     assert "Responsibility Routing" in text
     assert "read-only route visibility" in text
     assert "do not create Authority" in text
@@ -123,10 +129,15 @@ def test_current_repository_metadata_tracks_current_published_identity() -> None
     status = json.loads((ROOT / "product-status.json").read_text(encoding="utf-8"))
     published = status["version"]
 
+    candidate = status.get("candidate")
+    expected = candidate["version"] if isinstance(candidate, dict) else published
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert f'version = "{published}"' in pyproject
-
+    assert f'version = "{expected}"' in pyproject
+    if isinstance(candidate, dict):
+        assert candidate["version"] != published
+        assert candidate["publication_blocked"] is True or candidate["state"] == "release-approved"
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert f"## [{expected}]" in changelog
     assert f"## [{published}]" in changelog
 
 
