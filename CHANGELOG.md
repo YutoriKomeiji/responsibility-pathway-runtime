@@ -8,6 +8,19 @@ Status: Published Public Alpha
 
 All notable changes to Responsibility Pathway Runtime are recorded here.
 
+## [0.1.0a7] - Unpublished release candidate
+
+### Current-source additions under evaluation
+- Test the same ambiguous external-effect boundary through plain Python, real LangGraph StateGraph, OpenAI Agents SDK FunctionTool, and Temporal SDK ActivityEnvironment integrations.
+- Strengthen regression checks so unresolved dispatch is not reported as allowed/success and same-call replay does not silently redispatch.
+- Improve reader-facing first-working-result instructions and current-source evidence/lifecycle separation.
+
+### Evidence limits and release gate
+- This is not a public release: PyPI and GitHub current release remain v0.1.0a6.
+- Cross-framework tests are bounded SDK/activity/node/function-tool probes, not a universal production-grade Temporal service/workflow deployment claim.
+- Security PR #56 (HTTP mutation redirect containment) requires independent review before final candidate freeze.
+- Require exact-head package, source tests, EN/JA/site/public-export/formal and real-browser evidence; no tag/release/PyPI without Human Gate.
+
 ## [0.1.0a6] - 2026-09-07
 
 ### Added
