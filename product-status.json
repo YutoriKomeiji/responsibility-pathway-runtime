@@ -11,7 +11,14 @@
   "release_approved": true,
   "publication_blocked": false,
   "blocker_issue": null,
-  "candidate": null,
+  "candidate": {
+    "version": "0.1.0a7",
+    "state": "release-candidate",
+    "release_approved": false,
+    "publication_blocked": true,
+    "source_line": "post-0.1.0a6 current main",
+    "evidence_state": "exact-head-validation-pending"
+  },
   "release_evidence": {
     "version": "0.1.0a6",
     "source_base": "0.1.0a5",
