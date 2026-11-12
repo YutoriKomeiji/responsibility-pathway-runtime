@@ -1,8 +1,8 @@
 # Responsibility Pathway Runtime
 
-## Public Alpha — 0.1.0a6
+## Public Alpha package identity — 0.1.0a7
 
-Package identity: `responsibility-pathway-runtime==0.1.0a6`.
+Package identity: `responsibility-pathway-runtime==0.1.0a7`.
 
 RPR is an MIT-licensed Python runtime for AI agents and automation that perform consequential external actions. It keeps authorization, execution attempts, uncertain external effects, reconciliation, repair/resume boundaries, and Responsibility Routing connected across failures and restarts.
 
@@ -21,7 +21,7 @@ Responsibility Routing treats Human Return as one bounded route rather than the 
 
 ### Verification scope
 
-The 0.1.0a6 candidate passed the complete standalone suite (477 tests), production-grade demo tests, clean wheel installation, CLI checks, Lean 4 / JSON / Python parity checks, reproducible artifact verification, and English/Japanese browser/Pyodide E2E checks before release authorization.
+The 0.1.0a7 distribution is to be evaluated against exact-head build, complete standalone and real-framework boundary tests, clean wheel installation, CLI checks, Lean 4 / JSON / Python parity, reproducible artifacts, and English/Japanese browser/Pyodide E2E. Test results must be tied to the exact release candidate source revision; prior-version counts are not evidence for this version.
 
 ### Boundaries
 
