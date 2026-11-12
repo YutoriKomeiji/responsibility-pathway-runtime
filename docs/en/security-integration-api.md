@@ -2,7 +2,7 @@
 Document Title: RPR Security Integration and API Boundary
 Document Type: Public Product Guide
 Status: Public Alpha
-Version: 0.1.0a6
+Version: 0.1.0a7
 Freeze ID: RPR-CF-2026-08-02-01
 Header Language: English
 Body Language: English
