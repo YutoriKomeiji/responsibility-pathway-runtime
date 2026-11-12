@@ -79,6 +79,9 @@ def test_plain_python_boundary_preserves_unknown_without_blind_redispatch():
 
     assert first.state == PathwayState.WRITE_STATUS_UNKNOWN.value
     assert second.state == PathwayState.WRITE_STATUS_UNKNOWN.value
+    # A retained unknown effect must not be reported as permission or success.
+    assert first.allowed is False
+    assert second.allowed is False
     assert_unknown_is_preserved(runtime, executor, pathway_id)
 
 
@@ -108,6 +111,8 @@ def test_real_langgraph_stategraph_preserves_same_rpr_boundary():
 
     assert first["rpr"]["state"] == PathwayState.WRITE_STATUS_UNKNOWN.value
     assert second["rpr"]["state"] == PathwayState.WRITE_STATUS_UNKNOWN.value
+    assert first["rpr"]["allowed"] is False
+    assert second["rpr"]["allowed"] is False
     assert_unknown_is_preserved(runtime, executor, pathway_id)
 
 
