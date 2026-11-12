@@ -60,7 +60,9 @@ New to this project? Follow the [first working result guide](docs/first-working-
 
 The PyPI command below intentionally installs the **latest published** version (`0.1.0a6`). The a7 version is an **unpublished candidate** and must not be described as available on PyPI.
 
-Current published line: `0.1.0a6`. **Unpublished source candidate: `0.1.0a7`**; install the candidate from its exact GitHub branch/source checkout after validation, not from PyPI.
+Current published line: `0.1.0a6`.
+
+**Unpublished source candidate: `0.1.0a7`**. Install a7 from its exact GitHub branch/source checkout after validation, not from PyPI.
 
 ```bash
 python3.11 -m venv .venv
